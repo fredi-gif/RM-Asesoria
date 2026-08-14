@@ -1,0 +1,45 @@
+---
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import { whatsapp } from '../../lib/config';
+
+/**
+ * Punto ÚNICO de conversión de la web.
+ *
+ * Hoy abre WhatsApp con un mensaje prellenado. Cuando llegue el formulario de
+ * captación inteligente por trámite, se cambia el `href` de este componente por
+ * la ruta del formulario y toda la web queda migrada de una vez.
+ */
+interface Props {
+  /** Mensaje prellenado. Debe ser específico del trámite. */
+  mensaje?: string;
+  label?: string;
+  variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  fullWidth?: boolean;
+  class?: string;
+}
+
+const {
+  mensaje,
+  label = 'Empezar por WhatsApp',
+  variant = 'primary',
+  size = 'lg',
+  fullWidth = false,
+  class: className,
+} = Astro.props;
+---
+
+<Button
+  href={whatsapp(mensaje)}
+  variant={variant}
+  size={size}
+  fullWidth={fullWidth}
+  class={className}
+  target="_blank"
+  rel="noopener"
+  data-cta="whatsapp"
+>
+  <Icon name="whatsapp" size={size === 'sm' ? 16 : 20} />
+  {label}
+</Button>

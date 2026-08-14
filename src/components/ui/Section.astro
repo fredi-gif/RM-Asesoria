@@ -1,0 +1,38 @@
+---
+type Tone = 'white' | 'alt' | 'brand-soft' | 'brand-dark';
+type Spacing = 'none' | 'tight' | 'normal';
+
+interface Props {
+  class?: string;
+  id?: string;
+  /** Fondo de la sección. Alternar `alt` da ritmo vertical sin usar bordes. */
+  tone?: Tone;
+  /** `tight` para bloques secundarios, `none` cuando el hijo controla el padding. */
+  spacing?: Spacing;
+  as?: 'section' | 'div' | 'footer';
+}
+
+const { class: className, id, as: Tag = 'section' } = Astro.props;
+
+// Anotados uno a uno: el `<Tag>` dinámico impide a Astro inferir Props, y sin
+// el tipo explícito la indexación de los mapas de abajo queda como `any`.
+const tone: Tone = Astro.props.tone ?? 'white';
+const spacing: Spacing = Astro.props.spacing ?? 'normal';
+
+const tones: Record<Tone, string> = {
+  white: 'bg-surface',
+  alt: 'bg-surface-alt',
+  'brand-soft': 'bg-brand-50',
+  'brand-dark': 'bg-brand-950 text-white',
+};
+
+const spacings: Record<Spacing, string> = {
+  none: '',
+  tight: 'py-12 lg:py-16',
+  normal: 'py-16 lg:py-24',
+};
+---
+
+<Tag id={id} class:list={[tones[tone], spacings[spacing], className]}>
+  <slot />
+</Tag>

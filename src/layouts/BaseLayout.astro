@@ -1,0 +1,96 @@
+---
+import '../styles/global.css';
+
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import JsonLd from '../components/seo/JsonLd.astro';
+import { empresa } from '../lib/config';
+import { LANG } from '../config/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Datos estructurados adicionales de la página (Service, FAQPage…). */
+  schema?: Record<string, unknown>[];
+  noindex?: boolean;
+  /** Deja hueco al final para la barra fija de móvil. */
+  stickyCta?: boolean;
+}
+
+const {
+  title,
+  description = empresa.description,
+  schema = [],
+  noindex = false,
+  stickyCta = false,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? empresa.url).href;
+const tituloCompleto = title.includes(empresa.name) ? title : `${title} | ${empresa.name}`;
+
+/**
+ * Organization + LocalBusiness van en todas las páginas: es lo que permite a
+ * Google asociar los datos de contacto y el nombre comercial con el dominio.
+ */
+const organizacion = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  '@id': `${empresa.url}/#organizacion`,
+  name: empresa.name,
+  legalName: empresa.legal.razonSocial,
+  description: empresa.description,
+  url: empresa.url,
+  email: empresa.email,
+  telephone: empresa.telefono,
+  taxID: empresa.legal.cif,
+  areaServed: { '@type': 'Country', name: 'España' },
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: empresa.legal.direccion,
+    addressCountry: 'ES',
+  },
+};
+---
+
+<!doctype html>
+<html lang={LANG}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={empresa.name} />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0a1f44" />
+
+    <JsonLd schema={organizacion} />
+    {schema.map((item) => <JsonLd schema={item} />)}
+  </head>
+
+  <body class:list={['min-h-dvh', stickyCta && 'pb-20 lg:pb-0']}>
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-999 focus:rounded-md focus:bg-brand-900 focus:px-4 focus:py-2 focus:text-white"
+    >
+      Saltar al contenido
+    </a>
+
+    <Header />
+    <main id="contenido">
+      <slot />
+    </main>
+    <Footer />
+    <slot name="after" />
+  </body>
+</html>

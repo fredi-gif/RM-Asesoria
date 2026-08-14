@@ -1,0 +1,195 @@
+---
+/**
+ * Ilustración de un trámite, para la tarjeta del listado.
+ *
+ * Comparte gramática con `DocIlustracion.astro` (mismo lenguaje plano y misma
+ * paleta) pero aquí son escenas, no documentos: representan la acción del
+ * trámite, no el papel que hay que aportar.
+ *
+ * Se indexan por el mismo nombre que el icono, así que el campo `icon` de
+ * Keystatic gobierna a la vez el icono pequeño (menú, footer) y esta
+ * ilustración. Añadir un trámite nuevo con un icono existente no requiere
+ * dibujar nada.
+ */
+export type TramiteIlustracionName = keyof typeof ILUSTRACIONES;
+
+const TINTA = 'var(--color-brand-900)';
+const MEDIO = 'var(--color-brand-600)';
+const SUAVE = 'var(--color-brand-100)';
+const PAPEL = 'var(--color-surface)';
+const ACENTO = 'var(--color-accent-500)';
+const ACENTO_SUAVE = 'var(--color-accent-50)';
+
+/** Halo de fondo común: da unidad al conjunto y evita el vacío en las esquinas. */
+const halo = `<circle cx="100" cy="62" r="45" fill="${SUAVE}" opacity=".5"/>`;
+
+/**
+ * Coche de perfil, centrado en x=100 con las ruedas a y=87.
+ * Se reutiliza en todos los trámites cuyo sujeto es el vehículo.
+ *
+ * Cabina y carrocería van del mismo tinte y solapadas: así se leen como una
+ * sola silueta. La ventanilla es lo único claro, y va encima. (La cabina en
+ * azul claro se confundía con el halo y el coche parecía un bloque liso.)
+ */
+const coche = `
+  <path d="M74 66V54a6 6 0 0 1 6-6h34a6 6 0 0 1 4.9 2.6L128 66Z" fill="${TINTA}"/>
+  <path d="M52 84V72a8 8 0 0 1 8-8h80a8 8 0 0 1 8 8v12a3 3 0 0 1-3 3H55a3 3 0 0 1-3-3Z" fill="${TINTA}"/>
+  <path d="M81 62V57a2 2 0 0 1 2-2h28a2 2 0 0 1 1.6.8L118 62Z" fill="${SUAVE}"/>
+  <circle cx="74" cy="87" r="9" fill="${TINTA}"/><circle cx="74" cy="87" r="3.5" fill="${PAPEL}"/>
+  <circle cx="126" cy="87" r="9" fill="${TINTA}"/><circle cx="126" cy="87" r="3.5" fill="${PAPEL}"/>
+`;
+
+/**
+ * Insignia circular naranja arriba a la derecha, para alta y baja.
+ *
+ * Las flechas van como constantes sueltas y no como argumento de una función
+ * que devuelva un literal: anidar plantillas dentro de otra plantilla rompe
+ * el analizador del frontmatter de Astro.
+ */
+const insigniaFondo = `<circle cx="146" cy="38" r="16" fill="${ACENTO}"/>`;
+const flechaArriba = `<path d="M146 46V30m-7 7l7-7 7 7" stroke="${PAPEL}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+const flechaAbajo = `<path d="M146 30v16m-7-7l7 7 7-7" stroke="${PAPEL}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+
+const ILUSTRACIONES = {
+  /** Transferencia: dos flechas de intercambio sobre el vehículo. */
+  traspaso: `
+    ${halo}
+    <path d="M74 22h48" stroke="${ACENTO}" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M115 16l7 6-7 6" stroke="${ACENTO}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M126 36H78" stroke="${MEDIO}" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M85 30l-7 6 7 6" stroke="${MEDIO}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    ${coche}
+  `,
+
+  /** Notificación de venta: sobre camino de la DGT con el aviso confirmado. */
+  firma: `
+    ${halo}
+    <rect x="52" y="38" width="96" height="64" rx="8" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="2.5"/>
+    <path d="M55 44l42 30a6 6 0 0 0 6 0l42-30" fill="none" stroke="${SUAVE}" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="140" cy="42" r="16" fill="${ACENTO}"/>
+    <path d="M133 42l5 5 9-10" stroke="${PAPEL}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  `,
+
+  /** Informe de DGT: historial del vehículo bajo la lupa. */
+  lupa: `
+    ${halo}
+    <rect x="56" y="20" width="72" height="86" rx="7" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="2.5"/>
+    <path d="M70 38h30" stroke="${TINTA}" stroke-width="4" stroke-linecap="round"/>
+    <path d="M70 52h44M70 64h44M70 76h28" stroke="${SUAVE}" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="126" cy="72" r="22" fill="${PAPEL}" fill-opacity=".85" stroke="${ACENTO}" stroke-width="4"/>
+    <path d="M142 88l12 12" stroke="${ACENTO}" stroke-width="5" stroke-linecap="round"/>
+  `,
+
+  /** Matriculación: la placa definitiva, recién asignada. */
+  matricula: `
+    ${halo}
+    <rect x="34" y="42" width="132" height="42" rx="6" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="2.5"/>
+    <path d="M40 42h16v42H40a6 6 0 0 1-6-6V48a6 6 0 0 1 6-6Z" fill="${TINTA}"/>
+    <circle cx="48" cy="58" r="5" fill="none" stroke="${ACENTO}" stroke-width="1.5"/>
+    <path d="M68 63h24M102 63h50" stroke="${TINTA}" stroke-width="9" stroke-linecap="round"/>
+    <path d="M150 26v10M164 34l-7 5M136 34l7 5" stroke="${ACENTO}" stroke-width="3.5" stroke-linecap="round"/>
+  `,
+
+  /** Alta: el vehículo vuelve a circular. */
+  alta: `
+    ${halo}
+    ${coche}
+    ${insigniaFondo}
+    ${flechaArriba}
+  `,
+
+  /** Baja: el vehículo se retira de circulación. */
+  baja: `
+    ${halo}
+    ${coche}
+    ${insigniaFondo}
+    ${flechaAbajo}
+  `,
+
+  /** Duplicado del permiso: una copia sale de la tarjeta original. */
+  duplicado: `
+    ${halo}
+    <rect x="34" y="26" width="98" height="58" rx="7" fill="${SUAVE}"/>
+    <rect x="60" y="42" width="98" height="58" rx="7" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="2.5"/>
+    <path d="M66 42h86a6 6 0 0 1 6 6v7H60v-7a6 6 0 0 1 6-6Z" fill="${TINTA}"/>
+    <rect x="70" y="64" width="26" height="24" rx="3" fill="var(--color-brand-50)"/>
+    <path d="M106 68h42M106 80h26" stroke="${SUAVE}" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="150" cy="86" r="11" fill="${ACENTO}"/>
+    <path d="M145 86h10M150 81v10" stroke="${PAPEL}" stroke-width="3" stroke-linecap="round"/>
+  `,
+
+  /** Duplicado de la ficha técnica: hoja de características por duplicado. */
+  documento: `
+    ${halo}
+    <rect x="42" y="18" width="76" height="86" rx="7" fill="${SUAVE}"/>
+    <rect x="66" y="28" width="76" height="86" rx="7" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="2.5"/>
+    <path d="M80 46h34" stroke="${TINTA}" stroke-width="4" stroke-linecap="round"/>
+    <path d="M80 60h48M80 72h48M80 84h30" stroke="${SUAVE}" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="130" cy="92" r="12" fill="${ACENTO}"/>
+    <path d="M124 92h12M130 86v12" stroke="${PAPEL}" stroke-width="3" stroke-linecap="round"/>
+  `,
+
+  /** Cambio de servicio: el vehículo estrena destino (cartel en el techo). */
+  ajustes: `
+    ${halo}
+    <rect x="86" y="31" width="30" height="16" rx="4" fill="${ACENTO}"/>
+    <path d="M93 39h16" stroke="${PAPEL}" stroke-width="3" stroke-linecap="round"/>
+    ${coche}
+    <circle cx="52" cy="42" r="16" fill="${MEDIO}"/>
+    <path d="M45 38h12m-4-4 4 4-4 4" stroke="${PAPEL}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M59 48H47m4 4-4-4 4-4" stroke="${PAPEL}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  `,
+
+  /** Levantamiento de reserva: el candado se abre, el coche queda libre. */
+  candado: `
+    ${halo}
+    <path d="M84 56V44a16 16 0 0 1 30-7" fill="none" stroke="${ACENTO}" stroke-width="6" stroke-linecap="round"/>
+    <rect x="62" y="54" width="76" height="52" rx="10" fill="${TINTA}"/>
+    <circle cx="100" cy="74" r="7" fill="${ACENTO}"/>
+    <path d="M100 80v10" stroke="${ACENTO}" stroke-width="5" stroke-linecap="round"/>
+  `,
+
+  /** Etiqueta medioambiental: el distintivo pegado en el parabrisas. */
+  hoja: `
+    ${halo}
+    <circle cx="100" cy="62" r="36" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="3"/>
+    <circle cx="100" cy="62" r="27" fill="var(--color-success)" opacity=".12"/>
+    <path d="M86 74c0-16 10-27 30-27 0 18-10 27-24 27h-6Z" fill="var(--color-success)"/>
+    <path d="M92 70c4-6 9-10 15-12" stroke="${PAPEL}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <circle cx="132" cy="34" r="10" fill="${ACENTO}"/>
+    <path d="M127 34l4 4 6-7" stroke="${PAPEL}" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  `,
+
+  /** Placas rojas: matrícula temporal de empresa. */
+  placas: `
+    ${halo}
+    <rect x="30" y="30" width="130" height="40" rx="6" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="2.5"/>
+    <path d="M64 50h26M100 50h48" stroke="${SUAVE}" stroke-width="8" stroke-linecap="round"/>
+    <rect x="40" y="56" width="130" height="40" rx="6" fill="var(--color-danger)"/>
+    <path d="M74 76h26M110 76h48" stroke="${PAPEL}" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="54" cy="76" r="7" fill="none" stroke="${PAPEL}" stroke-width="2"/>
+  `,
+
+  /** Genérico: el vehículo, sin más. */
+  coche: `
+    ${halo}
+    ${coche}
+  `,
+} as const;
+
+interface Props {
+  name?: string;
+  class?: string;
+}
+
+const { name = 'coche', class: className } = Astro.props;
+const arte = ILUSTRACIONES[name as TramiteIlustracionName] ?? ILUSTRACIONES.coche;
+---
+
+<svg
+  viewBox="0 0 200 120"
+  xmlns="http://www.w3.org/2000/svg"
+  class:list={['h-auto w-full', className]}
+  aria-hidden="true"
+  set:html={arte}
+/>

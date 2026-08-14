@@ -1,0 +1,36 @@
+---
+interface Props {
+  /** Etiqueta pequeña sobre el titular. */
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  align?: 'left' | 'center';
+  /** Nivel semántico. La home usa h2; dentro de una página de trámite, h2 también. */
+  as?: 'h2' | 'h3';
+  class?: string;
+}
+
+const { eyebrow, title, subtitle, align = 'left', as: Tag = 'h2', class: className } = Astro.props;
+---
+
+<div
+  class:list={[
+    'flex flex-col gap-3',
+    align === 'center' && 'items-center text-center',
+    className,
+  ]}
+>
+  {
+    eyebrow && (
+      <span class="text-caption font-display font-bold tracking-[0.14em] text-accent-600 uppercase">
+        {eyebrow}
+      </span>
+    )
+  }
+  <Tag class="text-h2">{title}</Tag>
+  {
+    subtitle && (
+      <p class="max-w-[60ch] text-ink-muted" set:html={subtitle} />
+    )
+  }
+</div>

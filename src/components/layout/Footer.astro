@@ -1,0 +1,133 @@
+---
+import Logo from './Logo.astro';
+import Container from '../ui/Container.astro';
+import Icon from '../ui/Icon.astro';
+import { empresa, whatsapp } from '../../lib/config';
+import { getTramites, tramiteHref } from '../../lib/tramites';
+
+const tramites = await getTramites();
+const anio = new Date().getFullYear();
+
+const legales = [
+  { href: '/aviso-legal', label: 'Aviso legal' },
+  { href: '/privacidad', label: 'Política de privacidad' },
+  { href: '/cookies', label: 'Política de cookies' },
+];
+
+/**
+ * Franja de confianza del footer.
+ *
+ * No incluye logos de Visa/Mastercard/Bizum ni un sello «PCI DSS Compliant»:
+ * hoy no se cobra con tarjeta en la web (todo el flujo pasa por WhatsApp) y
+ * RM Gestión no tiene esa certificación, así que ponerlos sería una afirmación
+ * falsa de infraestructura de pago además de usar marcas de terceros sin
+ * autorización. En su lugar, señales de confianza reales y verificables.
+ */
+const confianzaFooter = [
+  { icono: 'candado', texto: 'Datos cifrados y protegidos' },
+  { icono: 'escudo', texto: 'Cumplimos el RGPD' },
+  { icono: 'check-circle', texto: 'Gestoría con acceso directo a la DGT' },
+] as const;
+---
+
+<footer class="bg-brand-950 text-white">
+  <Container class="py-14 lg:py-16">
+    <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
+      <div class="flex flex-col gap-4">
+        <Logo inverse />
+        <p class="max-w-[38ch] text-small text-white/60">{empresa.description}</p>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <h2 class="text-caption font-display font-bold tracking-[0.12em] text-white/40 uppercase">
+          Trámites
+        </h2>
+        <ul class="flex flex-col gap-2">
+          {
+            tramites.map((tramite) => (
+              <li>
+                <a
+                  href={tramiteHref(tramite)}
+                  class="text-small text-white/70 transition-colors hover:text-accent-400"
+                >
+                  {tramite.data.shortTitle}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <h2 class="text-caption font-display font-bold tracking-[0.12em] text-white/40 uppercase">
+          Contacto
+        </h2>
+        <ul class="flex flex-col gap-2 text-small text-white/70">
+          <li>
+            <a
+              href={whatsapp()}
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center gap-2 transition-colors hover:text-accent-400"
+            >
+              <Icon name="whatsapp" size={16} />
+              WhatsApp
+            </a>
+          </li>
+          <li>
+            <a href={`mailto:${empresa.email}`} class="transition-colors hover:text-accent-400">
+              {empresa.email}
+            </a>
+          </li>
+          <li class="text-white/50">{empresa.horario}</li>
+        </ul>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <h2 class="text-caption font-display font-bold tracking-[0.12em] text-white/40 uppercase">
+          Legal
+        </h2>
+        <ul class="flex flex-col gap-2">
+          {
+            legales.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="text-small text-white/70 transition-colors hover:text-accent-400"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-col gap-3 border-t border-white/10 pt-8">
+      <h2 class="text-caption font-display font-bold tracking-[0.12em] text-white/40 uppercase">
+        Seguridad y confianza
+      </h2>
+      <ul class="flex flex-wrap gap-3">
+        {
+          confianzaFooter.map((item) => (
+            <li class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-small text-white/70">
+              <Icon name={item.icono} size={16} class="shrink-0 text-accent-400" />
+              {item.texto}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div
+      class="mt-8 flex flex-col gap-2 border-t border-white/10 pt-6 text-caption text-white/40 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>© {anio} {empresa.legal.razonSocial} · CIF {empresa.legal.cif}</p>
+      <p>
+        Los precios mostrados son orientativos y no incluyen impuestos de titularidad ni conceptos
+        variables.
+      </p>
+    </div>
+  </Container>
+</footer>

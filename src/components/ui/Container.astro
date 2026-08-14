@@ -1,0 +1,18 @@
+---
+interface Props {
+  class?: string;
+  /** `prose` estrecha el ancho a 68ch para bloques de lectura larga. */
+  width?: 'page' | 'prose';
+}
+
+const { class: className, width = 'page' } = Astro.props;
+
+const widths = {
+  page: 'max-w-[var(--container-page)]',
+  prose: 'max-w-[68ch]',
+};
+---
+
+<div class:list={['mx-auto w-full px-5 sm:px-6 lg:px-8', widths[width], className]}>
+  <slot />
+</div>

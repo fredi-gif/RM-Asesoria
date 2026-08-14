@@ -1,0 +1,70 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+type Variant = 'primary' | 'secondary' | 'outline' | 'ghost';
+type Size = 'sm' | 'md' | 'lg';
+
+interface Props extends Omit<HTMLAttributes<'a'>, 'size'> {
+  variant?: Variant;
+  size?: Size;
+  /** Si se pasa `href` renderiza <a>; si no, <button>. */
+  href?: string;
+  type?: 'button' | 'submit';
+  fullWidth?: boolean;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  type = 'button',
+  fullWidth = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const base =
+  'inline-flex items-center justify-center gap-2 rounded-md font-display font-semibold ' +
+  'transition-[background-color,border-color,color,box-shadow,transform] duration-150 ' +
+  'active:translate-y-px disabled:pointer-events-none disabled:opacity-50 whitespace-nowrap';
+
+/**
+ * El naranja solo alcanza contraste AA sobre blanco en textos grandes y en
+ * negrita, así que `primary` siempre lleva texto blanco sobre el naranja
+ * —nunca naranja sobre blanco— y el tamaño mínimo es 15px semibold.
+ */
+const variants: Record<Variant, string> = {
+  primary: 'bg-accent-500 text-white hover:bg-accent-600 shadow-[0_1px_2px_rgb(234_106_11/0.25)]',
+  secondary: 'bg-brand-900 text-white hover:bg-brand-800',
+  outline: 'border border-line bg-white text-brand-900 hover:border-brand-100 hover:bg-brand-50',
+  ghost: 'text-brand-900 hover:bg-brand-50',
+};
+
+const sizes: Record<Size, string> = {
+  sm: 'h-9 px-3.5 text-[0.9375rem]',
+  md: 'h-11 px-5 text-[1rem]',
+  lg: 'h-13 px-6.5 text-[1.0625rem]',
+};
+
+const classes = [
+  base,
+  variants[variant],
+  sizes[size],
+  fullWidth && 'w-full',
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+{
+  href ? (
+    <a href={href} class={classes} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class={classes} {...(rest as HTMLAttributes<'button'>)}>
+      <slot />
+    </button>
+  )
+}

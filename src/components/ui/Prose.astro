@@ -1,0 +1,120 @@
+---
+/**
+ * Estilos tipográficos para la salida de Markdoc.
+ *
+ * Sin plugin de typography: son cuatro reglas y así los tokens mandan sin
+ * pelearse con los defaults de `@tailwindcss/typography`.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={['prose-rm', className]}>
+  <slot />
+</div>
+
+<style is:global>
+  .prose-rm {
+    max-width: 68ch;
+    color: var(--color-ink-muted);
+  }
+
+  .prose-rm > * + * {
+    margin-top: 1.15em;
+  }
+
+  .prose-rm h2 {
+    font-size: var(--text-h3);
+    line-height: 1.35;
+    margin-top: 2em;
+  }
+
+  .prose-rm h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-brand-900);
+    margin-top: 1.75em;
+  }
+
+  .prose-rm strong {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  .prose-rm a {
+    color: var(--color-brand-600);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+
+  .prose-rm a:hover {
+    color: var(--color-accent-600);
+  }
+
+  .prose-rm ul,
+  .prose-rm ol {
+    padding-left: 1.35em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+  }
+
+  .prose-rm ul {
+    list-style: disc;
+  }
+
+  .prose-rm ol {
+    list-style: decimal;
+  }
+
+  .prose-rm li::marker {
+    color: var(--color-accent-500);
+  }
+
+  .prose-rm blockquote {
+    border-left: 3px solid var(--color-accent-400);
+    background: var(--color-accent-50);
+    padding: 0.85em 1.15em;
+    border-radius: var(--radius-sm);
+    color: var(--color-ink);
+  }
+
+  .prose-rm blockquote > * + * {
+    margin-top: 0.6em;
+  }
+
+  .prose-rm code {
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-line);
+    border-radius: 0.3em;
+    padding: 0.1em 0.35em;
+    font-size: 0.9em;
+  }
+
+  .prose-rm hr {
+    border-color: var(--color-line);
+    margin-block: 2em;
+  }
+
+  .prose-rm table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-small);
+  }
+
+  .prose-rm th,
+  .prose-rm td {
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.6em 0.75em;
+    text-align: left;
+  }
+
+  .prose-rm th {
+    color: var(--color-brand-900);
+    font-weight: 600;
+  }
+</style>

@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/ui/Container.astro';
+import Section from '../components/ui/Section.astro';
+import Button from '../components/ui/Button.astro';
+import TramiteCard from '../components/tramite/TramiteCard.astro';
+import { getTramites } from '../lib/tramites';
+
+/** Mostramos los destacados: si alguien llega aquí, lo útil es ofrecerle salida. */
+const destacados = (await getTramites()).filter((t) => t.data.destacado).slice(0, 3);
+---
+
+<BaseLayout title="Página no encontrada" noindex>
+  <Section>
+    <Container class="flex flex-col gap-10">
+      <div class="flex max-w-[46ch] flex-col gap-4">
+        <span class="font-display text-caption font-bold tracking-[0.14em] text-accent-600 uppercase">
+          Error 404
+        </span>
+        <h1 class="text-h1">Esta página no existe</h1>
+        <p class="text-ink-muted">
+          Puede que el enlace esté mal escrito o que hayamos movido el contenido. Estos son los
+          trámites que más nos piden.
+        </p>
+        <div class="flex flex-wrap gap-3 pt-1">
+          <Button href="/" variant="secondary">Volver al inicio</Button>
+          <Button href="/tramites" variant="outline">Ver todos los trámites</Button>
+        </div>
+      </div>
+
+      {
+        destacados.length > 0 && (
+          <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {destacados.map((tramite) => (
+              <TramiteCard tramite={tramite} />
+            ))}
+          </ul>
+        )
+      }
+    </Container>
+  </Section>
+</BaseLayout>

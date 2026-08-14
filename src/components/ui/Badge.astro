@@ -1,0 +1,31 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+type Tone = 'neutral' | 'brand' | 'accent' | 'success';
+
+interface Props {
+  tone?: Tone;
+  icon?: IconName;
+  class?: string;
+}
+
+const { tone = 'neutral', icon, class: className } = Astro.props;
+
+const tones: Record<Tone, string> = {
+  neutral: 'bg-surface-alt text-ink-muted ring-line',
+  brand: 'bg-brand-50 text-brand-700 ring-brand-100',
+  accent: 'bg-accent-50 text-accent-600 ring-accent-400/30',
+  success: 'bg-emerald-50 text-success ring-emerald-200',
+};
+---
+
+<span
+  class:list={[
+    'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-caption font-semibold ring-1 ring-inset',
+    tones[tone],
+    className,
+  ]}
+>
+  {icon && <Icon name={icon} size={14} />}
+  <slot />
+</span>

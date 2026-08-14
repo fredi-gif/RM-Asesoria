@@ -1,0 +1,37 @@
+---
+import WhatsAppCTA from '../tramite/WhatsAppCTA.astro';
+import { euros } from '../../lib/format';
+
+/**
+ * Barra fija inferior, solo en móvil.
+ *
+ * En una web de trámites el grueso del tráfico llega desde el móvil y la
+ * decisión se toma después de leer la documentación, que queda lejos del CTA
+ * de la cabecera. Esta barra evita tener que hacer scroll de vuelta.
+ *
+ * El `<body>` lleva `pb-20 lg:pb-0` para que no tape el final del contenido.
+ */
+interface Props {
+  mensaje?: string;
+  label?: string;
+  precioDesde?: number;
+}
+
+const { mensaje, label = 'Empezar ahora', precioDesde } = Astro.props;
+---
+
+<div
+  class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur-sm lg:hidden"
+>
+  <div class="flex items-center gap-3">
+    {
+      precioDesde !== undefined && (
+        <div class="flex shrink-0 flex-col leading-tight">
+          <span class="text-caption text-ink-muted">Desde</span>
+          <span class="font-display font-bold text-brand-900">{euros(precioDesde)}</span>
+        </div>
+      )
+    }
+    <WhatsAppCTA mensaje={mensaje} size="md" fullWidth label={label} />
+  </div>
+</div>

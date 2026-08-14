@@ -1,0 +1,94 @@
+/**
+ * Design tokens de RM Gestión.
+ *
+ * ⚠️ COLORES PROVISIONALES. Cuando llegue la identidad real del cliente,
+ * este archivo es lo único que hay que tocar para recolorear toda la web.
+ *
+ * Regla de uso del acento: el naranja se reserva para acción y jerarquía
+ * (CTA, número de paso, icono de check, subrayado del claim). Nunca como fondo
+ * de sección grande. El azul manda en la estructura, el naranja en la atención.
+ */
+
+@theme {
+  /* ---- Azul institucional — color de marca ---- */
+  --color-brand-950: #060f24;
+  --color-brand-900: #0a1f44;
+  --color-brand-800: #12305f;
+  --color-brand-700: #1b4079;
+  --color-brand-600: #24528f;
+  --color-brand-100: #dde6f2;
+  --color-brand-50: #f2f6fb;
+
+  /* ---- Naranja — acento y acción ---- */
+  --color-accent-600: #ea6a0b;
+  --color-accent-500: #f97316;
+  --color-accent-400: #fb923c;
+  --color-accent-50: #fff4ec;
+
+  /* ---- Neutros ---- */
+  --color-ink: #0f172a;
+  --color-ink-muted: #475569;
+  --color-ink-subtle: #94a3b8;
+  --color-line: #e2e8f0;
+  --color-surface: #ffffff;
+  /* Fondo alterno de sección: apenas se separa del blanco, solo da ritmo. */
+  --color-surface-alt: #f8fafc;
+  /* Fondo de tarjeta sobre blanco. Un punto más oscuro que `surface-alt`
+     porque aquí sí tiene que leerse el recorte de la tarjeta. */
+  --color-surface-muted: #f1f5f9;
+
+  /* ---- Semánticos ---- */
+  --color-success: #15803d;
+  --color-warning: #b45309;
+  --color-danger: #b91c1c;
+
+  /* ---- Tipografía ---- */
+  --font-display: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Source Sans 3 Variable', ui-sans-serif, system-ui, sans-serif;
+
+  /* Escala tipográfica. Los titulares usan clamp() para fluir entre móvil y
+     desktop sin breakpoints. El cuerpo va a 17px, no 16: son páginas de
+     lectura densa (listados de documentación). */
+  --text-display: clamp(2.25rem, 1.55rem + 3.1vw, 3.25rem);
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 700;
+
+  --text-h1: clamp(1.875rem, 1.45rem + 1.9vw, 2.5rem);
+  --text-h1--line-height: 1.18;
+  --text-h1--letter-spacing: -0.018em;
+  --text-h1--font-weight: 700;
+
+  --text-h2: clamp(1.5rem, 1.24rem + 1.15vw, 2rem);
+  --text-h2--line-height: 1.25;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h2--font-weight: 700;
+
+  --text-h3: clamp(1.25rem, 1.19rem + 0.28vw, 1.375rem);
+  --text-h3--line-height: 1.35;
+  --text-h3--letter-spacing: -0.01em;
+  --text-h3--font-weight: 600;
+
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.65;
+
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.6;
+
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.55;
+
+  /* ---- Forma ---- */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+
+  /* Sombras deliberadamente discretas: la jerarquía la da el borde, no la
+     elevación. Es lo que separa "gestoría seria" de "plantilla genérica". */
+  --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+  --shadow-card-hover: 0 6px 20px -8px rgb(10 31 68 / 0.18);
+  --shadow-header: 0 1px 0 0 var(--color-line);
+
+  /* ---- Layout ---- */
+  --container-page: 75rem; /* 1200px */
+}

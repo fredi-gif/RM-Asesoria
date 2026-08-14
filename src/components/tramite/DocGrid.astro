@@ -1,0 +1,36 @@
+---
+import Card from '../ui/Card.astro';
+import DocIlustracion from './DocIlustracion.astro';
+
+/**
+ * Rejilla plana con toda la documentación del trámite.
+ *
+ * Deliberadamente sin agrupar por casos: el usuario ve de una vez todo lo que
+ * tiene que reunir. Los matices («solo si vende una empresa») van en la
+ * aclaración de cada documento, no en la estructura.
+ */
+interface Props {
+  documentos: { documento: string; ayuda?: string | null; ilustracion?: string | null }[];
+  class?: string;
+}
+
+const { documentos, class: className } = Astro.props;
+---
+
+{
+  documentos.length > 0 && (
+    <ul class:list={['grid gap-4 sm:grid-cols-2 lg:grid-cols-4', className]}>
+      {documentos.map((doc) => (
+        <Card as="li" class="flex flex-col overflow-hidden">
+          <div class="border-b border-line bg-brand-50 px-6 pt-5 pb-0">
+            <DocIlustracion name={doc.ilustracion ?? 'generico'} class="mx-auto max-w-[13rem]" />
+          </div>
+          <div class="flex flex-col gap-1 p-5">
+            <h3 class="font-display font-semibold text-brand-900">{doc.documento}</h3>
+            {doc.ayuda && <p class="text-small text-ink-muted">{doc.ayuda}</p>}
+          </div>
+        </Card>
+      ))}
+    </ul>
+  )
+}

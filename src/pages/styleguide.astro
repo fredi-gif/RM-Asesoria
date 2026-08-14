@@ -1,0 +1,402 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/ui/Container.astro';
+import Section from '../components/ui/Section.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import Button from '../components/ui/Button.astro';
+import Badge from '../components/ui/Badge.astro';
+import Card from '../components/ui/Card.astro';
+import Icon from '../components/ui/Icon.astro';
+import WhatsAppCTA from '../components/tramite/WhatsAppCTA.astro';
+import StepList from '../components/tramite/StepList.astro';
+import StepsRow from '../components/tramite/StepsRow.astro';
+import DocGrid from '../components/tramite/DocGrid.astro';
+import DocIlustracion from '../components/tramite/DocIlustracion.astro';
+import TramiteIlustracion from '../components/tramite/TramiteIlustracion.astro';
+import PriceBreakdown from '../components/tramite/PriceBreakdown.astro';
+import FaqAccordion from '../components/tramite/FaqAccordion.astro';
+import TramiteCard from '../components/tramite/TramiteCard.astro';
+import { getTramites } from '../lib/tramites';
+
+/**
+ * Guía de estilo interna. No se indexa ni entra en el sitemap.
+ * Sirve para validar el sistema de diseño de un vistazo y para recolorear la
+ * web cuando lleguen los colores definitivos del cliente.
+ */
+const tramites = await getTramites();
+const ejemplo = tramites[0];
+
+/**
+ * Las clases van escritas enteras a propósito: Tailwind escanea el código
+ * fuente como texto, así que `bg-brand-${tono}` no generaría nada.
+ */
+const escalaAzul = [
+  ['brand-950', 'bg-brand-950'],
+  ['brand-900', 'bg-brand-900'],
+  ['brand-800', 'bg-brand-800'],
+  ['brand-700', 'bg-brand-700'],
+  ['brand-600', 'bg-brand-600'],
+  ['brand-100', 'bg-brand-100'],
+  ['brand-50', 'bg-brand-50'],
+];
+
+const escalaNaranja = [
+  ['accent-600', 'bg-accent-600'],
+  ['accent-500', 'bg-accent-500'],
+  ['accent-400', 'bg-accent-400'],
+  ['accent-50', 'bg-accent-50'],
+];
+
+const neutros = [
+  ['ink', 'bg-ink', 'Texto principal'],
+  ['ink-muted', 'bg-ink-muted', 'Texto secundario'],
+  ['ink-subtle', 'bg-ink-subtle', 'Captions'],
+  ['line', 'bg-line', 'Bordes'],
+  ['surface-alt', 'bg-surface-alt', 'Fondo alterno'],
+];
+
+const ilustraciones = [
+  'permiso-circulacion',
+  'ficha-tecnica',
+  'dni',
+  'contrato',
+  'factura',
+  'denuncia',
+  'certificado',
+  'justificante',
+  'matricula',
+  'escritura',
+  'coc',
+  'seguro',
+  'datos',
+  'generico',
+];
+
+const ilustracionesTramite = [
+  'traspaso',
+  'firma',
+  'lupa',
+  'matricula',
+  'alta',
+  'baja',
+  'duplicado',
+  'documento',
+  'ajustes',
+  'candado',
+  'hoja',
+  'placas',
+  'coche',
+];
+
+const iconos = [
+  'coche',
+  'traspaso',
+  'documento',
+  'firma',
+  'lupa',
+  'matricula',
+  'alta',
+  'baja',
+  'duplicado',
+  'ajustes',
+  'candado',
+  'hoja',
+  'placas',
+  'check',
+  'check-circle',
+  'flecha-derecha',
+  'chevron',
+  'reloj',
+  'escudo',
+  'pantalla',
+  'euro',
+  'menu',
+  'cerrar',
+  'whatsapp',
+  'aviso',
+] as const;
+---
+
+<BaseLayout title="Guía de estilo" noindex>
+  <Section spacing="tight" tone="brand-soft" class="border-b border-line">
+    <Container class="flex flex-col gap-3">
+      <h1 class="text-h1">Guía de estilo</h1>
+      <p class="max-w-[62ch] text-ink-muted">
+        Página interna de trabajo. Todos los colores salen de <code
+          class="rounded-sm bg-white px-1.5 py-0.5 text-small">src/styles/tokens.css</code
+        >: cambiar la marca es editar ese archivo.
+      </p>
+    </Container>
+  </Section>
+
+  <!-- Color -->
+  <Section spacing="tight">
+    <Container class="flex flex-col gap-8">
+      <SectionHeading eyebrow="Fundamentos" title="Color" />
+
+      <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-2">
+          <h3 class="text-h3">Azul institucional</h3>
+          <div class="flex flex-wrap gap-2">
+            {
+              escalaAzul.map(([token, clase]) => (
+                <div class="flex w-24 flex-col gap-1.5">
+                  <div class:list={['h-16 rounded-md border border-line', clase]} />
+                  <span class="text-caption text-ink-muted">{token}</span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <h3 class="text-h3">Naranja de acento</h3>
+          <div class="flex flex-wrap gap-2">
+            {
+              escalaNaranja.map(([token, clase]) => (
+                <div class="flex w-24 flex-col gap-1.5">
+                  <div class:list={['h-16 rounded-md border border-line', clase]} />
+                  <span class="text-caption text-ink-muted">{token}</span>
+                </div>
+              ))
+            }
+          </div>
+          <p class="max-w-[62ch] text-small text-ink-muted">
+            El naranja solo se usa para acción y jerarquía. Nunca como color de texto de párrafo:
+            sobre blanco no alcanza AA en tamaños pequeños.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <h3 class="text-h3">Neutros</h3>
+          <div class="flex flex-wrap gap-2">
+            {
+              neutros.map(([token, clase, uso]) => (
+                <div class="flex w-32 flex-col gap-1.5">
+                  <div class:list={['h-16 rounded-md border border-line', clase]} />
+                  <span class="text-caption text-ink-muted">
+                    {token}
+                    <br />
+                    {uso}
+                  </span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  <!-- Tipografía -->
+  <Section spacing="tight" tone="alt">
+    <Container class="flex flex-col gap-8">
+      <SectionHeading
+        eyebrow="Fundamentos"
+        title="Tipografía"
+        subtitle="Plus Jakarta Sans en titulares, Source Sans 3 en cuerpo. Ambas self-hosted."
+      />
+      <div class="flex flex-col gap-5">
+        <div><span class="text-caption text-ink-subtle">display</span>
+          <p class="text-display">Trámites sin colas</p>
+        </div>
+        <div><span class="text-caption text-ink-subtle">h1</span>
+          <p class="text-h1">Transferencia de vehículo</p>
+        </div>
+        <div><span class="text-caption text-ink-subtle">h2</span>
+          <p class="text-h2">Documentación necesaria</p>
+        </div>
+        <div><span class="text-caption text-ink-subtle">h3</span>
+          <p class="text-h3">Si el vendedor es un particular</p>
+        </div>
+        <div><span class="text-caption text-ink-subtle">body</span>
+          <p class="max-w-[62ch]">
+            El permiso de circulación es el documento que acredita quién es el titular del vehículo
+            y que este está dado de alta en la DGT.
+          </p>
+        </div>
+        <div><span class="text-caption text-ink-subtle">small</span>
+          <p class="text-small text-ink-muted">La ITV debe estar en vigor para poder transferir.</p>
+        </div>
+        <div><span class="text-caption text-ink-subtle">caption</span>
+          <p class="text-caption text-ink-subtle">Precios con IVA incluido.</p>
+        </div>
+        <div><span class="text-caption text-ink-subtle">claim-mark</span>
+          <p class="text-h2">Todos tus trámites, <span class="claim-mark">online</span></p>
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  <!-- Botones -->
+  <Section spacing="tight">
+    <Container class="flex flex-col gap-8">
+      <SectionHeading eyebrow="Componentes" title="Botones" />
+      <div class="flex flex-col gap-5">
+        <div class="flex flex-wrap items-center gap-3">
+          <Button variant="primary">Primario</Button>
+          <Button variant="secondary">Secundario</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="ghost">Ghost</Button>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <Button size="sm">Pequeño</Button>
+          <Button size="md">Mediano</Button>
+          <Button size="lg">Grande</Button>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <WhatsAppCTA size="md" />
+          <WhatsAppCTA size="md" variant="outline" label="Escríbenos" />
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  <!-- Badges y tarjetas -->
+  <Section spacing="tight" tone="alt">
+    <Container class="flex flex-col gap-8">
+      <SectionHeading eyebrow="Componentes" title="Etiquetas y tarjetas" />
+      <div class="flex flex-wrap gap-2">
+        <Badge>Neutral</Badge>
+        <Badge tone="brand" icon="reloj">24-48 h</Badge>
+        <Badge tone="accent" icon="euro">Desde 59 €</Badge>
+        <Badge tone="success" icon="check">Revisado</Badge>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Card class="p-5">
+          <h3 class="text-h3">Tarjeta estática</h3>
+          <p class="mt-2 text-small text-ink-muted">Borde suave, sombra casi inexistente.</p>
+        </Card>
+        <Card interactive class="p-5">
+          <h3 class="text-h3">Tarjeta interactiva</h3>
+          <p class="mt-2 text-small text-ink-muted">Pasa el ratón por encima.</p>
+        </Card>
+        <Card tone="muted" interactive class="p-5">
+          <h3 class="text-h3">Tarjeta gris</h3>
+          <p class="mt-2 text-small text-ink-muted">
+            Para secciones de fondo blanco. Al pasar el ratón sube hacia el blanco.
+          </p>
+        </Card>
+      </div>
+      {
+        ejemplo && (
+          <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <TramiteCard tramite={ejemplo} />
+          </ul>
+        )
+      }
+    </Container>
+  </Section>
+
+  <!-- Componentes de trámite -->
+  {
+    ejemplo && (
+      <Section spacing="tight">
+        <Container class="flex flex-col gap-10">
+          <SectionHeading eyebrow="Componentes" title="Bloques de la página de trámite" />
+
+          <div class="grid gap-10 lg:grid-cols-2">
+            <div class="flex flex-col gap-4">
+              <h3 class="text-h3">StepList (vertical, página de trámite)</h3>
+              <StepList pasos={ejemplo.data.pasos.slice(0, 3)} />
+            </div>
+            <div class="flex flex-col gap-4">
+              <h3 class="text-h3">PriceBreakdown</h3>
+              <PriceBreakdown precio={ejemplo.data.precio} plazo={ejemplo.data.hero.plazo} />
+              <p class="text-small text-ink-muted">
+                Con <code class="rounded-sm bg-white px-1.5 py-0.5">cta</code>, el botón se pinta
+                dentro y a todo el ancho:
+              </p>
+              <PriceBreakdown
+                precio={ejemplo.data.precio}
+                plazo={ejemplo.data.hero.plazo}
+                cta={{
+                  mensaje: ejemplo.data.whatsappMensaje ?? '',
+                  label: ejemplo.data.ctaLabel ?? 'Empezar por WhatsApp',
+                }}
+              />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-4">
+            <h3 class="text-h3">StepsRow (horizontal, home)</h3>
+            <StepsRow pasos={ejemplo.data.pasos.slice(0, 3)} />
+          </div>
+
+          <div class="flex flex-col gap-4">
+            <h3 class="text-h3">DocGrid</h3>
+            <DocGrid documentos={ejemplo.data.documentacion.slice(0, 3)} />
+          </div>
+
+          <div class="flex flex-col gap-4">
+            <h3 class="text-h3">FaqAccordion</h3>
+            <FaqAccordion faqs={ejemplo.data.faqs.slice(0, 3)} />
+          </div>
+        </Container>
+      </Section>
+    )
+  }
+
+  <!-- Ilustraciones de documento -->
+  <Section spacing="tight">
+    <Container class="flex flex-col gap-8">
+      <SectionHeading
+        title="Ilustraciones de documento"
+        subtitle="Representaciones estilizadas, no reproducciones del documento oficial. Añadir una implica añadirla también al select de Keystatic."
+      />
+      <ul class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        {
+          ilustraciones.map((nombre) => (
+            <li class="flex flex-col gap-2 overflow-hidden rounded-md border border-line">
+              <div class="bg-brand-50 px-4 pt-4">
+                <DocIlustracion name={nombre} />
+              </div>
+              <span class="px-3 pb-3 text-center text-caption text-ink-subtle">{nombre}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </Container>
+  </Section>
+
+  <!-- Ilustraciones de trámite -->
+  <Section spacing="tight" tone="alt">
+    <Container class="flex flex-col gap-8">
+      <SectionHeading
+        title="Ilustraciones de trámite"
+        subtitle="Las de la tarjeta del listado. Se indexan por el mismo nombre que el icono, así que el campo «Icono» de Keystatic gobierna a la vez el icono pequeño y esta ilustración."
+      />
+      <ul class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {
+          ilustracionesTramite.map((nombre) => (
+            <li class="flex flex-col gap-2 overflow-hidden rounded-md border border-line bg-surface">
+              <TramiteIlustracion name={nombre} />
+              <span class="px-3 pb-3 text-center text-caption text-ink-subtle">{nombre}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </Container>
+  </Section>
+
+  <!-- Iconos -->
+  <Section spacing="tight">
+    <Container class="flex flex-col gap-8">
+      <SectionHeading
+        eyebrow="Fundamentos"
+        title="Iconos"
+        subtitle="Rejilla 24, trazo 1.5, remates redondeados. Añadir uno nuevo implica añadirlo también al select de Keystatic."
+      />
+      <ul class="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:grid-cols-8">
+        {
+          iconos.map((nombre) => (
+            <li class="flex flex-col items-center gap-2 rounded-md border border-line bg-surface p-3">
+              <Icon name={nombre} size={22} class="text-brand-800" />
+              <span class="text-center text-caption text-ink-subtle">{nombre}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </Container>
+  </Section>
+</BaseLayout>

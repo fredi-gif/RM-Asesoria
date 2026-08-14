@@ -1,0 +1,137 @@
+---
+import Logo from './Logo.astro';
+import Container from '../ui/Container.astro';
+import Icon, { type IconName } from '../ui/Icon.astro';
+import WhatsAppCTA from '../tramite/WhatsAppCTA.astro';
+import { getTramites, tramiteHref } from '../../lib/tramites';
+
+const tramites = await getTramites();
+const path = Astro.url.pathname;
+const enTramites = path.startsWith('/tramites');
+---
+
+<header class="sticky top-0 z-50">
+  <!-- El fondo con desenfoque va en una capa aparte, no en <header>.
+       `backdrop-filter` crea un «containing block» para los descendientes en
+       position:fixed (igual que `transform`): el panel del menú móvil,
+       fixed con top/bottom para ocupar la pantalla, quedaba anclado al
+       header (64px de alto) en vez de al viewport, y se veía aplastado
+       detrás del contenido de la página. Al mover el blur a esta capa, el
+       header deja de ser containing block y el panel vuelve a posicionarse
+       respecto al viewport. -->
+  <div aria-hidden="true" class="absolute inset-0 -z-10 border-b border-line bg-surface/90 backdrop-blur-md"></div>
+  <Container>
+    <div class="flex h-16 items-center justify-between gap-4 lg:h-18">
+      <div class="flex items-center gap-8">
+        <!-- `flex` y no solo `shrink-0`: el contenido del logo es un
+             `inline-flex`, que se apoya en la línea base y deja debajo el
+             hueco del descendente. Eso hacía la caja del enlace ~41px en vez
+             de 34 y subía el logo 4,5px respecto a los enlaces del menú.
+             Como contenedor flex desaparece la línea base y ambos centran. -->
+        <a href="/" class="flex shrink-0 items-center" aria-label="Ir a la página de inicio">
+          <Logo />
+        </a>
+
+        <!-- Navegación de escritorio, junto al logo. El desplegable se abre
+             con :hover y con :focus-within, así que funciona con teclado sin
+             JavaScript. -->
+        <nav class="hidden lg:flex lg:items-center lg:gap-1" aria-label="Principal">
+          <div class="group relative">
+            <a
+              href="/tramites"
+              class:list={[
+                'flex items-center gap-1 rounded-md px-3 py-2 font-display text-small font-semibold transition-colors',
+                enTramites ? 'text-accent-600' : 'text-brand-900 hover:text-accent-600',
+              ]}
+              aria-current={enTramites ? 'page' : undefined}
+            >
+              Trámites
+              <Icon
+                name="chevron"
+                size={16}
+                class="transition-transform duration-200 group-hover:-rotate-180 group-focus-within:-rotate-180"
+              />
+            </a>
+
+            <div
+              class="invisible absolute top-full left-0 w-[36rem] pt-2 opacity-0 transition-[opacity,visibility] duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
+            >
+              <div
+                class="rounded-lg border border-line bg-surface p-3 shadow-[var(--shadow-card-hover)]"
+              >
+                <ul class="grid grid-cols-2 gap-x-2">
+                  {
+                    tramites.map((tramite) => (
+                      <li>
+                        <a
+                          href={tramiteHref(tramite)}
+                          class="flex items-center gap-2.5 rounded-sm px-2 py-1.5 text-small text-ink-muted transition-colors hover:bg-brand-50 hover:text-brand-900"
+                        >
+                          <Icon
+                            name={tramite.data.icon as IconName}
+                            size={17}
+                            class="shrink-0 text-brand-600"
+                          />
+                          {tramite.data.shortTitle}
+                        </a>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <a
+            href="/#tramitar"
+            class="rounded-md px-3 py-2 font-display text-small font-semibold text-brand-900 transition-colors hover:text-accent-600"
+          >
+            Cómo funciona
+          </a>
+        </nav>
+      </div>
+
+      <div class="hidden shrink-0 lg:block">
+        <WhatsAppCTA size="sm" label="Contactar" />
+      </div>
+
+      <!-- Menú móvil: <details> nativo, sin JavaScript. -->
+      <details class="group lg:hidden">
+        <summary
+          class="flex size-10 cursor-pointer list-none items-center justify-center rounded-md border border-line text-brand-900 [&::-webkit-details-marker]:hidden"
+          aria-label="Abrir menú"
+        >
+          <Icon name="menu" size={20} class="group-open:hidden" />
+          <Icon name="cerrar" size={20} class="hidden group-open:block" />
+        </summary>
+
+        <div
+          class="fixed inset-x-0 top-16 bottom-0 overflow-y-auto border-t border-line bg-surface px-5 py-6"
+        >
+          <nav class="flex flex-col gap-6 pb-24" aria-label="Principal">
+            <ul class="flex flex-col divide-y divide-line">
+              {
+                tramites.map((tramite) => (
+                  <li>
+                    <a
+                      href={tramiteHref(tramite)}
+                      class="flex items-center gap-3 py-3 font-display font-semibold text-brand-900"
+                    >
+                      <Icon
+                        name={tramite.data.icon as IconName}
+                        size={19}
+                        class="shrink-0 text-brand-600"
+                      />
+                      {tramite.data.shortTitle}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+            <WhatsAppCTA fullWidth label="Contactar por WhatsApp" />
+          </nav>
+        </div>
+      </details>
+    </div>
+  </Container>
+</header>

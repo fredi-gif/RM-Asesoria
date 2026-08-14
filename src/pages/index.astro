@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/ui/Container.astro';
+import Section from '../components/ui/Section.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import WhatsAppCTA from '../components/tramite/WhatsAppCTA.astro';
+import TramiteCard from '../components/tramite/TramiteCard.astro';
+import StepsRow from '../components/tramite/StepsRow.astro';
+import LogoCloud from '../components/home/LogoCloud.astro';
+
+import home from '../content/home/index.json';
+import { getTramites } from '../lib/tramites';
+import { resaltar } from '../lib/format';
+import { empresa } from '../lib/config';
+
+const tramites = await getTramites();
+---
+
+<BaseLayout
+  title={home.seo.metaTitle || empresa.name}
+  description={home.seo.metaDescription || empresa.description}
+>
+  <!-- 1 · Cabecera -->
+  <!-- El fondo se pide con `tone`, no con una clase suelta: una `bg-*` pasada
+       por `class` empata en especificidad con la del propio Section y quién
+       gana lo decide el orden del CSS, no el del atributo. -->
+  <Section spacing="none" tone="white" class="relative overflow-hidden">
+    <Container class="relative pt-14 pb-10 lg:pt-20 lg:pb-14">
+      <LogoCloud />
+
+      <div class="relative flex max-w-[42rem] flex-col gap-6">
+        <h1 class="text-display" set:html={resaltar(home.hero.claim)} />
+        <p class="max-w-[54ch] text-[1.125rem] text-ink-muted">{home.hero.subclaim}</p>
+
+        <div class="pt-2">
+          <WhatsAppCTA
+            mensaje={home.hero.whatsappMensaje}
+            label={home.hero.ctaPrimario}
+            size="lg"
+          />
+        </div>
+      </div>
+    </Container>
+  </Section>
+
+  <!-- 2 · Listado de trámites, sin encabezado ni categorías: la rejilla se
+       explica sola y es el motivo por el que se entra en la home.
+       Comparte el blanco con la cabecera; lo que separa un bloque de otro es
+       el gris de las tarjetas, no un cambio de fondo. -->
+  <Section id="tramites" spacing="none">
+    <Container class="pb-16 lg:pb-24">
+      <ul class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+        {tramites.map((tramite) => <TramiteCard tramite={tramite} />)}
+      </ul>
+    </Container>
+  </Section>
+
+  <!-- 3 · Cómo funciona -->
+  <Section id="tramitar" tone="alt">
+    <Container class="flex flex-col gap-10">
+      <SectionHeading title={home.comoFunciona.titulo} subtitle={home.comoFunciona.subtitulo} />
+      <StepsRow pasos={home.comoFunciona.pasos} />
+    </Container>
+  </Section>
+</BaseLayout>

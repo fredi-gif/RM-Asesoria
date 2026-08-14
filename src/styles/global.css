@@ -1,0 +1,76 @@
+@import 'tailwindcss';
+
+@import '@fontsource-variable/plus-jakarta-sans';
+@import '@fontsource-variable/source-sans-3';
+
+@import './tokens.css';
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Compensa el header sticky al saltar a un ancla. */
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    color: var(--color-brand-900);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Foco visible y coherente en toda la web. Accesibilidad, pero también
+     percepción de calidad: los focos por defecto del navegador cantan. */
+  :where(a, button, summary, input, textarea, select):focus-visible {
+    outline: 2px solid var(--color-accent-500);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::selection {
+    background-color: var(--color-brand-900);
+    color: white;
+  }
+}
+
+@layer components {
+  /* Subrayado del claim. Se usa envolviendo palabras en <span class="claim-mark">.
+     Va como text-decoration y no como fondo: así el trazo queda por debajo de
+     los glifos en lugar de cruzarlos, y respeta los descendentes de g, j o y. */
+  .claim-mark {
+    text-decoration-line: underline;
+    text-decoration-color: var(--color-accent-500);
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.14em;
+    text-decoration-skip-ink: none;
+  }
+}

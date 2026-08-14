@@ -1,0 +1,45 @@
+---
+type Tone = 'white' | 'muted' | 'glass';
+
+interface Props {
+  class?: string;
+  /** Añade el realce de borde y la elevación sutil al pasar el ratón. */
+  interactive?: boolean;
+  as?: 'div' | 'article' | 'li';
+  /**
+   * `muted` da a la tarjeta un gris tenue: es lo que la recorta cuando el
+   * fondo de la sección es blanco. Sobre una sección ya gris usa `white`.
+   * `glass` la deja translúcida con desenfoque, para que se transparente el
+   * fondo de la cabecera del trámite.
+   */
+  tone?: Tone;
+}
+
+const { class: className, interactive = false, as: Tag = 'div' } = Astro.props;
+const tone: Tone = Astro.props.tone ?? 'white';
+
+const tones: Record<Tone, string> = {
+  white: 'bg-surface',
+  muted: 'bg-surface-muted',
+  glass: 'bg-surface/70 backdrop-blur-xl',
+};
+
+/** Al pasar el ratón, la tarjeta gris sube hacia el blanco: se «enciende». */
+const hovers: Record<Tone, string> = {
+  white: 'hover:border-brand-100',
+  muted: 'hover:border-brand-100 hover:bg-surface',
+  glass: 'hover:border-brand-100',
+};
+---
+
+<Tag
+  class:list={[
+    'rounded-md border border-line shadow-[var(--shadow-card)]',
+    tones[tone],
+    interactive &&
+      `transition-[border-color,background-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)] ${hovers[tone]}`,
+    className,
+  ]}
+>
+  <slot />
+</Tag>

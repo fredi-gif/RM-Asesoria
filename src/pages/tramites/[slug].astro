@@ -1,0 +1,225 @@
+---
+import { render } from 'astro:content';
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/ui/Container.astro';
+import Section from '../../components/ui/Section.astro';
+import SectionHeading from '../../components/ui/SectionHeading.astro';
+import Prose from '../../components/ui/Prose.astro';
+import WhatsAppCTA from '../../components/tramite/WhatsAppCTA.astro';
+import StepList from '../../components/tramite/StepList.astro';
+import DocGrid from '../../components/tramite/DocGrid.astro';
+import PriceBreakdown from '../../components/tramite/PriceBreakdown.astro';
+import FaqAccordion from '../../components/tramite/FaqAccordion.astro';
+import StickyMobileCTA from '../../components/layout/StickyMobileCTA.astro';
+
+import { getTramites, totalTramite, type Tramite } from '../../lib/tramites';
+import { textoPlano } from '../../lib/format';
+import { empresa } from '../../lib/config';
+
+export async function getStaticPaths() {
+  const tramites = await getTramites();
+  return tramites.map((tramite) => ({
+    params: { slug: tramite.id },
+    props: { tramite },
+  }));
+}
+
+interface Props {
+  tramite: Tramite;
+}
+
+const { tramite } = Astro.props;
+const { data } = tramite;
+const { Content } = await render(tramite);
+
+const total = totalTramite(data.precio);
+const mensaje = data.whatsappMensaje ?? `Hola, quiero información sobre: ${data.title}`;
+const ctaLabel = data.ctaLabel ?? 'Empezar por WhatsApp';
+const url = `${empresa.url}/tramites/${tramite.id}`;
+
+/** La explicación del trámite abre el bloque de preguntas frecuentes. */
+const preguntaDestacada = data.contenidoPregunta ?? `¿Qué es y cuándo se necesita?`;
+
+const schema: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: data.title,
+    description: data.summary,
+    url,
+    serviceType: data.shortTitle,
+    provider: { '@id': `${empresa.url}/#organizacion` },
+    areaServed: { '@type': 'Country', name: 'España' },
+    offers: {
+      '@type': 'Offer',
+      price: total,
+      priceCurrency: 'EUR',
+      url,
+      availability: 'https://schema.org/OnlineOnly',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: empresa.url },
+      { '@type': 'ListItem', position: 2, name: 'Trámites', item: `${empresa.url}/tramites` },
+      { '@type': 'ListItem', position: 3, name: data.shortTitle, item: url },
+    ],
+  },
+];
+
+/**
+ * El FAQPage arranca con la explicación del trámite, igual que la página, para
+ * que los datos estructurados reflejen lo que el usuario ve.
+ */
+const explicacion = tramite.body ? textoPlano(tramite.body) : '';
+const faqsSchema = [
+  ...(explicacion ? [{ pregunta: preguntaDestacada, respuesta: explicacion }] : []),
+  ...data.faqs,
+];
+
+if (faqsSchema.length > 0) {
+  schema.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqsSchema.map((faq) => ({
+      '@type': 'Question',
+      name: faq.pregunta,
+      acceptedAnswer: { '@type': 'Answer', text: faq.respuesta },
+    })),
+  });
+}
+---
+
+<BaseLayout
+  title={data.seo.metaTitle || data.title}
+  description={data.seo.metaDescription || data.summary}
+  schema={schema}
+  stickyCta
+>
+  <!-- 1 · Cabecera -->
+  <Section spacing="none" tone="white" class="relative overflow-hidden border-b border-line">
+    <!-- Manchas de color muy desenfocadas. El blanco plano dejaba la cabecera
+         sin peso; sobre esto la tarjeta de precio va translúcida (`glass`) y
+         el fondo se transparenta a través de ella. -->
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+      <div
+        class="absolute -top-40 -left-32 size-[36rem] rounded-full bg-brand-600/20 blur-3xl"
+      >
+      </div>
+      <div
+        class="absolute -top-24 right-[6%] size-[28rem] rounded-full bg-accent-400/25 blur-3xl"
+      >
+      </div>
+      <div
+        class="absolute -bottom-56 left-[30%] size-[32rem] rounded-full bg-brand-100/70 blur-3xl"
+      >
+      </div>
+    </div>
+
+    <Container class="relative py-12 lg:py-16">
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-start lg:gap-14">
+        <div class="flex flex-col gap-5">
+          <!-- `text-display`, el mismo tamaño que el H1 de la home. -->
+          <h1 class="text-display">{data.hero.claim || data.title}</h1>
+
+          {data.hero.subtitulo && <p class="max-w-[58ch] text-ink-muted">{data.hero.subtitulo}</p>}
+
+          <div class="hidden pt-1 lg:block">
+            <WhatsAppCTA mensaje={mensaje} label={ctaLabel} />
+          </div>
+        </div>
+
+        <!-- El precio va en la cabecera en todos los tamaños: es la primera
+             pregunta del usuario y no debería requerir scroll. En móvil esta
+             es la única tarjeta de precio — la sección «Precio del trámite»
+             de más abajo queda oculta para no repetirla. -->
+        <PriceBreakdown precio={data.precio} plazo={data.hero.plazo} tone="glass" />
+      </div>
+    </Container>
+  </Section>
+
+  <!-- 2 · Pasos del proceso -->
+  {
+    data.pasos.length > 0 && (
+      <Section id="pasos" spacing="tight">
+        <Container class="grid gap-8 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-14">
+          <SectionHeading
+            title="Pasos del proceso"
+            subtitle="De principio a fin, sin que tengas que pisar una oficina."
+            class="lg:sticky lg:top-28 lg:self-start"
+          />
+          <StepList pasos={data.pasos} />
+        </Container>
+      </Section>
+    )
+  }
+
+  <!-- 3 · Documentación necesaria -->
+  {
+    data.documentacion.length > 0 && (
+      <Section id="documentacion" tone="alt" spacing="tight">
+        <Container class="flex flex-col gap-8">
+          <SectionHeading
+            title="Documentación necesaria para tramitar"
+            subtitle="Esto es todo lo que tienes que reunir. Si te falta algo, dínoslo y te decimos cómo conseguirlo."
+          />
+          <DocGrid documentos={data.documentacion} />
+        </Container>
+      </Section>
+    )
+  }
+
+  <!-- 4 · Precio · solo escritorio: en móvil el precio ya sale entero en la
+       cabecera y aquí sería la misma tarjeta repetida. -->
+  <Section id="precio" spacing="tight" class="hidden lg:block">
+    <Container class="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-14">
+      <div class="flex flex-col gap-5">
+        <SectionHeading
+          title="Precio del trámite"
+          subtitle="Sin cargos sorpresa: lo que ves es lo que pagas, y los conceptos que dependen de tu caso van marcados aparte."
+        />
+      </div>
+      <!-- Aquí el botón va dentro de la tarjeta, pegado al precio. En la
+           cabecera no, porque allí ya hay un CTA bajo el H1. -->
+      <PriceBreakdown
+        precio={data.precio}
+        plazo={data.hero.plazo}
+        cta={{ mensaje, label: ctaLabel }}
+      />
+    </Container>
+  </Section>
+
+  <!-- 5 · Preguntas frecuentes -->
+  <Section id="faq" tone="alt" spacing="tight">
+    <Container class="flex flex-col gap-8">
+      <SectionHeading title="Preguntas frecuentes" />
+      <FaqAccordion faqs={data.faqs} preguntaDestacada={preguntaDestacada}>
+        <Prose slot="destacada">
+          <Content />
+        </Prose>
+      </FaqAccordion>
+    </Container>
+  </Section>
+
+  <!-- 6 · CTA de cierre -->
+  <Section spacing="none" tone="brand-dark">
+    <Container class="py-14 lg:py-16">
+      <div
+        class="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10"
+      >
+        <div class="flex flex-col gap-2">
+          <h2 class="text-h2 text-white">¿Empezamos con tu {data.shortTitle.toLowerCase()}?</h2>
+          <p class="max-w-[48ch] text-white/70">
+            Escríbenos por WhatsApp y te decimos en el momento qué necesitamos y cuánto costará.
+          </p>
+        </div>
+        <WhatsAppCTA mensaje={mensaje} label={ctaLabel} class="shrink-0" />
+      </div>
+    </Container>
+  </Section>
+
+  <StickyMobileCTA slot="after" mensaje={mensaje} label={ctaLabel} precioDesde={total} />
+</BaseLayout>

@@ -1,0 +1,100 @@
+---
+import { Image } from 'astro:assets';
+
+import dgt from '../../assets/logos/dgt.svg';
+import agenciaTributaria from '../../assets/logos/agencia-tributaria.svg';
+import eurococ from '../../assets/logos/eurococ.svg';
+import colegio from '../../assets/logos/colegio-gestores.png';
+import docusign from '../../assets/logos/docusign.svg';
+
+/**
+ * Nube de logos institucionales del hero.
+ *
+ * Va en la mitad derecha, que es la que queda libre de texto, y solo a partir
+ * de `xl`: por debajo (incluido `lg`, 1024px) el contenedor no tiene hueco
+ * real para la nube sin solapar el texto del claim.
+ *
+ * Todas las cajas son círculos del mismo diámetro — el tamaño de caja no
+ * depende del logo. Cada logotipo se ajusta dentro por `object-contain`, así
+ * que el eurococ (muy apaisado) y el docusign (con wordmark) conviven sin que
+ * unas cajas queden más anchas que otras.
+ *
+ * Con un número impar de logos, dos columnas en rejilla dejarían un hueco
+ * suelto. En su lugar son dos columnas de flujo libre (3 + 2) con la segunda
+ * desplazada verticalmente a media altura: entrelazadas, sin hueco y sin
+ * leerse como una tabla.
+ */
+const COLUMNA_A = [
+  { src: dgt, alt: 'Dirección General de Tráfico', duracion: '7s', retardo: '0s' },
+  { src: colegio, alt: 'Colegio de Gestores Administrativos', duracion: '8s', retardo: '-4s', ancho: 128 },
+  { src: eurococ, alt: 'EuroCOC', duracion: '10s', retardo: '-1.2s' },
+];
+
+const COLUMNA_B = [
+  { src: agenciaTributaria, alt: 'Agencia Tributaria', duracion: '9s', retardo: '-2.5s' },
+  { src: docusign, alt: 'Docusign', duracion: '11s', retardo: '-6s' },
+];
+---
+
+<div
+  class="pointer-events-none absolute inset-y-0 right-6 hidden w-[24rem] items-center xl:flex"
+>
+  <div class="flex w-full justify-center gap-6">
+    <div class="flex flex-col gap-5">
+      {
+        COLUMNA_A.map((logo) => (
+          <div
+            class="logo-flotante flex size-24 items-center justify-center rounded-full border border-line bg-surface shadow-[0_4px_12px_-6px_rgb(10_31_68/0.22)]"
+            style={`--duracion:${logo.duracion};--retardo:${logo.retardo}`}
+          >
+            <Image
+              src={logo.src}
+              alt={logo.alt}
+              width={logo.ancho}
+              densities={logo.ancho ? [1, 2] : undefined}
+              class="h-[62%] w-[62%] object-contain"
+              loading="eager"
+            />
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Media pitch (circle + gap) hacia abajo para entrelazar con la
+         columna A en lugar de alinearse en filas. -->
+    <div class="flex translate-y-[3.625rem] flex-col gap-5">
+      {
+        COLUMNA_B.map((logo) => (
+          <div
+            class="logo-flotante flex size-24 items-center justify-center rounded-full border border-line bg-surface shadow-[0_4px_12px_-6px_rgb(10_31_68/0.22)]"
+            style={`--duracion:${logo.duracion};--retardo:${logo.retardo}`}
+          >
+            <Image
+              src={logo.src}
+              alt={logo.alt}
+              class="h-[62%] w-[62%] object-contain"
+              loading="eager"
+            />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  .logo-flotante {
+    animation: flotar var(--duracion, 8s) ease-in-out var(--retardo, 0s) infinite alternate;
+  }
+
+  /* El escalonado de columnas va por la propiedad `translate` de Tailwind 4,
+     que es independiente de `transform`: se componen sin pisarse. */
+  @keyframes flotar {
+    from {
+      transform: translateY(-0.4rem);
+    }
+    to {
+      transform: translateY(0.4rem);
+    }
+  }
+</style>

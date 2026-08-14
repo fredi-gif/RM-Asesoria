@@ -1,0 +1,14 @@
+{
+  "name": "RM Gestión",
+  "description": "Gestoría online especializada en trámites de vehículos: transferencias, matriculaciones, bajas y mucho más. Sin colas y sin desplazamientos.",
+  "whatsapp": "34600000000",
+  "email": "hola@rmgestion.es",
+  "telefono": "+34 600 00 00 00",
+  "horario": "Lunes a viernes, de 9:00 a 19:00",
+  "legal": {
+    "razonSocial": "RM Gestión S.L.",
+    "cif": "B00000000",
+    "direccion": "Calle Ejemplo 1, 08001 Barcelona",
+    "registro": "Registro Mercantil de Barcelona"
+  }
+}

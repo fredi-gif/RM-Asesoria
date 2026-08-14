@@ -1,0 +1,48 @@
+---
+import Card from '../ui/Card.astro';
+import Icon from '../ui/Icon.astro';
+import TramiteIlustracion from './TramiteIlustracion.astro';
+import { euros } from '../../lib/format';
+import { tramiteHref, totalTramite, type Tramite } from '../../lib/tramites';
+
+interface Props {
+  tramite: Tramite;
+}
+
+const { tramite } = Astro.props;
+const { data } = tramite;
+const total = totalTramite(data.precio);
+---
+
+<Card as="li" tone="muted" interactive class="group relative flex flex-col overflow-hidden">
+  <!-- Panel blanco para la ilustración: sobre el gris de la tarjeta es lo que
+       la recorta, igual que el `brand-50` recorta las de documentación sobre
+       las tarjetas blancas de la página de trámite. -->
+  <div class="border-b border-line bg-surface px-5 pt-4">
+    <TramiteIlustracion name={data.icon} class="mx-auto max-w-[12rem]" />
+  </div>
+
+  <div class="flex flex-1 flex-col gap-1.5 p-4 sm:p-5">
+    <h3 class="text-h3">
+      <!-- El enlace cubre toda la tarjeta, pero el área clicable accesible
+           sigue siendo el título. -->
+      <a href={tramiteHref(tramite)} class="after:absolute after:inset-0 after:content-['']">
+        {data.shortTitle}
+      </a>
+    </h3>
+    <!-- En móvil, con 2 columnas, el resumen sobra: alarga mucho la tarjeta
+         y el título ya orienta. Vuelve a partir de `sm`. -->
+    <p class="hidden text-small text-ink-muted sm:block">{data.summary}</p>
+
+    <div class="mt-auto flex items-center justify-between gap-3 pt-3">
+      <span class="text-small font-semibold text-brand-900">
+        {data.precio.mostrarDesde ? 'Desde ' : ''}{euros(total)}
+      </span>
+      <Icon
+        name="flecha-derecha"
+        size={18}
+        class="text-ink-subtle transition-[color,transform] duration-200 group-hover:translate-x-0.5 group-hover:text-accent-500"
+      />
+    </div>
+  </div>
+</Card>

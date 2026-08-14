@@ -1,0 +1,142 @@
+---
+import Card from '../ui/Card.astro';
+import Icon from '../ui/Icon.astro';
+import WhatsAppCTA from './WhatsAppCTA.astro';
+import { euros, numeroEuros } from '../../lib/format';
+import { totalTramite, type Tramite } from '../../lib/tramites';
+
+interface Props {
+  precio: Tramite['data']['precio'];
+  /** Plazo de tramitación. Va aquí, junto al precio, donde se decide la compra. */
+  plazo?: string | null;
+  /**
+   * Si se pasa, el botón se pinta dentro de la tarjeta y a todo el ancho.
+   * Se omite en la cabecera, que ya tiene su propio CTA bajo el H1.
+   */
+  cta?: { mensaje: string; label: string } | null;
+  /** `glass` para que se transparente el fondo desenfocado de la cabecera. */
+  tone?: 'white' | 'glass';
+  class?: string;
+}
+
+const { precio, plazo, cta = null, tone = 'white', class: className } = Astro.props;
+const total = totalTramite(precio);
+
+/** Tipo general de IVA aplicable a los servicios de gestoría. */
+const IVA = 0.21;
+
+/**
+ * `honorarios` se guarda con el IVA ya sumado, así que la base y la cuota se
+ * derivan de ahí. Se redondea la base y la cuota se calcula por diferencia,
+ * de modo que las dos líneas suman siempre exactamente los honorarios.
+ */
+const baseImponible = Math.round((precio.honorarios / (1 + IVA)) * 100) / 100;
+const cuotaIva = Math.round((precio.honorarios - baseImponible) * 100) / 100;
+
+/** Conceptos cerrados, los que componen el total. */
+const incluido = [
+  { concepto: 'Nuestro servicio', detalle: 'base imponible', importe: euros(baseImponible) },
+  { concepto: `IVA (${IVA * 100} %)`, detalle: 'sobre nuestro servicio', importe: euros(cuotaIva) },
+  ...(precio.tasaDgt !== null
+    ? [{ concepto: 'Tasa DGT', detalle: 'no sujeta a IVA', importe: euros(precio.tasaDgt) }]
+    : []),
+];
+
+const grupoTitulo =
+  'flex items-center gap-2 font-display text-small font-semibold text-brand-900';
+---
+
+<Card tone={tone} class:list={['flex flex-col overflow-hidden', className]}>
+  <div class="flex flex-col gap-6 p-6">
+    <!-- Precio destacado. La cifra y el «€» van separados para poder darles
+         tamaños distintos, como el «$299/month» de la referencia pero con el
+         símbolo detrás, que es como se escribe en castellano. -->
+    <div class="flex flex-col gap-1.5">
+      {
+        precio.mostrarDesde && (
+          <span class="font-display text-caption font-bold tracking-[0.14em] text-accent-600 uppercase">
+            Desde
+          </span>
+        )
+      }
+      <p class="flex items-baseline gap-1.5">
+        <span
+          class="font-display text-[3.25rem] leading-none font-bold tracking-[-0.03em] text-brand-900 tabular-nums"
+        >
+          {numeroEuros(total)}
+        </span>
+        <span class="font-display text-h3 font-bold text-ink-subtle">€</span>
+      </p>
+      {
+        plazo && (
+          <p class="flex items-center gap-1.5 text-small text-ink-muted">
+            <Icon name="reloj" size={15} class="shrink-0 text-accent-500" />
+            Listo en <strong class="font-semibold text-brand-900">{plazo}</strong>
+          </p>
+        )
+      }
+    </div>
+
+    <div class="h-px bg-line"></div>
+
+    <div class="flex flex-col gap-5">
+      <div class="flex flex-col gap-2.5">
+        <h3 class={grupoTitulo}>
+          <Icon name="punto" size={17} class="shrink-0 text-accent-500" />
+          Qué incluye este precio
+        </h3>
+        <ul class="flex flex-col gap-2 pl-[1.6rem]">
+          {
+            /* Concepto y matiz apilados, no en la misma línea: en la tarjeta
+               estrecha de la cabecera el «· IVA incluido» partía el renglón y
+               dejaba el importe descolgado del texto. */
+            incluido.map((linea) => (
+              <li class="flex items-start justify-between gap-3">
+                <span class="flex items-start gap-2">
+                  <Icon name="check" size={14} class="mt-1 shrink-0 text-accent-500" />
+                  <span class="flex flex-col">
+                    <span class="text-small text-ink">{linea.concepto}</span>
+                    <span class="text-caption text-ink-subtle">{linea.detalle}</span>
+                  </span>
+                </span>
+                <span class="shrink-0 font-display text-small font-semibold text-brand-900 tabular-nums">
+                  {linea.importe}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      {
+        precio.notas.length > 0 && (
+          <div class="flex flex-col gap-2.5">
+            <h3 class={grupoTitulo}>
+              <Icon name="punto" size={17} class="shrink-0 text-ink-subtle" />
+              Aparte, según tu caso
+            </h3>
+            <ul class="flex flex-col gap-2 pl-[1.6rem]">
+              {precio.notas.map((nota) => (
+                <li class="flex items-baseline justify-between gap-3 text-small">
+                  <span class="text-ink-muted">{nota}</span>
+                  <span class="shrink-0 text-caption text-ink-subtle">Variable</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+
+    {
+      cta && (
+        <div class="flex flex-col gap-2">
+          <WhatsAppCTA mensaje={cta.mensaje} label={cta.label} fullWidth />
+          <p class="text-center text-caption text-ink-subtle">
+            Te confirmamos el importe exacto antes de tramitar nada.
+          </p>
+        </div>
+      )
+    }
+  </div>
+</Card>

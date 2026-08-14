@@ -1,0 +1,48 @@
+---
+interface Paso {
+  titulo: string;
+  descripcion: string;
+}
+
+interface Props {
+  pasos: Paso[];
+  class?: string;
+}
+
+const { pasos, class: className } = Astro.props;
+
+/**
+ * Variante horizontal de los pasos, para la home.
+ *
+ * La línea conectora sale del número hacia la derecha y se corta en el último
+ * paso. En móvil las columnas se apilan y la línea desaparece, porque en
+ * vertical el conector es la propia lectura.
+ *
+ * Los pasos de la página de trámite siguen usando `StepList`, que es la
+ * variante vertical y admite listas más largas.
+ */
+---
+
+{
+  pasos.length > 0 && (
+    <ol class:list={['grid gap-x-8 gap-y-10 md:grid-cols-3', className]}>
+      {pasos.map((paso, i) => (
+        <li class="flex flex-col gap-4">
+          <div class="flex items-center gap-4">
+            <span class="flex size-12 shrink-0 items-center justify-center rounded-full bg-accent-50 font-display text-[1.125rem] font-bold text-accent-600 ring-1 ring-accent-400/25 ring-inset">
+              {i + 1}
+            </span>
+            {i < pasos.length - 1 && (
+              <span aria-hidden="true" class="hidden h-px flex-1 bg-line md:block" />
+            )}
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <h3 class="text-h3">{paso.titulo}</h3>
+            <p class="text-ink-muted">{paso.descripcion}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  )
+}

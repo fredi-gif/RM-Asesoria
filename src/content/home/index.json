@@ -1,0 +1,30 @@
+{
+  "hero": {
+    "claim": "Todos tus trámites de vehículos, **online y sin colas**",
+    "subclaim": "Transferencias, matriculaciones, bajas y duplicados gestionados por profesionales. Nos encargamos del papeleo con la DGT mientras tú sigues con lo tuyo.",
+    "ctaPrimario": "Empezar por WhatsApp",
+    "whatsappMensaje": "Hola, me gustaría información sobre un trámite de vehículo."
+  },
+  "comoFunciona": {
+    "titulo": "Tramitar con RM Gestión",
+    "subtitulo": "",
+    "pasos": [
+      {
+        "titulo": "Rellena el formulario",
+        "descripcion": "Nos dices qué trámite necesitas y los datos del vehículo. Te confirmamos en el momento qué documentación hace falta y cuánto costará."
+      },
+      {
+        "titulo": "Envíanos la documentación digitalizada",
+        "descripcion": "Una foto o un escaneo de cada documento desde el móvil. Revisamos que todo esté correcto antes de presentar nada."
+      },
+      {
+        "titulo": "Finalizamos tu trámite",
+        "descripcion": "Presentamos el trámite ante la DGT y te enviamos la documentación definitiva. Te mantenemos informado en todo momento."
+      }
+    ]
+  },
+  "seo": {
+    "metaTitle": "Trámites de vehículos online | Transferencias, bajas y matriculaciones",
+    "metaDescription": "Gestoría online de trámites de vehículos: transferencias, notificaciones de venta, matriculaciones, bajas, duplicados y etiquetas. Precio cerrado y tramitación en 24-48 h."
+  }
+}
