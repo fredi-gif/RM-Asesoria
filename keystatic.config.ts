@@ -43,12 +43,14 @@ const ILUSTRACIONES = [
 ] as const;
 
 export default config({
-  storage: {
-    // Fase local: Keystatic escribe directamente en disco durante `pnpm dev`.
-    // Al desplegar se cambia por:
-    //   { kind: 'github', repo: { owner: '…', name: '…' } }
-    kind: 'local',
-  },
+  // En local (`astro dev`), Keystatic escribe directamente en disco.
+  // En producción (Vercel) no hay acceso de escritura al filesystem del repo,
+  // así que se lee/escribe contra la API de GitHub. Requiere las variables de
+  // entorno KEYSTATIC_GITHUB_CLIENT_ID, KEYSTATIC_GITHUB_CLIENT_SECRET y
+  // KEYSTATIC_SECRET configuradas en el proyecto de Vercel.
+  storage: import.meta.env.PROD
+    ? { kind: 'github', repo: { owner: 'fredi-gif', name: 'RM-Asesoria' } }
+    : { kind: 'local' },
 
   ui: {
     brand: { name: 'RM Gestión' },
