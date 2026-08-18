@@ -62,7 +62,7 @@ export default config({
   collections: {
     tramites: collection({
       label: 'Trámites',
-      path: 'src/content/tramites/*',
+      path: 'src/content/tramites/*/',
       slugField: 'title',
       format: { contentField: 'contenido' },
       entryLayout: 'content',
@@ -252,7 +252,7 @@ export default config({
 
     paginas: collection({
       label: 'Páginas legales',
-      path: 'src/content/paginas/*',
+      path: 'src/content/paginas/*/',
       slugField: 'title',
       format: { contentField: 'contenido' },
       entryLayout: 'content',
@@ -268,7 +268,7 @@ export default config({
   singletons: {
     configuracion: singleton({
       label: 'Datos de la empresa',
-      path: 'src/content/configuracion',
+      path: 'src/content/configuracion/',
       format: { data: 'json' },
       schema: {
         name: fields.text({ label: 'Nombre comercial' }),
@@ -294,7 +294,7 @@ export default config({
 
     home: singleton({
       label: 'Home',
-      path: 'src/content/home',
+      path: 'src/content/home/',
       format: { data: 'json' },
       schema: {
         hero: fields.object(
