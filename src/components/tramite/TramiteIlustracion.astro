@@ -2,9 +2,27 @@
 /**
  * Ilustración de un trámite, para la tarjeta del listado.
  *
- * Comparte gramática con `DocIlustracion.astro` (mismo lenguaje plano y misma
- * paleta) pero aquí son escenas, no documentos: representan la acción del
- * trámite, no el papel que hay que aportar.
+ * Son mock-ups, no iconos: cada trámite se representa con el documento que
+ * realmente se tramita (el permiso, la ficha técnica, la placa, el distintivo
+ * ambiental), puesto en perspectiva ligera, con canto y sombra proyectada,
+ * acompañado del elemento de escena que da contexto (el coche, la lupa, el
+ * sello, el candado).
+ *
+ * Tres reglas que sostienen el conjunto:
+ *
+ * 1. Perspectiva única. Todo va girado entre -6° y -9° sobre su propio centro,
+ *    con el canto dibujado debajo y una sombra elíptica difuminada apoyada
+ *    siempre en la misma línea de suelo (y≈104). Así los doce parecen fotos de
+ *    la misma sesión y no doce dibujos sueltos.
+ * 2. Color real del documento. La banda del permiso va en azul UE, la ficha
+ *    técnica en verde, las placas de empresa en rojo, el distintivo ambiental
+ *    en su azul y verde. La paleta de marca queda para el atrezzo (sellos,
+ *    flechas, insignias), que es donde el naranja tiene que llamar la atención.
+ * 3. Estructura real, texto abstracto. Se reproducen las proporciones, las
+ *    bandas, las casillas y los bloques del documento, pero los renglones son
+ *    barras. A 192 px de ancho —el tamaño real en la tarjeta— cualquier texto
+ *    de campo se convertiría en ruido, y además evita que el mock-up se lea
+ *    como un documento oficial reproducido.
  *
  * Se indexan por el mismo nombre que el icono, así que el campo `icon` de
  * Keystatic gobierna a la vez el icono pequeño (menú, footer) y esta
@@ -13,166 +31,396 @@
  */
 export type TramiteIlustracionName = keyof typeof ILUSTRACIONES;
 
-const TINTA = 'var(--color-brand-900)';
-const MEDIO = 'var(--color-brand-600)';
-const SUAVE = 'var(--color-brand-100)';
-const PAPEL = 'var(--color-surface)';
-const ACENTO = 'var(--color-accent-500)';
-const ACENTO_SUAVE = 'var(--color-accent-50)';
-
-/** Halo de fondo común: da unidad al conjunto y evita el vacío en las esquinas. */
-const halo = `<circle cx="100" cy="62" r="45" fill="${SUAVE}" opacity=".5"/>`;
-
 /**
- * Coche de perfil, centrado en x=100 con las ruedas a y=87.
- * Se reutiliza en todos los trámites cuyo sujeto es el vehículo.
- *
- * Cabina y carrocería van del mismo tinte y solapadas: así se leen como una
- * sola silueta. La ventanilla es lo único claro, y va encima. (La cabina en
- * azul claro se confundía con el halo y el coche parecía un bloque liso.)
+ * Los `id` de `<defs>` son globales al documento, y en el listado se pintan
+ * doce de estos SVG en la misma página. Sin sufijo único, el primer degradado
+ * ganaría y los once restantes heredarían sus colores.
  */
-const coche = `
-  <path d="M74 66V54a6 6 0 0 1 6-6h34a6 6 0 0 1 4.9 2.6L128 66Z" fill="${TINTA}"/>
-  <path d="M52 84V72a8 8 0 0 1 8-8h80a8 8 0 0 1 8 8v12a3 3 0 0 1-3 3H55a3 3 0 0 1-3-3Z" fill="${TINTA}"/>
-  <path d="M81 62V57a2 2 0 0 1 2-2h28a2 2 0 0 1 1.6.8L118 62Z" fill="${SUAVE}"/>
-  <circle cx="74" cy="87" r="9" fill="${TINTA}"/><circle cx="74" cy="87" r="3.5" fill="${PAPEL}"/>
-  <circle cx="126" cy="87" r="9" fill="${TINTA}"/><circle cx="126" cy="87" r="3.5" fill="${PAPEL}"/>
+const uid = Math.random().toString(36).slice(2, 9);
+const fSombra = 'sb-' + uid;
+const gPapel = 'pp-' + uid;
+const gAzul = 'az-' + uid;
+const gVerde = 've-' + uid;
+const gRojo = 'ro-' + uid;
+const gCoche = 'co-' + uid;
+const gCristal = 'cr-' + uid;
+const gEco = 'ec-' + uid;
+const gLuna = 'ln-' + uid;
+const gLlanta = 'll-' + uid;
+
+/* ---- Colores reales de cada documento ---- */
+const AZUL_UE = '#003399'; // banda del permiso y matrícula europea
+const ORO_UE = '#ffcc00'; // estrellas
+const VERDE_ITV = '#0f7a52'; // ficha técnica / tarjeta ITV
+const ROJO_PLACA = '#c1272d'; // placas rojas de empresa
+const ECO_AZUL = '#0e76bc'; // mitad azul del distintivo ECO
+const ECO_VERDE = '#3faa49'; // mitad verde del distintivo ECO
+
+/* ---- Neutros del papel ---- */
+const CANTO = '#c3d0e0'; // grosor del documento
+const BORDE = '#d5dfec';
+const BARRA = '#c6d3e3'; // renglones abstractos
+const BARRA_FUERTE = '#8fa5c0'; // renglón de titular, algo más marcado
+const HUECO = '#eef3f9'; // casillas y recuadros
+
+/* ---- Marca, solo para atrezzo ---- */
+const NARANJA = '#f97316';
+const NARANJA_OSCURO = '#ea6a0b';
+const NAVY = '#0a1f44';
+const BLANCO = '#ffffff';
+const VERDE_OK = '#15803d';
+const ROJO_KO = '#b91c1c';
+
+const defs = `
+  <defs>
+    <filter id="${fSombra}" x="-60%" y="-120%" width="220%" height="340%">
+      <feGaussianBlur stdDeviation="3.6"/>
+    </filter>
+    <linearGradient id="${gPapel}" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e9eff7"/>
+    </linearGradient>
+    <linearGradient id="${gAzul}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b4bb8"/>
+      <stop offset="1" stop-color="${AZUL_UE}"/>
+    </linearGradient>
+    <linearGradient id="${gVerde}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#159c69"/>
+      <stop offset="1" stop-color="${VERDE_ITV}"/>
+    </linearGradient>
+    <linearGradient id="${gRojo}" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#d63a40"/>
+      <stop offset="1" stop-color="${ROJO_PLACA}"/>
+    </linearGradient>
+    <linearGradient id="${gCoche}" x1="0" y1="0" x2="0.15" y2="1">
+      <stop offset="0" stop-color="#2f63a8"/>
+      <stop offset="0.55" stop-color="#17407a"/>
+      <stop offset="1" stop-color="#0b2148"/>
+    </linearGradient>
+    <linearGradient id="${gLuna}" x1="0.1" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#d3e6fb"/>
+      <stop offset="1" stop-color="#7ba9dd"/>
+    </linearGradient>
+    <linearGradient id="${gLlanta}" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#f1f5f9"/>
+      <stop offset="1" stop-color="#94a3b8"/>
+    </linearGradient>
+    <linearGradient id="${gCristal}" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".92"/>
+      <stop offset="0.55" stop-color="#dce8f6" stop-opacity=".62"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity=".85"/>
+    </linearGradient>
+    <linearGradient id="${gEco}" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="${ECO_AZUL}"/>
+      <stop offset="0.5" stop-color="${ECO_AZUL}"/>
+      <stop offset="0.5" stop-color="${ECO_VERDE}"/>
+      <stop offset="1" stop-color="${ECO_VERDE}"/>
+    </linearGradient>
+  </defs>
 `;
 
 /**
- * Insignia circular naranja arriba a la derecha, para alta y baja.
- *
- * Las flechas van como constantes sueltas y no como argumento de una función
- * que devuelva un literal: anidar plantillas dentro de otra plantilla rompe
- * el analizador del frontmatter de Astro.
+ * Sombras de apoyo. Van todas a la misma altura para que los doce trámites
+ * compartan línea de suelo. `filter` las difumina: sin eso el mock-up parece
+ * un recorte pegado.
  */
-const insigniaFondo = `<circle cx="146" cy="38" r="16" fill="${ACENTO}"/>`;
-const flechaArriba = `<path d="M146 46V30m-7 7l7-7 7 7" stroke="${PAPEL}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-const flechaAbajo = `<path d="M146 30v16m-7-7l7 7 7-7" stroke="${PAPEL}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+const sombraAncha = `<ellipse cx="100" cy="104" rx="60" ry="6.5" fill="${NAVY}" opacity=".18" filter="url(#${fSombra})"/>`;
+const sombraMedia = `<ellipse cx="100" cy="104" rx="46" ry="5.5" fill="${NAVY}" opacity=".18" filter="url(#${fSombra})"/>`;
+const sombraEstrecha = `<ellipse cx="100" cy="104" rx="34" ry="5" fill="${NAVY}" opacity=".18" filter="url(#${fSombra})"/>`;
+
+/**
+ * Estrellas de la UE centradas en el origen, para envolver en un `translate`
+ * allí donde hagan falta. Se construyen por concatenación y no con plantillas
+ * anidadas: anidar backticks dentro de otra plantilla rompe el analizador del
+ * frontmatter de Astro.
+ */
+const estrellasUE = Array.from({ length: 12 }, (_, i) => {
+  const a = (i / 12) * Math.PI * 2 - Math.PI / 2;
+  return (
+    '<circle cx="' +
+    (Math.cos(a) * 4.6).toFixed(1) +
+    '" cy="' +
+    (Math.sin(a) * 4.6).toFixed(1) +
+    '" r="0.85" fill="' +
+    ORO_UE +
+    '"/>'
+  );
+}).join('');
+
+/**
+ * Coche de perfil mirando a la derecha, apoyado en y=88, centrado en x=100.
+ *
+ * Los pasos de rueda van recortados en el propio contorno de la carrocería
+ * (los dos arcos del final del path), no tapados con círculos encima: es lo
+ * que hace que la rueda se lea metida en la carrocería y no pegada delante.
+ * El resto del volumen lo dan el degradado vertical, la línea de hombro y el
+ * reflejo diagonal de la luna.
+ */
+const coche = `
+  <path d="M42 88V74c0-5 3-9 8-10l22-6 12-11c2-2 4-3 7-3h29c4 0 7 1 9 4l14 14 10 2c4 1 7 4 7 8v16h-13a15 15 0 0 0-30 0H85a15 15 0 0 0-30 0z" fill="url(#${gCoche})"/>
+  <path d="M82 58l10-11c1-1 2-2 4-2h5v13z" fill="url(#${gLuna})"/>
+  <path d="M105 45h15c2 0 4 1 5 2l10 11h-30z" fill="url(#${gLuna})"/>
+  <path d="M108 45l-9 13h6l9-13z" fill="${BLANCO}" opacity=".45"/>
+  <path d="M50 70h108" stroke="#5b8fd0" stroke-width="1.3" opacity=".45"/>
+  <path d="M50 64l22-6" stroke="#7aa8de" stroke-width="1.3" opacity=".35"/>
+  <rect x="99" y="64" width="9" height="2.6" rx="1.3" fill="#8fb4e2" opacity=".8"/>
+  <rect x="149" y="72" width="9" height="7" rx="2.5" fill="#ffe6b0"/>
+  <rect x="42" y="72" width="8" height="7" rx="2.5" fill="#e0555b"/>
+  <circle cx="70" cy="88" r="13" fill="#0d1626"/>
+  <circle cx="70" cy="88" r="6.6" fill="url(#${gLlanta})"/>
+  <circle cx="70" cy="88" r="2.3" fill="#7c8ea6"/>
+  <circle cx="130" cy="88" r="13" fill="#0d1626"/>
+  <circle cx="130" cy="88" r="6.6" fill="url(#${gLlanta})"/>
+  <circle cx="130" cy="88" r="2.3" fill="#7c8ea6"/>
+`;
+
+/**
+ * Insignia circular de estado, arriba a la derecha. Se compone el fondo y el
+ * símbolo por separado para poder combinar color y flecha sin anidar
+ * plantillas.
+ */
+const insigniaVerde = `<circle cx="150" cy="30" r="17" fill="${VERDE_OK}"/><circle cx="150" cy="30" r="17" fill="none" stroke="${BLANCO}" stroke-width="2.5"/>`;
+const insigniaRoja = `<circle cx="150" cy="30" r="17" fill="${ROJO_KO}"/><circle cx="150" cy="30" r="17" fill="none" stroke="${BLANCO}" stroke-width="2.5"/>`;
+const insigniaNaranja = `<circle cx="150" cy="30" r="17" fill="${NARANJA}"/><circle cx="150" cy="30" r="17" fill="none" stroke="${BLANCO}" stroke-width="2.5"/>`;
+const flechaArriba = `<path d="M150 39V22m-7 7l7-7 7 7" stroke="${BLANCO}" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+const flechaAbajo = `<path d="M150 21v17m-7-7l7 7 7-7" stroke="${BLANCO}" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+const check = `<path d="M142 30l5.5 5.5L159 24" stroke="${BLANCO}" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+const mas = `<path d="M141 30h18M150 21v18" stroke="${BLANCO}" stroke-width="3.4" stroke-linecap="round"/>`;
 
 const ILUSTRACIONES = {
-  /** Transferencia: dos flechas de intercambio sobre el vehículo. */
+  /** Transferencia: el permiso cambia de titular. Flechas de intercambio. */
   traspaso: `
-    ${halo}
-    <path d="M74 22h48" stroke="${ACENTO}" stroke-width="3.5" stroke-linecap="round"/>
-    <path d="M115 16l7 6-7 6" stroke="${ACENTO}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M126 36H78" stroke="${MEDIO}" stroke-width="3.5" stroke-linecap="round"/>
-    <path d="M85 30l-7 6 7 6" stroke="${MEDIO}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    ${coche}
+    ${defs}
+    ${sombraAncha}
+    <g transform="rotate(-8 100 71)">
+      <rect x="46" y="48" width="108" height="54" rx="7" fill="${CANTO}"/>
+      <rect x="46" y="44" width="108" height="54" rx="7" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
+      <path d="M53 44h94a7 7 0 0 1 7 7v9H46v-9a7 7 0 0 1 7-7Z" fill="url(#${gAzul})"/>
+      <g transform="translate(59 51.5)">${estrellasUE}</g>
+      <rect x="72" y="50" width="38" height="3" rx="1.5" fill="${BLANCO}" opacity=".75"/>
+      <rect x="55" y="68" width="27" height="23" rx="3" fill="${HUECO}" stroke="${BORDE}" stroke-width="1"/>
+      <path d="M60 85l6-6 4 4 5-5 4 7z" fill="${BARRA}"/>
+      <rect x="90" y="69" width="54" height="3.4" rx="1.7" fill="${BARRA_FUERTE}"/>
+      <rect x="90" y="77" width="54" height="3" rx="1.5" fill="${BARRA}"/>
+      <rect x="90" y="85" width="34" height="3" rx="1.5" fill="${BARRA}"/>
+    </g>
+    <path d="M66 18h56" stroke="${NARANJA}" stroke-width="4" stroke-linecap="round"/>
+    <path d="M114 11l8 7-8 7" stroke="${NARANJA}" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M134 32H78" stroke="${NAVY}" stroke-width="4" stroke-linecap="round"/>
+    <path d="M86 25l-8 7 8 7" stroke="${NAVY}" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
   `,
 
-  /** Notificación de venta: sobre camino de la DGT con el aviso confirmado. */
+  /** Notificación de venta: el impreso presentado y sellado como recibido. */
   firma: `
-    ${halo}
-    <rect x="52" y="38" width="96" height="64" rx="8" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="2.5"/>
-    <path d="M55 44l42 30a6 6 0 0 0 6 0l42-30" fill="none" stroke="${SUAVE}" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="140" cy="42" r="16" fill="${ACENTO}"/>
-    <path d="M133 42l5 5 9-10" stroke="${PAPEL}" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    ${defs}
+    ${sombraMedia}
+    <g transform="rotate(-7 96 60)">
+      <rect x="54" y="18" width="88" height="82" rx="6" fill="${CANTO}"/>
+      <rect x="54" y="14" width="88" height="82" rx="6" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
+      <path d="M60 14h76a6 6 0 0 1 6 6v8H54v-8a6 6 0 0 1 6-6Z" fill="url(#${gAzul})"/>
+      <rect x="64" y="19" width="34" height="3" rx="1.5" fill="${BLANCO}" opacity=".8"/>
+      <rect x="66" y="38" width="42" height="4" rx="2" fill="${BARRA_FUERTE}"/>
+      <rect x="66" y="49" width="64" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="66" y="57" width="64" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="66" y="65" width="40" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <path d="M68 86c8-12 12 7 19-2s10 6 17-5" stroke="${NAVY}" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".8"/>
+      <rect x="66" y="90" width="52" height="1.6" rx="0.8" fill="${BARRA}"/>
+    </g>
+    ${insigniaNaranja}
+    ${check}
   `,
 
-  /** Informe de DGT: historial del vehículo bajo la lupa. */
+  /** Informe de DGT: el historial impreso, revisado con lupa. */
   lupa: `
-    ${halo}
-    <rect x="56" y="20" width="72" height="86" rx="7" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="2.5"/>
-    <path d="M70 38h30" stroke="${TINTA}" stroke-width="4" stroke-linecap="round"/>
-    <path d="M70 52h44M70 64h44M70 76h28" stroke="${SUAVE}" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="126" cy="72" r="22" fill="${PAPEL}" fill-opacity=".85" stroke="${ACENTO}" stroke-width="4"/>
-    <path d="M142 88l12 12" stroke="${ACENTO}" stroke-width="5" stroke-linecap="round"/>
+    ${defs}
+    ${sombraMedia}
+    <g transform="rotate(-7 92 58)">
+      <rect x="46" y="16" width="86" height="84" rx="6" fill="${CANTO}"/>
+      <rect x="46" y="12" width="86" height="84" rx="6" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
+      <path d="M52 12h74a6 6 0 0 1 6 6v9H46v-9a6 6 0 0 1 6-6Z" fill="url(#${gAzul})"/>
+      <g transform="translate(57 19.5)">${estrellasUE}</g>
+      <rect x="70" y="18" width="42" height="3" rx="1.5" fill="${BLANCO}" opacity=".75"/>
+      <rect x="57" y="38" width="38" height="4" rx="2" fill="${BARRA_FUERTE}"/>
+      <rect x="57" y="49" width="64" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="57" y="57" width="64" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="57" y="65" width="64" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="57" y="73" width="46" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="57" y="81" width="30" height="3.2" rx="1.6" fill="${BARRA}"/>
+    </g>
+    <path d="M150 92l14 14" stroke="${NARANJA_OSCURO}" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="132" cy="72" r="27" fill="url(#${gCristal})"/>
+    <circle cx="132" cy="72" r="27" fill="none" stroke="${NARANJA}" stroke-width="5.5"/>
+    <path d="M118 60a19 19 0 0 0-6 12" stroke="${BLANCO}" stroke-width="3.4" fill="none" stroke-linecap="round" opacity=".9"/>
   `,
 
-  /** Matriculación: la placa definitiva, recién asignada. */
+  /** Matriculación: la placa española recién asignada, con su sello. */
   matricula: `
-    ${halo}
-    <rect x="34" y="42" width="132" height="42" rx="6" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="2.5"/>
-    <path d="M40 42h16v42H40a6 6 0 0 1-6-6V48a6 6 0 0 1 6-6Z" fill="${TINTA}"/>
-    <circle cx="48" cy="58" r="5" fill="none" stroke="${ACENTO}" stroke-width="1.5"/>
-    <path d="M68 63h24M102 63h50" stroke="${TINTA}" stroke-width="9" stroke-linecap="round"/>
-    <path d="M150 26v10M164 34l-7 5M136 34l7 5" stroke="${ACENTO}" stroke-width="3.5" stroke-linecap="round"/>
+    ${defs}
+    ${sombraAncha}
+    <g transform="rotate(-8 100 64)">
+      <rect x="30" y="46" width="140" height="42" rx="6" fill="${CANTO}"/>
+      <rect x="30" y="42" width="140" height="42" rx="6" fill="url(#${gPapel})" stroke="#b9c6d8" stroke-width="1.4"/>
+      <path d="M36 42h14v42H36a6 6 0 0 1-6-6V48a6 6 0 0 1 6-6Z" fill="url(#${gAzul})"/>
+      <g transform="translate(43 58)">${estrellasUE}</g>
+      <rect x="41" y="72" width="5" height="4" rx="1" fill="${ORO_UE}"/>
+      <rect x="60" y="55" width="9" height="16" rx="2" fill="#1a2433"/>
+      <rect x="73" y="55" width="9" height="16" rx="2" fill="#1a2433"/>
+      <rect x="86" y="55" width="9" height="16" rx="2" fill="#1a2433"/>
+      <rect x="99" y="55" width="9" height="16" rx="2" fill="#1a2433"/>
+      <rect x="118" y="55" width="9" height="16" rx="2" fill="#1a2433"/>
+      <rect x="131" y="55" width="9" height="16" rx="2" fill="#1a2433"/>
+      <rect x="144" y="55" width="9" height="16" rx="2" fill="#1a2433"/>
+    </g>
+    ${insigniaNaranja}
+    ${check}
   `,
 
   /** Alta: el vehículo vuelve a circular. */
   alta: `
-    ${halo}
+    ${defs}
+    ${sombraAncha}
     ${coche}
-    ${insigniaFondo}
+    ${insigniaVerde}
     ${flechaArriba}
   `,
 
   /** Baja: el vehículo se retira de circulación. */
   baja: `
-    ${halo}
+    ${defs}
+    ${sombraAncha}
     ${coche}
-    ${insigniaFondo}
+    ${insigniaRoja}
     ${flechaAbajo}
   `,
 
-  /** Duplicado del permiso: una copia sale de la tarjeta original. */
+  /** Duplicado del permiso: dos permisos, el nuevo sobre el original. */
   duplicado: `
-    ${halo}
-    <rect x="34" y="26" width="98" height="58" rx="7" fill="${SUAVE}"/>
-    <rect x="60" y="42" width="98" height="58" rx="7" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="2.5"/>
-    <path d="M66 42h86a6 6 0 0 1 6 6v7H60v-7a6 6 0 0 1 6-6Z" fill="${TINTA}"/>
-    <rect x="70" y="64" width="26" height="24" rx="3" fill="var(--color-brand-50)"/>
-    <path d="M106 68h42M106 80h26" stroke="${SUAVE}" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="150" cy="86" r="11" fill="${ACENTO}"/>
-    <path d="M145 86h10M150 81v10" stroke="${PAPEL}" stroke-width="3" stroke-linecap="round"/>
+    ${defs}
+    ${sombraAncha}
+    <g transform="rotate(-11 92 56)" opacity=".55">
+      <rect x="34" y="30" width="106" height="56" rx="7" fill="${CANTO}"/>
+      <rect x="34" y="27" width="106" height="56" rx="7" fill="#f4f7fb" stroke="${BORDE}" stroke-width="1.2"/>
+      <path d="M41 27h92a7 7 0 0 1 7 7v9H34v-9a7 7 0 0 1 7-7Z" fill="#4a74b8"/>
+    </g>
+    <g transform="rotate(-5 110 72)">
+      <rect x="58" y="48" width="106" height="56" rx="7" fill="${CANTO}"/>
+      <rect x="58" y="44" width="106" height="56" rx="7" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
+      <path d="M65 44h92a7 7 0 0 1 7 7v9H58v-9a7 7 0 0 1 7-7Z" fill="url(#${gAzul})"/>
+      <g transform="translate(71 51.5)">${estrellasUE}</g>
+      <rect x="84" y="50" width="38" height="3" rx="1.5" fill="${BLANCO}" opacity=".75"/>
+      <rect x="66" y="68" width="26" height="24" rx="3" fill="${HUECO}" stroke="${BORDE}" stroke-width="1"/>
+      <path d="M71 85l6-6 4 4 5-5 4 7z" fill="${BARRA}"/>
+      <rect x="100" y="69" width="54" height="3.4" rx="1.7" fill="${BARRA_FUERTE}"/>
+      <rect x="100" y="77" width="54" height="3" rx="1.5" fill="${BARRA}"/>
+      <rect x="100" y="85" width="34" height="3" rx="1.5" fill="${BARRA}"/>
+    </g>
+    ${insigniaNaranja}
+    ${mas}
   `,
 
-  /** Duplicado de la ficha técnica: hoja de características por duplicado. */
+  /** Duplicado de la ficha técnica: la tarjeta ITV por duplicado. */
   documento: `
-    ${halo}
-    <rect x="42" y="18" width="76" height="86" rx="7" fill="${SUAVE}"/>
-    <rect x="66" y="28" width="76" height="86" rx="7" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="2.5"/>
-    <path d="M80 46h34" stroke="${TINTA}" stroke-width="4" stroke-linecap="round"/>
-    <path d="M80 60h48M80 72h48M80 84h30" stroke="${SUAVE}" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="130" cy="92" r="12" fill="${ACENTO}"/>
-    <path d="M124 92h12M130 86v12" stroke="${PAPEL}" stroke-width="3" stroke-linecap="round"/>
+    ${defs}
+    ${sombraAncha}
+    <g transform="rotate(-11 92 56)" opacity=".55">
+      <rect x="38" y="26" width="98" height="60" rx="7" fill="${CANTO}"/>
+      <rect x="38" y="23" width="98" height="60" rx="7" fill="#f4f7fb" stroke="${BORDE}" stroke-width="1.2"/>
+      <path d="M45 23h84a7 7 0 0 1 7 7v9H38v-9a7 7 0 0 1 7-7Z" fill="#5aa88a"/>
+    </g>
+    <g transform="rotate(-5 110 72)">
+      <rect x="62" y="46" width="98" height="60" rx="7" fill="${CANTO}"/>
+      <rect x="62" y="42" width="98" height="60" rx="7" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
+      <path d="M69 42h84a7 7 0 0 1 7 7v9H62v-9a7 7 0 0 1 7-7Z" fill="url(#${gVerde})"/>
+      <rect x="72" y="48" width="40" height="3" rx="1.5" fill="${BLANCO}" opacity=".8"/>
+      <rect x="72" y="66" width="30" height="3.4" rx="1.7" fill="${BARRA_FUERTE}"/>
+      <rect x="108" y="66" width="42" height="3.4" rx="1.7" fill="${BARRA}"/>
+      <rect x="72" y="75" width="30" height="3.2" rx="1.6" fill="${BARRA_FUERTE}"/>
+      <rect x="108" y="75" width="42" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="72" y="84" width="30" height="3.2" rx="1.6" fill="${BARRA_FUERTE}"/>
+      <rect x="108" y="84" width="26" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <circle cx="146" cy="88" r="9" fill="none" stroke="${VERDE_ITV}" stroke-width="1.8" opacity=".6"/>
+    </g>
+    ${insigniaNaranja}
+    ${mas}
   `,
 
-  /** Cambio de servicio: el vehículo estrena destino (cartel en el techo). */
+  /** Cambio de servicio: el vehículo estrena uso, con su rótulo en el techo. */
   ajustes: `
-    ${halo}
-    <rect x="86" y="31" width="30" height="16" rx="4" fill="${ACENTO}"/>
-    <path d="M93 39h16" stroke="${PAPEL}" stroke-width="3" stroke-linecap="round"/>
+    ${defs}
+    ${sombraAncha}
+    <rect x="88" y="28" width="34" height="16" rx="4" fill="${NARANJA}"/>
+    <rect x="88" y="28" width="34" height="16" rx="4" fill="none" stroke="${NARANJA_OSCURO}" stroke-width="1.2"/>
+    <rect x="95" y="34" width="20" height="3.4" rx="1.7" fill="${BLANCO}"/>
     ${coche}
-    <circle cx="52" cy="42" r="16" fill="${MEDIO}"/>
-    <path d="M45 38h12m-4-4 4 4-4 4" stroke="${PAPEL}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M59 48H47m4 4-4-4 4-4" stroke="${PAPEL}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="44" cy="40" r="17" fill="url(#${gCoche})"/>
+    <path d="M36 36h14m-4-4 4 4-4 4" stroke="${BLANCO}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M52 46H38m4 4-4-4 4-4" stroke="${BLANCO}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
   `,
 
-  /** Levantamiento de reserva: el candado se abre, el coche queda libre. */
+  /** Levantamiento de reserva: el contrato queda libre de cargas. */
   candado: `
-    ${halo}
-    <path d="M84 56V44a16 16 0 0 1 30-7" fill="none" stroke="${ACENTO}" stroke-width="6" stroke-linecap="round"/>
-    <rect x="62" y="54" width="76" height="52" rx="10" fill="${TINTA}"/>
-    <circle cx="100" cy="74" r="7" fill="${ACENTO}"/>
-    <path d="M100 80v10" stroke="${ACENTO}" stroke-width="5" stroke-linecap="round"/>
+    ${defs}
+    ${sombraMedia}
+    <g transform="rotate(-7 92 58)">
+      <rect x="46" y="18" width="86" height="82" rx="6" fill="${CANTO}"/>
+      <rect x="46" y="14" width="86" height="82" rx="6" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
+      <rect x="58" y="28" width="40" height="4" rx="2" fill="${BARRA_FUERTE}"/>
+      <rect x="58" y="40" width="62" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="58" y="48" width="62" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="58" y="56" width="44" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <path d="M60 80c8-11 12 6 18-2s10 5 16-4" stroke="${NAVY}" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".75"/>
+      <rect x="58" y="86" width="48" height="1.6" rx="0.8" fill="${BARRA}"/>
+    </g>
+    <path d="M124 62V50a15 15 0 0 1 29-5" fill="none" stroke="${NARANJA_OSCURO}" stroke-width="6.5" stroke-linecap="round"/>
+    <rect x="110" y="60" width="56" height="42" rx="9" fill="${NARANJA}"/>
+    <rect x="110" y="60" width="56" height="42" rx="9" fill="none" stroke="${NARANJA_OSCURO}" stroke-width="1.4"/>
+    <circle cx="138" cy="77" r="6.5" fill="${BLANCO}"/>
+    <path d="M138 83v9" stroke="${BLANCO}" stroke-width="4.6" stroke-linecap="round"/>
   `,
 
-  /** Etiqueta medioambiental: el distintivo pegado en el parabrisas. */
+  /** Etiqueta medioambiental: el distintivo, como pegatina troquelada. */
   hoja: `
-    ${halo}
-    <circle cx="100" cy="62" r="36" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="3"/>
-    <circle cx="100" cy="62" r="27" fill="var(--color-success)" opacity=".12"/>
-    <path d="M86 74c0-16 10-27 30-27 0 18-10 27-24 27h-6Z" fill="var(--color-success)"/>
-    <path d="M92 70c4-6 9-10 15-12" stroke="${PAPEL}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <circle cx="132" cy="34" r="10" fill="${ACENTO}"/>
-    <path d="M127 34l4 4 6-7" stroke="${PAPEL}" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    ${defs}
+    ${sombraMedia}
+    <g transform="rotate(-8 100 60)">
+      <circle cx="100" cy="64" r="40" fill="${CANTO}"/>
+      <circle cx="100" cy="60" r="40" fill="url(#${gEco})"/>
+      <circle cx="100" cy="60" r="40" fill="none" stroke="${BLANCO}" stroke-width="4.5"/>
+      <circle cx="100" cy="60" r="31" fill="none" stroke="${BLANCO}" stroke-width="1.8" opacity=".5"/>
+      <path d="M83 73c0-15 10-26 29-26 0 17-10 26-23 26z" fill="${BLANCO}" opacity=".94"/>
+      <path d="M88 70c4-6 10-11 17-13" stroke="${ECO_VERDE}" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+      <path d="M70 40a40 40 0 0 1 23-17" stroke="${BLANCO}" stroke-width="3.2" fill="none" stroke-linecap="round" opacity=".45"/>
+    </g>
   `,
 
-  /** Placas rojas: matrícula temporal de empresa. */
+  /** Placas rojas: el juego de placas temporales de empresa. */
   placas: `
-    ${halo}
-    <rect x="30" y="30" width="130" height="40" rx="6" fill="${PAPEL}" stroke="${SUAVE}" stroke-width="2.5"/>
-    <path d="M64 50h26M100 50h48" stroke="${SUAVE}" stroke-width="8" stroke-linecap="round"/>
-    <rect x="40" y="56" width="130" height="40" rx="6" fill="var(--color-danger)"/>
-    <path d="M74 76h26M110 76h48" stroke="${PAPEL}" stroke-width="8" stroke-linecap="round"/>
-    <circle cx="54" cy="76" r="7" fill="none" stroke="${PAPEL}" stroke-width="2"/>
+    ${defs}
+    ${sombraAncha}
+    <g transform="rotate(-11 88 46)" opacity=".6">
+      <rect x="34" y="26" width="118" height="36" rx="5" fill="#8f2429"/>
+      <rect x="34" y="23" width="118" height="36" rx="5" fill="#d9565b"/>
+      <rect x="52" y="36" width="76" height="10" rx="3" fill="${BLANCO}" opacity=".55"/>
+    </g>
+    <g transform="rotate(-5 106 76)">
+      <rect x="44" y="58" width="122" height="38" rx="5" fill="#8f2429"/>
+      <rect x="44" y="54" width="122" height="38" rx="5" fill="url(#${gRojo})"/>
+      <rect x="44" y="54" width="122" height="38" rx="5" fill="none" stroke="#a51f25" stroke-width="1.2"/>
+      <rect x="53" y="66" width="8" height="15" rx="2" fill="${BLANCO}"/>
+      <rect x="70" y="66" width="8" height="15" rx="2" fill="${BLANCO}"/>
+      <rect x="82" y="66" width="8" height="15" rx="2" fill="${BLANCO}"/>
+      <rect x="94" y="66" width="8" height="15" rx="2" fill="${BLANCO}"/>
+      <rect x="112" y="66" width="8" height="15" rx="2" fill="${BLANCO}"/>
+      <rect x="124" y="66" width="8" height="15" rx="2" fill="${BLANCO}"/>
+      <rect x="136" y="66" width="8" height="15" rx="2" fill="${BLANCO}"/>
+      <rect x="148" y="66" width="8" height="15" rx="2" fill="${BLANCO}"/>
+    </g>
   `,
 
   /** Genérico: el vehículo, sin más. */
   coche: `
-    ${halo}
+    ${defs}
+    ${sombraAncha}
     ${coche}
   `,
 } as const;
