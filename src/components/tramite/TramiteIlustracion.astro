@@ -2,27 +2,37 @@
 /**
  * Ilustración de un trámite, para la tarjeta del listado.
  *
- * Son mock-ups, no iconos: cada trámite se representa con el documento que
- * realmente se tramita (el permiso, la ficha técnica, la placa, el distintivo
- * ambiental), puesto en perspectiva ligera, con canto y sombra proyectada,
- * acompañado del elemento de escena que da contexto (el coche, la lupa, el
- * sello, el candado).
+ * Son mock-ups de documento, no iconos: cada trámite se representa con el papel
+ * que realmente se tramita —el permiso de circulación, la ficha técnica, la
+ * placa, el distintivo ambiental— puesto en perspectiva ligera, con canto y
+ * sombra proyectada, y acompañado del elemento de escena que da contexto (la
+ * lupa, el candado, el sello).
  *
- * Tres reglas que sostienen el conjunto:
+ * Cuatro reglas sostienen el conjunto:
  *
- * 1. Perspectiva única. Todo va girado entre -6° y -9° sobre su propio centro,
+ * 1. Solo documentos. No aparece el vehículo en ninguna: lo que vendemos es la
+ *    gestión del papeleo, así que el sujeto de la escena es siempre el
+ *    documento. Los trámites que actúan sobre el estado del vehículo (alta,
+ *    baja, cambio de servicio) se resuelven con el permiso más una insignia
+ *    que dice qué le pasa.
+ * 2. Perspectiva única. Todo va girado entre -5° y -11° sobre su propio centro,
  *    con el canto dibujado debajo y una sombra elíptica difuminada apoyada
  *    siempre en la misma línea de suelo (y≈104). Así los doce parecen fotos de
  *    la misma sesión y no doce dibujos sueltos.
- * 2. Color real del documento. La banda del permiso va en azul UE, la ficha
- *    técnica en verde, las placas de empresa en rojo, el distintivo ambiental
- *    en su azul y verde. La paleta de marca queda para el atrezzo (sellos,
- *    flechas, insignias), que es donde el naranja tiene que llamar la atención.
- * 3. Estructura real, texto abstracto. Se reproducen las proporciones, las
+ * 3. Color real del documento. El permiso de circulación es verde; la placa
+ *    española, blanca con banda azul UE; las placas de empresa, rojas; el
+ *    distintivo ambiental, azul y verde. La ficha técnica va en grafito: su
+ *    color real la dejaría a un paso del verde del permiso y «Duplicado del
+ *    permiso» y «Duplicado de la ficha técnica» quedan adyacentes en el
+ *    listado, así que se separan por valor —neutro oscuro frente a verde— que
+ *    es lo que aguanta a 120 px en móvil.
+ *    La paleta de marca queda para el atrezzo (sellos, flechas, insignias),
+ *    que es donde el naranja tiene que llamar la atención.
+ * 4. Estructura real, texto abstracto. Se reproducen las proporciones, las
  *    bandas, las casillas y los bloques del documento, pero los renglones son
- *    barras. A 192 px de ancho —el tamaño real en la tarjeta— cualquier texto
- *    de campo se convertiría en ruido, y además evita que el mock-up se lea
- *    como un documento oficial reproducido.
+ *    barras. A 192 px de ancho —el tamaño real en la tarjeta, 120 px en móvil—
+ *    cualquier texto de campo se convertiría en ruido, y además evita que el
+ *    mock-up se lea como un documento oficial reproducido.
  *
  * Se indexan por el mismo nombre que el icono, así que el campo `icon` de
  * Keystatic gobierna a la vez el icono pequeño (menú, footer) y esta
@@ -39,29 +49,33 @@ export type TramiteIlustracionName = keyof typeof ILUSTRACIONES;
 const uid = Math.random().toString(36).slice(2, 9);
 const fSombra = 'sb-' + uid;
 const gPapel = 'pp-' + uid;
+const gPapelVerde = 'pv-' + uid;
 const gAzul = 'az-' + uid;
-const gVerde = 've-' + uid;
+const gVerdePermiso = 'vp-' + uid;
+const gGrafito = 'gf-' + uid;
 const gRojo = 'ro-' + uid;
-const gCoche = 'co-' + uid;
 const gCristal = 'cr-' + uid;
 const gEco = 'ec-' + uid;
-const gLuna = 'ln-' + uid;
-const gLlanta = 'll-' + uid;
 
 /* ---- Colores reales de cada documento ---- */
-const AZUL_UE = '#003399'; // banda del permiso y matrícula europea
+const AZUL_UE = '#003399'; // banda de la matrícula europea y cabecera DGT
 const ORO_UE = '#ffcc00'; // estrellas
-const VERDE_ITV = '#0f7a52'; // ficha técnica / tarjeta ITV
+const VERDE_PERMISO = '#2e7d46'; // permiso de circulación
+const GRAFITO_ITV = '#3f4d61'; // ficha técnica / tarjeta ITV
 const ROJO_PLACA = '#c1272d'; // placas rojas de empresa
 const ECO_AZUL = '#0e76bc'; // mitad azul del distintivo ECO
 const ECO_VERDE = '#3faa49'; // mitad verde del distintivo ECO
 
 /* ---- Neutros del papel ---- */
 const CANTO = '#c3d0e0'; // grosor del documento
+const CANTO_VERDE = '#b3d2bd'; // grosor del permiso, para no romper el verde
 const BORDE = '#d5dfec';
+const BORDE_VERDE = '#c2dcca';
 const BARRA = '#c6d3e3'; // renglones abstractos
 const BARRA_FUERTE = '#8fa5c0'; // renglón de titular, algo más marcado
-const HUECO = '#eef3f9'; // casillas y recuadros
+const BARRA_VERDE = '#a9cbb3';
+const BARRA_VERDE_FUERTE = '#78a386';
+const HUECO_VERDE = '#e2f0e7'; // casilla de la foto del vehículo, sobre papel verde
 
 /* ---- Marca, solo para atrezzo ---- */
 const NARANJA = '#f97316';
@@ -80,30 +94,25 @@ const defs = `
       <stop offset="0" stop-color="#ffffff"/>
       <stop offset="1" stop-color="#e9eff7"/>
     </linearGradient>
+    <linearGradient id="${gPapelVerde}" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#fbfdfb"/>
+      <stop offset="1" stop-color="#e3f0e7"/>
+    </linearGradient>
     <linearGradient id="${gAzul}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#0b4bb8"/>
       <stop offset="1" stop-color="${AZUL_UE}"/>
     </linearGradient>
-    <linearGradient id="${gVerde}" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#159c69"/>
-      <stop offset="1" stop-color="${VERDE_ITV}"/>
+    <linearGradient id="${gVerdePermiso}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#43a05d"/>
+      <stop offset="1" stop-color="${VERDE_PERMISO}"/>
+    </linearGradient>
+    <linearGradient id="${gGrafito}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5b6d86"/>
+      <stop offset="1" stop-color="${GRAFITO_ITV}"/>
     </linearGradient>
     <linearGradient id="${gRojo}" x1="0" y1="0" x2="0.3" y2="1">
       <stop offset="0" stop-color="#d63a40"/>
       <stop offset="1" stop-color="${ROJO_PLACA}"/>
-    </linearGradient>
-    <linearGradient id="${gCoche}" x1="0" y1="0" x2="0.15" y2="1">
-      <stop offset="0" stop-color="#2f63a8"/>
-      <stop offset="0.55" stop-color="#17407a"/>
-      <stop offset="1" stop-color="#0b2148"/>
-    </linearGradient>
-    <linearGradient id="${gLuna}" x1="0.1" y1="0" x2="0.7" y2="1">
-      <stop offset="0" stop-color="#d3e6fb"/>
-      <stop offset="1" stop-color="#7ba9dd"/>
-    </linearGradient>
-    <linearGradient id="${gLlanta}" x1="0" y1="0" x2="0.4" y2="1">
-      <stop offset="0" stop-color="#f1f5f9"/>
-      <stop offset="1" stop-color="#94a3b8"/>
     </linearGradient>
     <linearGradient id="${gCristal}" x1="0.15" y1="0" x2="0.85" y2="1">
       <stop offset="0" stop-color="#ffffff" stop-opacity=".92"/>
@@ -126,7 +135,6 @@ const defs = `
  */
 const sombraAncha = `<ellipse cx="100" cy="104" rx="60" ry="6.5" fill="${NAVY}" opacity=".18" filter="url(#${fSombra})"/>`;
 const sombraMedia = `<ellipse cx="100" cy="104" rx="46" ry="5.5" fill="${NAVY}" opacity=".18" filter="url(#${fSombra})"/>`;
-const sombraEstrecha = `<ellipse cx="100" cy="104" rx="34" ry="5" fill="${NAVY}" opacity=".18" filter="url(#${fSombra})"/>`;
 
 /**
  * Estrellas de la UE centradas en el origen, para envolver en un `translate`
@@ -148,36 +156,31 @@ const estrellasUE = Array.from({ length: 12 }, (_, i) => {
 }).join('');
 
 /**
- * Coche de perfil mirando a la derecha, apoyado en y=88, centrado en x=100.
+ * El permiso de circulación, verde, centrado y en perspectiva.
  *
- * Los pasos de rueda van recortados en el propio contorno de la carrocería
- * (los dos arcos del final del path), no tapados con círculos encima: es lo
- * que hace que la rueda se lea metida en la carrocería y no pegada delante.
- * El resto del volumen lo dan el degradado vertical, la línea de hombro y el
- * reflejo diagonal de la luna.
+ * Es la pieza que más se repite —transferencia, alta, baja, cambio de
+ * servicio y el genérico— así que va como constante única: la esquina
+ * superior derecha queda libre para que la insignia de cada trámite se apoye
+ * encima y sea ella la que diferencia unas de otras.
  */
-const coche = `
-  <path d="M42 88V74c0-5 3-9 8-10l22-6 12-11c2-2 4-3 7-3h29c4 0 7 1 9 4l14 14 10 2c4 1 7 4 7 8v16h-13a15 15 0 0 0-30 0H85a15 15 0 0 0-30 0z" fill="url(#${gCoche})"/>
-  <path d="M82 58l10-11c1-1 2-2 4-2h5v13z" fill="url(#${gLuna})"/>
-  <path d="M105 45h15c2 0 4 1 5 2l10 11h-30z" fill="url(#${gLuna})"/>
-  <path d="M108 45l-9 13h6l9-13z" fill="${BLANCO}" opacity=".45"/>
-  <path d="M50 70h108" stroke="#5b8fd0" stroke-width="1.3" opacity=".45"/>
-  <path d="M50 64l22-6" stroke="#7aa8de" stroke-width="1.3" opacity=".35"/>
-  <rect x="99" y="64" width="9" height="2.6" rx="1.3" fill="#8fb4e2" opacity=".8"/>
-  <rect x="149" y="72" width="9" height="7" rx="2.5" fill="#ffe6b0"/>
-  <rect x="42" y="72" width="8" height="7" rx="2.5" fill="#e0555b"/>
-  <circle cx="70" cy="88" r="13" fill="#0d1626"/>
-  <circle cx="70" cy="88" r="6.6" fill="url(#${gLlanta})"/>
-  <circle cx="70" cy="88" r="2.3" fill="#7c8ea6"/>
-  <circle cx="130" cy="88" r="13" fill="#0d1626"/>
-  <circle cx="130" cy="88" r="6.6" fill="url(#${gLlanta})"/>
-  <circle cx="130" cy="88" r="2.3" fill="#7c8ea6"/>
+const permiso = `
+  <g transform="rotate(-8 96 72)">
+    <rect x="40" y="48" width="112" height="56" rx="7" fill="${CANTO_VERDE}"/>
+    <rect x="40" y="44" width="112" height="56" rx="7" fill="url(#${gPapelVerde})" stroke="${BORDE_VERDE}" stroke-width="1.2"/>
+    <path d="M47 44h98a7 7 0 0 1 7 7v9H40v-9a7 7 0 0 1 7-7Z" fill="url(#${gVerdePermiso})"/>
+    <g transform="translate(53 51.5)">${estrellasUE}</g>
+    <rect x="66" y="50" width="40" height="3" rx="1.5" fill="${BLANCO}" opacity=".75"/>
+    <rect x="49" y="68" width="27" height="23" rx="3" fill="${HUECO_VERDE}" stroke="${BORDE_VERDE}" stroke-width="1"/>
+    <path d="M54 85l6-6 4 4 5-5 4 7z" fill="${BARRA_VERDE}"/>
+    <rect x="84" y="69" width="56" height="3.4" rx="1.7" fill="${BARRA_VERDE_FUERTE}"/>
+    <rect x="84" y="77" width="56" height="3" rx="1.5" fill="${BARRA_VERDE}"/>
+    <rect x="84" y="85" width="36" height="3" rx="1.5" fill="${BARRA_VERDE}"/>
+  </g>
 `;
 
 /**
- * Insignia circular de estado, arriba a la derecha. Se compone el fondo y el
- * símbolo por separado para poder combinar color y flecha sin anidar
- * plantillas.
+ * Insignias de estado, arriba a la derecha. Fondo y símbolo van por separado
+ * para poder combinar color y signo sin anidar plantillas.
  */
 const insigniaVerde = `<circle cx="150" cy="30" r="17" fill="${VERDE_OK}"/><circle cx="150" cy="30" r="17" fill="none" stroke="${BLANCO}" stroke-width="2.5"/>`;
 const insigniaRoja = `<circle cx="150" cy="30" r="17" fill="${ROJO_KO}"/><circle cx="150" cy="30" r="17" fill="none" stroke="${BLANCO}" stroke-width="2.5"/>`;
@@ -186,6 +189,7 @@ const flechaArriba = `<path d="M150 39V22m-7 7l7-7 7 7" stroke="${BLANCO}" strok
 const flechaAbajo = `<path d="M150 21v17m-7-7l7 7 7-7" stroke="${BLANCO}" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
 const check = `<path d="M142 30l5.5 5.5L159 24" stroke="${BLANCO}" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
 const mas = `<path d="M141 30h18M150 21v18" stroke="${BLANCO}" stroke-width="3.4" stroke-linecap="round"/>`;
+const intercambio = `<path d="M142 26h14m-4-4 4 4-4 4" stroke="${BLANCO}" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M158 35h-14m4 4-4-4 4-4" stroke="${BLANCO}" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
 
 const ILUSTRACIONES = {
   /** Transferencia: el permiso cambia de titular. Flechas de intercambio. */
@@ -193,16 +197,16 @@ const ILUSTRACIONES = {
     ${defs}
     ${sombraAncha}
     <g transform="rotate(-8 100 71)">
-      <rect x="46" y="48" width="108" height="54" rx="7" fill="${CANTO}"/>
-      <rect x="46" y="44" width="108" height="54" rx="7" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
-      <path d="M53 44h94a7 7 0 0 1 7 7v9H46v-9a7 7 0 0 1 7-7Z" fill="url(#${gAzul})"/>
+      <rect x="46" y="48" width="108" height="54" rx="7" fill="${CANTO_VERDE}"/>
+      <rect x="46" y="44" width="108" height="54" rx="7" fill="url(#${gPapelVerde})" stroke="${BORDE_VERDE}" stroke-width="1.2"/>
+      <path d="M53 44h94a7 7 0 0 1 7 7v9H46v-9a7 7 0 0 1 7-7Z" fill="url(#${gVerdePermiso})"/>
       <g transform="translate(59 51.5)">${estrellasUE}</g>
       <rect x="72" y="50" width="38" height="3" rx="1.5" fill="${BLANCO}" opacity=".75"/>
-      <rect x="55" y="68" width="27" height="23" rx="3" fill="${HUECO}" stroke="${BORDE}" stroke-width="1"/>
-      <path d="M60 85l6-6 4 4 5-5 4 7z" fill="${BARRA}"/>
-      <rect x="90" y="69" width="54" height="3.4" rx="1.7" fill="${BARRA_FUERTE}"/>
-      <rect x="90" y="77" width="54" height="3" rx="1.5" fill="${BARRA}"/>
-      <rect x="90" y="85" width="34" height="3" rx="1.5" fill="${BARRA}"/>
+      <rect x="55" y="68" width="27" height="23" rx="3" fill="${HUECO_VERDE}" stroke="${BORDE_VERDE}" stroke-width="1"/>
+      <path d="M60 85l6-6 4 4 5-5 4 7z" fill="${BARRA_VERDE}"/>
+      <rect x="90" y="69" width="54" height="3.4" rx="1.7" fill="${BARRA_VERDE_FUERTE}"/>
+      <rect x="90" y="77" width="54" height="3" rx="1.5" fill="${BARRA_VERDE}"/>
+      <rect x="90" y="85" width="34" height="3" rx="1.5" fill="${BARRA_VERDE}"/>
     </g>
     <path d="M66 18h56" stroke="${NARANJA}" stroke-width="4" stroke-linecap="round"/>
     <path d="M114 11l8 7-8 7" stroke="${NARANJA}" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
@@ -275,20 +279,20 @@ const ILUSTRACIONES = {
     ${check}
   `,
 
-  /** Alta: el vehículo vuelve a circular. */
+  /** Alta: el permiso vuelve a estar en vigor. */
   alta: `
     ${defs}
     ${sombraAncha}
-    ${coche}
+    ${permiso}
     ${insigniaVerde}
     ${flechaArriba}
   `,
 
-  /** Baja: el vehículo se retira de circulación. */
+  /** Baja: el permiso deja de estar en vigor. */
   baja: `
     ${defs}
     ${sombraAncha}
-    ${coche}
+    ${permiso}
     ${insigniaRoja}
     ${flechaAbajo}
   `,
@@ -298,21 +302,21 @@ const ILUSTRACIONES = {
     ${defs}
     ${sombraAncha}
     <g transform="rotate(-11 92 56)" opacity=".55">
-      <rect x="34" y="30" width="106" height="56" rx="7" fill="${CANTO}"/>
-      <rect x="34" y="27" width="106" height="56" rx="7" fill="#f4f7fb" stroke="${BORDE}" stroke-width="1.2"/>
-      <path d="M41 27h92a7 7 0 0 1 7 7v9H34v-9a7 7 0 0 1 7-7Z" fill="#4a74b8"/>
+      <rect x="34" y="30" width="106" height="56" rx="7" fill="${CANTO_VERDE}"/>
+      <rect x="34" y="27" width="106" height="56" rx="7" fill="#f1f8f3" stroke="${BORDE_VERDE}" stroke-width="1.2"/>
+      <path d="M41 27h92a7 7 0 0 1 7 7v9H34v-9a7 7 0 0 1 7-7Z" fill="#6fb384"/>
     </g>
     <g transform="rotate(-5 110 72)">
-      <rect x="58" y="48" width="106" height="56" rx="7" fill="${CANTO}"/>
-      <rect x="58" y="44" width="106" height="56" rx="7" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
-      <path d="M65 44h92a7 7 0 0 1 7 7v9H58v-9a7 7 0 0 1 7-7Z" fill="url(#${gAzul})"/>
+      <rect x="58" y="48" width="106" height="56" rx="7" fill="${CANTO_VERDE}"/>
+      <rect x="58" y="44" width="106" height="56" rx="7" fill="url(#${gPapelVerde})" stroke="${BORDE_VERDE}" stroke-width="1.2"/>
+      <path d="M65 44h92a7 7 0 0 1 7 7v9H58v-9a7 7 0 0 1 7-7Z" fill="url(#${gVerdePermiso})"/>
       <g transform="translate(71 51.5)">${estrellasUE}</g>
       <rect x="84" y="50" width="38" height="3" rx="1.5" fill="${BLANCO}" opacity=".75"/>
-      <rect x="66" y="68" width="26" height="24" rx="3" fill="${HUECO}" stroke="${BORDE}" stroke-width="1"/>
-      <path d="M71 85l6-6 4 4 5-5 4 7z" fill="${BARRA}"/>
-      <rect x="100" y="69" width="54" height="3.4" rx="1.7" fill="${BARRA_FUERTE}"/>
-      <rect x="100" y="77" width="54" height="3" rx="1.5" fill="${BARRA}"/>
-      <rect x="100" y="85" width="34" height="3" rx="1.5" fill="${BARRA}"/>
+      <rect x="66" y="68" width="26" height="24" rx="3" fill="${HUECO_VERDE}" stroke="${BORDE_VERDE}" stroke-width="1"/>
+      <path d="M71 85l6-6 4 4 5-5 4 7z" fill="${BARRA_VERDE}"/>
+      <rect x="100" y="69" width="54" height="3.4" rx="1.7" fill="${BARRA_VERDE_FUERTE}"/>
+      <rect x="100" y="77" width="54" height="3" rx="1.5" fill="${BARRA_VERDE}"/>
+      <rect x="100" y="85" width="34" height="3" rx="1.5" fill="${BARRA_VERDE}"/>
     </g>
     ${insigniaNaranja}
     ${mas}
@@ -325,12 +329,12 @@ const ILUSTRACIONES = {
     <g transform="rotate(-11 92 56)" opacity=".55">
       <rect x="38" y="26" width="98" height="60" rx="7" fill="${CANTO}"/>
       <rect x="38" y="23" width="98" height="60" rx="7" fill="#f4f7fb" stroke="${BORDE}" stroke-width="1.2"/>
-      <path d="M45 23h84a7 7 0 0 1 7 7v9H38v-9a7 7 0 0 1 7-7Z" fill="#5aa88a"/>
+      <path d="M45 23h84a7 7 0 0 1 7 7v9H38v-9a7 7 0 0 1 7-7Z" fill="#8f9cb0"/>
     </g>
     <g transform="rotate(-5 110 72)">
       <rect x="62" y="46" width="98" height="60" rx="7" fill="${CANTO}"/>
       <rect x="62" y="42" width="98" height="60" rx="7" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
-      <path d="M69 42h84a7 7 0 0 1 7 7v9H62v-9a7 7 0 0 1 7-7Z" fill="url(#${gVerde})"/>
+      <path d="M69 42h84a7 7 0 0 1 7 7v9H62v-9a7 7 0 0 1 7-7Z" fill="url(#${gGrafito})"/>
       <rect x="72" y="48" width="40" height="3" rx="1.5" fill="${BLANCO}" opacity=".8"/>
       <rect x="72" y="66" width="30" height="3.4" rx="1.7" fill="${BARRA_FUERTE}"/>
       <rect x="108" y="66" width="42" height="3.4" rx="1.7" fill="${BARRA}"/>
@@ -338,23 +342,19 @@ const ILUSTRACIONES = {
       <rect x="108" y="75" width="42" height="3.2" rx="1.6" fill="${BARRA}"/>
       <rect x="72" y="84" width="30" height="3.2" rx="1.6" fill="${BARRA_FUERTE}"/>
       <rect x="108" y="84" width="26" height="3.2" rx="1.6" fill="${BARRA}"/>
-      <circle cx="146" cy="88" r="9" fill="none" stroke="${VERDE_ITV}" stroke-width="1.8" opacity=".6"/>
+      <circle cx="146" cy="88" r="9" fill="none" stroke="${GRAFITO_ITV}" stroke-width="1.8" opacity=".6"/>
     </g>
     ${insigniaNaranja}
     ${mas}
   `,
 
-  /** Cambio de servicio: el vehículo estrena uso, con su rótulo en el techo. */
+  /** Cambio de servicio: el permiso pasa a otro uso registrado. */
   ajustes: `
     ${defs}
     ${sombraAncha}
-    <rect x="88" y="28" width="34" height="16" rx="4" fill="${NARANJA}"/>
-    <rect x="88" y="28" width="34" height="16" rx="4" fill="none" stroke="${NARANJA_OSCURO}" stroke-width="1.2"/>
-    <rect x="95" y="34" width="20" height="3.4" rx="1.7" fill="${BLANCO}"/>
-    ${coche}
-    <circle cx="44" cy="40" r="17" fill="url(#${gCoche})"/>
-    <path d="M36 36h14m-4-4 4 4-4 4" stroke="${BLANCO}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M52 46H38m4 4-4-4 4-4" stroke="${BLANCO}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    ${permiso}
+    ${insigniaNaranja}
+    ${intercambio}
   `,
 
   /** Levantamiento de reserva: el contrato queda libre de cargas. */
@@ -417,11 +417,14 @@ const ILUSTRACIONES = {
     </g>
   `,
 
-  /** Genérico: el vehículo, sin más. */
+  /**
+   * Genérico: el permiso, sin insignia. Es el que sale si un trámite nuevo
+   * se queda con un icono para el que no hay escena propia.
+   */
   coche: `
     ${defs}
     ${sombraAncha}
-    ${coche}
+    ${permiso}
   `,
 } as const;
 
