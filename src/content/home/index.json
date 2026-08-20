@@ -1,5 +1,10 @@
 {
-  "hero": {},
+  "hero": {
+    "claim": "Todos tus trámites de vehículos, **online y sin colas**",
+    "subclaim": "Transferencias, matriculaciones, bajas y duplicados gestionados por profesionales. Nos encargamos del papeleo con la DGT mientras tú sigues con lo tuyo.",
+    "ctaPrimario": "Contacta por WhatsApp",
+    "whatsappMensaje": "Hola, me gustaría información sobre un trámite de vehículo."
+  },
   "comoFunciona": {
     "titulo": "¿Cómo es nuestro servicio? ",
     "subtitulo": "Todos nuestros trámites se pueden hacer a distancia y sin necesidad de acudir a una oficina. Nosotros te daremos el soporte que necesitas. ",
@@ -22,5 +27,8 @@
       }
     ]
   },
-  "seo": {}
+  "seo": {
+    "metaTitle": "Trámites de vehículos online | Transferencias, bajas y matriculaciones",
+    "metaDescription": "Gestoría online de trámites de vehículos: transferencias, notificaciones de venta, matriculaciones, bajas, duplicados y etiquetas. Precio cerrado y tramitación en 24-48 h."
+  }
 }
