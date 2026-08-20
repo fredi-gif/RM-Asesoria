@@ -64,8 +64,14 @@ export function textoPlano(markdoc: string): string {
 /**
  * Convierte los **dobles asteriscos** de un texto plano en el subrayado naranja
  * del claim. Evita meter un editor de texto rico en el hero solo para esto.
+ *
+ * Acepta `undefined` porque el texto viene de Keystatic y el editor puede dejar
+ * el campo vacío. Un claim sin rellenar debe verse como un hueco en la home, no
+ * tumbar el build entero de la web.
  */
-export function resaltar(texto: string): string {
+export function resaltar(texto: string | undefined): string {
+  if (!texto) return '';
+
   const escapado = texto
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
