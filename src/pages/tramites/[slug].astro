@@ -92,6 +92,15 @@ if (faqsSchema.length > 0) {
     })),
   });
 }
+
+/**
+ * Bloques de la columna de contenido.
+ *
+ * La separación entre bloques la pone `divide-y` en el contenedor, que dibuja
+ * el filete en todos menos en el primero. Antes cada sección traía el suyo y
+ * quedaba una línea suelta justo debajo del titular.
+ */
+const bloque = 'flex scroll-mt-24 flex-col gap-8 py-12 lg:py-16';
 ---
 
 <BaseLayout
@@ -100,112 +109,101 @@ if (faqsSchema.length > 0) {
   schema={schema}
   stickyCta
 >
-  <!-- 1 · Cabecera -->
-  <Section spacing="none" tone="white" class="relative overflow-hidden border-b border-line">
-    <!-- Manchas de color muy desenfocadas. El blanco plano dejaba la cabecera
-         sin peso; sobre esto la tarjeta de precio va translúcida (`glass`) y
-         el fondo se transparenta a través de ella. -->
-    <div aria-hidden="true" class="pointer-events-none absolute inset-0">
-      <div
-        class="absolute -top-40 -left-32 size-[36rem] rounded-full bg-brand-600/20 blur-3xl"
-      >
-      </div>
-      <div
-        class="absolute -top-24 right-[6%] size-[28rem] rounded-full bg-accent-400/25 blur-3xl"
-      >
-      </div>
-      <div
-        class="absolute -bottom-56 left-[30%] size-[32rem] rounded-full bg-brand-100/70 blur-3xl"
-      >
-      </div>
+  <!--
+    Toda la página es una sola rejilla de dos columnas en escritorio: el
+    contenido a la izquierda y la tarjeta de precio a la derecha, que acompaña
+    el scroll. Antes el precio salía dos veces —en la cabecera y en una sección
+    propia más abajo— porque al bajar se perdía de vista; con la tarjeta fija
+    esa repetición sobra y se ha retirado.
+
+    Los tres hijos se colocan por `col-start`/`row-start` en vez de por orden
+    en el DOM, para que en móvil, donde no hay dos columnas, el orden de
+    lectura siga siendo el correcto: titular, precio y después el detalle.
+  -->
+  <!-- Sin `overflow-hidden` en la sección: un ancestro con overflow recortado
+       rompe el `position: sticky` de la tarjeta. El recorte de las manchas lo
+       hace su propia capa, que sí puede llevarlo. -->
+  <Section spacing="none" tone="white" class="relative">
+    <!-- Manchas de color muy desenfocadas, acotadas a la franja superior: la
+         sección ahora abarca la página entera y sin este recorte el degradado
+         se estiraría hasta las preguntas frecuentes.
+
+         El final lo marca una máscara, no el `overflow-hidden`: recortar a
+         secas dejaba una raya horizontal nítida cruzando la página justo por
+         debajo del titular, porque el corte parte el desenfoque por la mitad. -->
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-x-0 top-0 h-[36rem] overflow-hidden [-webkit-mask-image:linear-gradient(to_bottom,#000_50%,transparent)] [mask-image:linear-gradient(to_bottom,#000_50%,transparent)]"
+    >
+      <div class="absolute -top-40 -left-32 size-[36rem] rounded-full bg-brand-600/20 blur-3xl"></div>
+      <div class="absolute -top-24 right-[6%] size-[28rem] rounded-full bg-accent-400/25 blur-3xl"></div>
+      <div class="absolute top-64 left-[30%] size-[32rem] rounded-full bg-brand-100/70 blur-3xl"></div>
     </div>
 
     <Container class="relative py-12 lg:py-16">
-      <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-start lg:gap-14">
-        <div class="flex flex-col gap-5">
+      <div
+        class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,21rem)] lg:items-start lg:gap-12"
+      >
+        <!-- 1 · Titular -->
+        <div class="flex flex-col gap-5 lg:col-start-1 lg:row-start-1">
           <!-- `text-display`, el mismo tamaño que el H1 de la home. -->
           <h1 class="text-display">{data.hero.claim || data.title}</h1>
-
           {data.hero.subtitulo && <p class="max-w-[58ch] text-ink-muted">{data.hero.subtitulo}</p>}
-
-          <div class="hidden pt-1 lg:block">
-            <WhatsAppCTA mensaje={mensaje} label={ctaLabel} />
-          </div>
         </div>
 
-        <!-- El precio va en la cabecera en todos los tamaños: es la primera
-             pregunta del usuario y no debería requerir scroll. En móvil esta
-             es la única tarjeta de precio — la sección «Precio del trámite»
-             de más abajo queda oculta para no repetirla. -->
-        <PriceBreakdown precio={data.precio} plazo={data.hero.plazo} tone="glass" />
+        <!-- 2 · Tarjeta de precio · el único CTA persistente en escritorio.
+             `max-h` con scroll interno es una red de seguridad para pantallas
+             bajas: si la tarjeta cabe, no aparece ninguna barra. -->
+        <aside
+          class="lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto"
+        >
+          <PriceBreakdown
+            precio={data.precio}
+            plazo={data.hero.plazo}
+            cta={{ mensaje, label: ctaLabel }}
+          />
+        </aside>
+
+        <!-- 3 · Contenido del trámite -->
+        <div class="flex flex-col divide-y divide-line lg:col-start-1 lg:row-start-2">
+          {
+            data.pasos.length > 0 && (
+              <section id="pasos" class={bloque}>
+                <SectionHeading
+                  title="Pasos del proceso"
+                  subtitle="De principio a fin, sin que tengas que pisar una oficina."
+                />
+                <StepList pasos={data.pasos} />
+              </section>
+            )
+          }
+
+          {
+            data.documentacion.length > 0 && (
+              <section id="documentacion" class={bloque}>
+                <SectionHeading
+                  title="Documentación necesaria"
+                  subtitle="Esto es todo lo que tienes que reunir. Si te falta algo, dínoslo y te decimos cómo conseguirlo."
+                />
+                <DocGrid documentos={data.documentacion} />
+              </section>
+            )
+          }
+
+          <section id="faq" class={bloque}>
+            <SectionHeading title="Preguntas frecuentes" />
+            <FaqAccordion faqs={data.faqs} preguntaDestacada={preguntaDestacada}>
+              <Prose slot="destacada">
+                <Content />
+              </Prose>
+            </FaqAccordion>
+          </section>
+        </div>
       </div>
     </Container>
   </Section>
 
-  <!-- 2 · Pasos del proceso -->
-  {
-    data.pasos.length > 0 && (
-      <Section id="pasos" spacing="tight">
-        <Container class="grid gap-8 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-14">
-          <SectionHeading
-            title="Pasos del proceso"
-            subtitle="De principio a fin, sin que tengas que pisar una oficina."
-            class="lg:sticky lg:top-28 lg:self-start"
-          />
-          <StepList pasos={data.pasos} />
-        </Container>
-      </Section>
-    )
-  }
-
-  <!-- 3 · Documentación necesaria -->
-  {
-    data.documentacion.length > 0 && (
-      <Section id="documentacion" tone="alt" spacing="tight">
-        <Container class="flex flex-col gap-8">
-          <SectionHeading
-            title="Documentación necesaria para tramitar"
-            subtitle="Esto es todo lo que tienes que reunir. Si te falta algo, dínoslo y te decimos cómo conseguirlo."
-          />
-          <DocGrid documentos={data.documentacion} />
-        </Container>
-      </Section>
-    )
-  }
-
-  <!-- 4 · Precio · solo escritorio: en móvil el precio ya sale entero en la
-       cabecera y aquí sería la misma tarjeta repetida. -->
-  <Section id="precio" spacing="tight" class="hidden lg:block">
-    <Container class="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-14">
-      <div class="flex flex-col gap-5">
-        <SectionHeading
-          title="Precio del trámite"
-          subtitle="Sin cargos sorpresa: lo que ves es lo que pagas, y los conceptos que dependen de tu caso van marcados aparte."
-        />
-      </div>
-      <!-- Aquí el botón va dentro de la tarjeta, pegado al precio. En la
-           cabecera no, porque allí ya hay un CTA bajo el H1. -->
-      <PriceBreakdown
-        precio={data.precio}
-        plazo={data.hero.plazo}
-        cta={{ mensaje, label: ctaLabel }}
-      />
-    </Container>
-  </Section>
-
-  <!-- 5 · Preguntas frecuentes -->
-  <Section id="faq" tone="alt" spacing="tight">
-    <Container class="flex flex-col gap-8">
-      <SectionHeading title="Preguntas frecuentes" />
-      <FaqAccordion faqs={data.faqs} preguntaDestacada={preguntaDestacada}>
-        <Prose slot="destacada">
-          <Content />
-        </Prose>
-      </FaqAccordion>
-    </Container>
-  </Section>
-
-  <!-- 6 · CTA de cierre -->
+  <!-- 4 · CTA de cierre -->
   <Section spacing="none" tone="brand-dark">
     <Container class="py-14 lg:py-16">
       <div

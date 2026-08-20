@@ -15,14 +15,25 @@ interface Props {
 }
 
 const { documentos, class: className } = Astro.props;
+
+/**
+ * Dos columnas como máximo.
+ *
+ * La rejilla vive ahora en la columna de contenido, no a todo el ancho de la
+ * página. Con cuatro columnas las tarjetas se quedaban en 190px, y con tres en
+ * 240px: la aclaración de cada documento caía a renglones de 28 caracteres. A
+ * dos columnas son ~370px y el texto respira.
+ */
 ---
 
 {
   documentos.length > 0 && (
-    <ul class:list={['grid gap-4 sm:grid-cols-2 lg:grid-cols-4', className]}>
+    <ul class:list={['grid gap-4 sm:grid-cols-2', className]}>
       {documentos.map((doc) => (
-        <Card as="li" class="flex flex-col overflow-hidden">
-          <div class="border-b border-line bg-brand-50 px-6 pt-5 pb-0">
+        // Gris la tarjeta y blanco el panel de la ilustración, como en las
+        // tarjetas de la home: es lo que las recorta sobre el fondo blanco.
+        <Card as="li" tone="muted" class="flex flex-col overflow-hidden">
+          <div class="border-b border-line bg-surface px-6 pt-5 pb-0">
             <DocIlustracion name={doc.ilustracion ?? 'generico'} class="mx-auto max-w-[13rem]" />
           </div>
           <div class="flex flex-col gap-1 p-5">
