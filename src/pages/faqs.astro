@@ -4,7 +4,6 @@ import Container from '../components/ui/Container.astro';
 import Section from '../components/ui/Section.astro';
 import Icon, { type IconName } from '../components/ui/Icon.astro';
 import Button from '../components/ui/Button.astro';
-import Breadcrumbs from '../components/seo/Breadcrumbs.astro';
 import WhatsAppCTA from '../components/tramite/WhatsAppCTA.astro';
 import FaqAccordion from '../components/tramite/FaqAccordion.astro';
 
@@ -73,7 +72,6 @@ const schema: Record<string, unknown>[] = [
   <!-- 1 · Cabecera -->
   <Section spacing="tight" tone="brand-soft" class="border-b border-line">
     <Container class="flex flex-col gap-4">
-      <Breadcrumbs items={[{ label: 'Preguntas frecuentes', href: '/faqs' }]} />
       <h1 class="text-h1">{titulo}</h1>
       {
         pagina.hero.entradilla && (

@@ -2,7 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Container from '../components/ui/Container.astro';
 import Section from '../components/ui/Section.astro';
-import Breadcrumbs from '../components/seo/Breadcrumbs.astro';
 import Button from '../components/ui/Button.astro';
 import WhatsAppCTA from '../components/tramite/WhatsAppCTA.astro';
 import PasoFicha from '../components/proceso/PasoFicha.astro';
@@ -60,7 +59,6 @@ const schema: Record<string, unknown>[] = [
   <!-- 1 · Cabecera -->
   <Section spacing="tight" tone="brand-soft" class="border-b border-line">
     <Container class="flex flex-col gap-4">
-      <Breadcrumbs items={[{ label: 'Cómo funciona', href: '/como-funciona' }]} />
       <h1 class="text-h1">{titulo}</h1>
       {
         pagina.hero.entradilla && (
