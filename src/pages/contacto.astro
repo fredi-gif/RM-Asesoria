@@ -1,0 +1,208 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/ui/Container.astro';
+import Section from '../components/ui/Section.astro';
+import Card from '../components/ui/Card.astro';
+import Icon, { type IconName } from '../components/ui/Icon.astro';
+import Button from '../components/ui/Button.astro';
+import Breadcrumbs from '../components/seo/Breadcrumbs.astro';
+import WhatsAppCTA from '../components/tramite/WhatsAppCTA.astro';
+
+import pagina from '../content/contacto/index.json';
+import { empresa, whatsapp } from '../lib/config';
+
+const url = `${empresa.url}/contacto`;
+const titulo = pagina.hero.titulo || 'Contacto';
+
+const mensaje = 'Hola, me gustaría información sobre un trámite de vehículo.';
+
+/**
+ * Los canales salen de `configuracion`, el singleton que el cliente edita en
+ * Keystatic: aquí no se escribe ningún dato de contacto a mano para que no
+ * haya dos sitios donde cambiar el teléfono.
+ *
+ * No hay formulario a propósito. Toda la web canaliza la conversión por
+ * WhatsApp, y un formulario exigiría un backend que recogiera datos personales
+ * —con lo que eso arrastra en la política de privacidad— para acabar en la
+ * misma conversación.
+ */
+const canales = [
+  {
+    icono: 'whatsapp',
+    titulo: 'WhatsApp',
+    valor: 'Respondemos en horario de oficina',
+    href: whatsapp(mensaje),
+    externo: true,
+    destacado: true,
+  },
+  {
+    icono: 'sobre',
+    titulo: 'Correo electrónico',
+    valor: empresa.email,
+    href: `mailto:${empresa.email}`,
+    externo: false,
+    destacado: false,
+  },
+  {
+    icono: 'telefono',
+    titulo: 'Teléfono',
+    valor: empresa.telefono,
+    href: `tel:${empresa.telefono.replace(/\s+/g, '')}`,
+    externo: false,
+    destacado: false,
+  },
+] as const;
+
+const schema: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: titulo,
+    url,
+    mainEntity: { '@id': `${empresa.url}/#organizacion` },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: empresa.url },
+      { '@type': 'ListItem', position: 2, name: 'Contacto', item: url },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={pagina.seo.metaTitle || titulo}
+  description={pagina.seo.metaDescription || pagina.hero.entradilla}
+  schema={schema}
+>
+  <!-- 1 · Cabecera -->
+  <Section spacing="tight" tone="brand-soft" class="border-b border-line">
+    <Container class="flex flex-col gap-4">
+      <Breadcrumbs items={[{ label: 'Contacto', href: '/contacto' }]} />
+      <h1 class="text-h1">{titulo}</h1>
+      {
+        pagina.hero.entradilla && (
+          <p class="max-w-[62ch] text-[1.125rem] text-ink-muted">{pagina.hero.entradilla}</p>
+        )
+      }
+    </Container>
+  </Section>
+
+  <!-- 2 · Canales -->
+  <Section spacing="tight">
+    <Container class="flex flex-col gap-8">
+      <ul class="grid gap-4 md:grid-cols-3">
+        {
+          canales.map((canal) => (
+            <Card as="li" tone="muted" interactive class="group relative flex flex-col gap-3 p-6">
+              <span
+                class:list={[
+                  'flex size-11 items-center justify-center rounded-full',
+                  canal.destacado
+                    ? 'bg-accent-50 text-accent-600 ring-1 ring-accent-400/25 ring-inset'
+                    : 'bg-brand-50 text-brand-600',
+                ]}
+              >
+                <Icon name={canal.icono as IconName} size={20} />
+              </span>
+
+              <h2 class="text-h3">
+                <a
+                  href={canal.href}
+                  target={canal.externo ? '_blank' : undefined}
+                  rel={canal.externo ? 'noopener' : undefined}
+                  class="after:absolute after:inset-0 after:content-['']"
+                >
+                  {canal.titulo}
+                </a>
+              </h2>
+              <p class="text-small text-ink-muted">{canal.valor}</p>
+            </Card>
+          ))
+        }
+      </ul>
+
+      <!-- El horario no es un canal, es la condición que aplica a los tres. -->
+      <div class="flex items-center gap-2.5 text-small text-ink-muted">
+        <Icon name="reloj" size={18} class="shrink-0 text-brand-600" />
+        {empresa.horario}
+      </div>
+    </Container>
+  </Section>
+
+  <!-- 3 · Datos de la empresa · lo que el aviso legal exige tener visible y
+       localizable, sin obligar a abrir la página legal entera. -->
+  <Section tone="alt" spacing="tight">
+    <Container class="grid gap-8 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-14">
+      <div class="flex flex-col gap-3">
+        <h2 class="text-h2">Datos de la empresa</h2>
+        <p class="text-ink-muted">
+          Somos una gestoría administrativa. Estos son los datos con los que operamos.
+        </p>
+      </div>
+
+      <dl class="grid gap-x-8 gap-y-5 sm:grid-cols-2">
+        <div class="flex flex-col gap-1">
+          <dt class="text-caption font-display font-bold tracking-[0.12em] text-ink-subtle uppercase">
+            Razón social
+          </dt>
+          <dd class="text-brand-900">{empresa.legal.razonSocial}</dd>
+        </div>
+        <div class="flex flex-col gap-1">
+          <dt class="text-caption font-display font-bold tracking-[0.12em] text-ink-subtle uppercase">
+            CIF
+          </dt>
+          <dd class="text-brand-900">{empresa.legal.cif}</dd>
+        </div>
+        <div class="flex flex-col gap-1">
+          <dt class="text-caption font-display font-bold tracking-[0.12em] text-ink-subtle uppercase">
+            Dirección
+          </dt>
+          <dd class="text-brand-900">{empresa.legal.direccion}</dd>
+        </div>
+        <div class="flex flex-col gap-1">
+          <dt class="text-caption font-display font-bold tracking-[0.12em] text-ink-subtle uppercase">
+            Registro
+          </dt>
+          <dd class="text-brand-900">{empresa.legal.registro}</dd>
+        </div>
+      </dl>
+    </Container>
+  </Section>
+
+  <!-- 4 · Salidas para quien todavía no sabe qué preguntar -->
+  <Section spacing="tight">
+    <Container class="flex flex-col items-start gap-5">
+      <h2 class="text-h2">¿Prefieres mirar primero?</h2>
+      <p class="max-w-[58ch] text-ink-muted">
+        Puede que tu duda ya esté resuelta. En cada trámite tienes la documentación exacta y el
+        precio, y en las preguntas frecuentes están las dudas que más nos llegan.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <Button href="/#tramites" variant="secondary">Ver todos los trámites</Button>
+        <Button href="/faqs" variant="outline">Preguntas frecuentes</Button>
+        <Button href="/como-funciona" variant="outline">Cómo funciona</Button>
+      </div>
+    </Container>
+  </Section>
+
+  <!-- 5 · CTA de cierre -->
+  <Section spacing="none" tone="brand-dark">
+    <Container class="py-14 lg:py-16">
+      <div
+        class="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10"
+      >
+        <div class="flex flex-col gap-2">
+          <h2 class="text-h2 text-white">Cuéntanos qué necesitas</h2>
+          <p class="max-w-[48ch] text-white/70">
+            Escríbenos por WhatsApp y te decimos en el momento qué documentación hace falta y cuánto
+            costará.
+          </p>
+        </div>
+        <WhatsAppCTA mensaje={mensaje} label="Contacta por WhatsApp" class="shrink-0" />
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>
