@@ -8,6 +8,12 @@ import { getTramites, tramiteHref } from '../../lib/tramites';
 const tramites = await getTramites();
 const anio = new Date().getFullYear();
 
+const paginas = [
+  { href: '/como-funciona', label: 'Cómo funciona' },
+  { href: '/faqs', label: 'Preguntas frecuentes' },
+  { href: '/contacto', label: 'Contacto' },
+];
+
 const legales = [
   { href: '/aviso-legal', label: 'Aviso legal' },
   { href: '/privacidad', label: 'Política de privacidad' },
@@ -32,7 +38,7 @@ const confianzaFooter = [
 
 <footer class="bg-brand-950 text-white">
   <Container class="py-14 lg:py-16">
-    <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
+    <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr]">
       <div class="flex flex-col gap-4">
         <Logo inverse />
         <p class="max-w-[38ch] text-small text-white/60">{empresa.description}</p>
@@ -51,6 +57,26 @@ const confianzaFooter = [
                   class="text-small text-white/70 transition-colors hover:text-accent-400"
                 >
                   {tramite.data.shortTitle}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <h2 class="text-caption font-display font-bold tracking-[0.12em] text-white/40 uppercase">
+          La web
+        </h2>
+        <ul class="flex flex-col gap-2">
+          {
+            paginas.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="text-small text-white/70 transition-colors hover:text-accent-400"
+                >
+                  {item.label}
                 </a>
               </li>
             ))
