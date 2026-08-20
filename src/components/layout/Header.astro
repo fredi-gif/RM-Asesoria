@@ -8,6 +8,17 @@ import { getTramites, tramiteHref } from '../../lib/tramites';
 const tramites = await getTramites();
 const path = Astro.url.pathname;
 const enTramites = path.startsWith('/tramites');
+
+/** Páginas fijas del menú, aparte del desplegable de trámites. */
+const enlaces = [
+  { href: '/como-funciona', label: 'Cómo funciona' },
+  { href: '/faqs', label: 'Preguntas frecuentes' },
+  { href: '/contacto', label: 'Contacto' },
+];
+
+// Se comparan las dos formas porque `trailingSlash` va en 'ignore': según cómo
+// se llegue a la página, el pathname puede traer la barra final o no.
+const esActivo = (href: string) => path === href || path === `${href}/`;
 ---
 
 <header class="sticky top-0 z-50">
@@ -38,7 +49,7 @@ const enTramites = path.startsWith('/tramites');
         <nav class="hidden lg:flex lg:items-center lg:gap-1" aria-label="Principal">
           <div class="group relative">
             <a
-              href="/tramites"
+              href="/#tramites"
               class:list={[
                 'flex items-center gap-1 rounded-md px-3 py-2 font-display text-small font-semibold transition-colors',
                 enTramites ? 'text-accent-600' : 'text-brand-900 hover:text-accent-600',
@@ -82,17 +93,27 @@ const enTramites = path.startsWith('/tramites');
             </div>
           </div>
 
-          <a
-            href="/#tramitar"
-            class="rounded-md px-3 py-2 font-display text-small font-semibold text-brand-900 transition-colors hover:text-accent-600"
-          >
-            Cómo funciona
-          </a>
+          {
+            enlaces.map((enlace) => (
+              <a
+                href={enlace.href}
+                class:list={[
+                  'rounded-md px-3 py-2 font-display text-small font-semibold transition-colors',
+                  esActivo(enlace.href)
+                    ? 'text-accent-600'
+                    : 'text-brand-900 hover:text-accent-600',
+                ]}
+                aria-current={esActivo(enlace.href) ? 'page' : undefined}
+              >
+                {enlace.label}
+              </a>
+            ))
+          }
         </nav>
       </div>
 
       <div class="hidden shrink-0 lg:block">
-        <WhatsAppCTA size="sm" label="Contactar" />
+        <WhatsAppCTA size="sm" label="WhatsApp" />
       </div>
 
       <!-- Menú móvil: <details> nativo, sin JavaScript. -->
@@ -128,6 +149,26 @@ const enTramites = path.startsWith('/tramites');
                 ))
               }
             </ul>
+
+            <ul class="flex flex-col divide-y divide-line">
+              {
+                enlaces.map((enlace) => (
+                  <li>
+                    <a
+                      href={enlace.href}
+                      class:list={[
+                        'flex py-3 font-display font-semibold',
+                        esActivo(enlace.href) ? 'text-accent-600' : 'text-brand-900',
+                      ]}
+                      aria-current={esActivo(enlace.href) ? 'page' : undefined}
+                    >
+                      {enlace.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+
             <WhatsAppCTA fullWidth label="Contactar por WhatsApp" />
           </nav>
         </div>

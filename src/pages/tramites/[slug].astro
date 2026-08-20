@@ -62,10 +62,11 @@ const schema: Record<string, unknown>[] = [
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
+    // Sin nivel intermedio «Trámites»: esa página ya no existe y un
+    // BreadcrumbList no debe declarar una URL que redirige.
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Inicio', item: empresa.url },
-      { '@type': 'ListItem', position: 2, name: 'Trámites', item: `${empresa.url}/tramites` },
-      { '@type': 'ListItem', position: 3, name: data.shortTitle, item: url },
+      { '@type': 'ListItem', position: 2, name: data.shortTitle, item: url },
     ],
   },
 ];

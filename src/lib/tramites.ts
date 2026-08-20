@@ -13,7 +13,7 @@ function comparar(a: Tramite, b: Tramite): number {
  * Todos los trámites, ya ordenados.
  *
  * No hay agrupación por categoría: el catálogo se presenta como una única
- * rejilla en la home, en `/tramites` y en el menú.
+ * rejilla en la home y en el menú.
  */
 export async function getTramites(): Promise<Tramite[]> {
   const tramites = await getCollection('tramites');
