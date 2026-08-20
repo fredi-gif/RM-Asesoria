@@ -40,14 +40,75 @@ const ILUSTRACIONES = {
     <path d="M97 72h14" stroke="${ACENTO_SUAVE}" stroke-width="2" stroke-linecap="round"/>
   `,
 
-  /** Documento de identidad: foto, datos y chip. */
+  /** Documento de identidad: banda oficial, foto, datos y chip. */
   dni: `
-    <rect x="24" y="30" width="112" height="54" rx="7" fill="${PAPEL}" stroke="${LINEA}" stroke-width="2"/>
-    <rect x="34" y="40" width="28" height="34" rx="4" fill="var(--color-brand-50)"/>
-    <circle cx="48" cy="52" r="6" fill="${LINEA}"/>
-    <path d="M38 70a10 10 0 0 1 20 0Z" fill="${LINEA}"/>
-    <path d="M72 46h50M72 56h34" stroke="${LINEA}" stroke-width="3.5" stroke-linecap="round"/>
-    <rect x="72" y="64" width="20" height="14" rx="3" fill="${ACENTO_SUAVE}" opacity=".45"/>
+    <rect x="22" y="26" width="116" height="60" rx="8" fill="${PAPEL}" stroke="${LINEA}" stroke-width="2"/>
+    <path d="M30 26h100a8 8 0 0 1 8 8v5H22v-5a8 8 0 0 1 8-8Z" fill="${TINTA}"/>
+    <path d="M30 32.5h26" stroke="${PAPEL}" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>
+    <rect x="32" y="47" width="30" height="32" rx="4" fill="var(--color-brand-50)" stroke="${LINEA}" stroke-width="1.5"/>
+    <circle cx="47" cy="58" r="6.5" fill="${LINEA}"/>
+    <path d="M36 75a11 11 0 0 1 22 0Z" fill="${LINEA}"/>
+    <path d="M72 50h50M72 59h34" stroke="${LINEA}" stroke-width="3.5" stroke-linecap="round"/>
+    <rect x="72" y="66" width="19" height="14" rx="3" fill="var(--color-accent-50)" stroke="${ACENTO_SUAVE}" stroke-width="1.5"/>
+    <path d="M77 66v14M72 71h19" stroke="${ACENTO_SUAVE}" stroke-width="1.2"/>
+    <path d="M98 73h24" stroke="${LINEA}" stroke-width="3" stroke-linecap="round"/>
+  `,
+
+  /**
+   * NIE: la tarjeta con el pasaporte detrás.
+   *
+   * Los trámites piden los dos documentos a los extranjeros, y con la
+   * ilustración del DNI eso no se veía: la pareja es justo lo que distingue
+   * este caso del de un nacional.
+   */
+  nie: `
+    <rect x="18" y="22" width="52" height="66" rx="6" fill="var(--color-brand-100)" stroke="${LINEA}" stroke-width="2"/>
+    <circle cx="44" cy="46" r="12" fill="none" stroke="${PAPEL}" stroke-width="2.2"/>
+    <path d="M32 46h24M44 34v24" stroke="${PAPEL}" stroke-width="1.6"/>
+    <path d="M32 68h24" stroke="${PAPEL}" stroke-width="2.5" stroke-linecap="round"/>
+    <rect x="62" y="36" width="78" height="50" rx="7" fill="${PAPEL}" stroke="${LINEA}" stroke-width="2"/>
+    <path d="M69 36h64a7 7 0 0 1 7 7v4H62v-4a7 7 0 0 1 7-7Z" fill="${TINTA}"/>
+    <rect x="70" y="54" width="23" height="26" rx="3" fill="var(--color-brand-50)" stroke="${LINEA}" stroke-width="1.5"/>
+    <circle cx="81.5" cy="62" r="4.5" fill="${LINEA}"/>
+    <path d="M74 77a7.5 7.5 0 0 1 15 0Z" fill="${LINEA}"/>
+    <path d="M100 58h30M100 66h18" stroke="${LINEA}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M100 75h22" stroke="${ACENTO_SUAVE}" stroke-width="3" stroke-linecap="round"/>
+  `,
+
+  /** CIF: la tarjeta fiscal de la empresa, con el edificio y el código. */
+  cif: `
+    <rect x="26" y="28" width="108" height="56" rx="8" fill="${PAPEL}" stroke="${LINEA}" stroke-width="2"/>
+    <path d="M34 28h92a8 8 0 0 1 8 8v5H26v-5a8 8 0 0 1 8-8Z" fill="${TINTA}"/>
+    <path d="M40 52h26v22H40Z" fill="var(--color-brand-50)" stroke="${LINEA}" stroke-width="1.5"/>
+    <path d="m40 52 13-8 13 8" fill="none" stroke="${LINEA}" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M46 60h5M55 60h5M46 68h5M55 68h5" stroke="${LINEA}" stroke-width="2" stroke-linecap="round"/>
+    <path d="M78 56h44" stroke="${LINEA}" stroke-width="3.5" stroke-linecap="round"/>
+    <rect x="78" y="64" width="44" height="12" rx="4" fill="var(--color-accent-50)" stroke="${ACENTO_SUAVE}" stroke-width="1.5"/>
+    <path d="M85 70h30" stroke="${ACENTO}" stroke-width="2.5" stroke-linecap="round"/>
+  `,
+
+  /** Carta de la financiera: membrete de la entidad y sello de conforme. */
+  'carta-financiera': `
+    <rect x="26" y="14" width="82" height="86" rx="7" fill="${PAPEL}" stroke="${LINEA}" stroke-width="2"/>
+    <path d="M38 36h26l-13-10Z" fill="${TINTA}"/>
+    <path d="M43 39v12M51 39v12M59 39v12" stroke="${TINTA}" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M38 54h26" stroke="${TINTA}" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M38 68h44M38 78h44M38 88h26" stroke="${LINEA}" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="112" cy="72" r="20" fill="none" stroke="${ACENTO}" stroke-width="2.5" opacity=".5"/>
+    <circle cx="112" cy="72" r="13.5" fill="var(--color-accent-50)" stroke="${ACENTO_SUAVE}" stroke-width="2"/>
+    <path d="m105 72 5 5 10-11" stroke="${ACENTO}" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  `,
+
+  /** Ficha técnica electrónica (eITV): el documento con su código QR. */
+  'ficha-tecnica-electronica': `
+    <rect x="24" y="18" width="76" height="76" rx="7" fill="${PAPEL}" stroke="${LINEA}" stroke-width="2"/>
+    <path d="M36 32h40" stroke="${TINTA}" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M36 44h52M36 54h52M36 64h30" stroke="${LINEA}" stroke-width="3" stroke-linecap="round"/>
+    <rect x="92" y="52" width="42" height="42" rx="6" fill="${PAPEL}" stroke="${ACENTO_SUAVE}" stroke-width="2"/>
+    <rect x="99" y="59" width="10" height="10" rx="2" fill="${TINTA}"/>
+    <rect x="117" y="59" width="10" height="10" rx="2" fill="${TINTA}"/>
+    <rect x="99" y="77" width="10" height="10" rx="2" fill="${TINTA}"/>
+    <path d="M117 77h5v5h-5zM124 82h4v5h-4zM117 86h5v3h-5z" fill="${ACENTO}"/>
   `,
 
   /** Hoja con firma manuscrita: contratos de compraventa. */

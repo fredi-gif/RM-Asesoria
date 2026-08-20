@@ -28,7 +28,11 @@ const ICONOS = [
 const ILUSTRACIONES = [
   { label: 'Permiso de circulación', value: 'permiso-circulacion' },
   { label: 'Ficha técnica / tarjeta ITV', value: 'ficha-tecnica' },
-  { label: 'DNI, NIE o pasaporte', value: 'dni' },
+  { label: 'Ficha técnica electrónica (eITV)', value: 'ficha-tecnica-electronica' },
+  { label: 'DNI o documento de identidad', value: 'dni' },
+  { label: 'NIE con pasaporte', value: 'nie' },
+  { label: 'CIF de empresa', value: 'cif' },
+  { label: 'Carta de pago de la financiera', value: 'carta-financiera' },
   { label: 'Contrato firmado', value: 'contrato' },
   { label: 'Factura', value: 'factura' },
   { label: 'Denuncia', value: 'denuncia' },
