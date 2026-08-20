@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Container from '../components/ui/Container.astro';
 import Section from '../components/ui/Section.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
+import Button from '../components/ui/Button.astro';
 import WhatsAppCTA from '../components/tramite/WhatsAppCTA.astro';
 import TramiteCard from '../components/tramite/TramiteCard.astro';
 import StepsRow from '../components/tramite/StepsRow.astro';
@@ -49,7 +50,7 @@ const tramites = await getTramites();
        el gris de las tarjetas, no un cambio de fondo. -->
   <Section id="tramites" spacing="none">
     <Container class="pb-16 lg:pb-24">
-      <ul class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+      <ul class="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
         {tramites.map((tramite) => <TramiteCard tramite={tramite} />)}
       </ul>
     </Container>
@@ -60,6 +61,10 @@ const tramites = await getTramites();
     <Container class="flex flex-col gap-10">
       <SectionHeading title={home.comoFunciona.titulo} subtitle={home.comoFunciona.subtitulo} />
       <StepsRow pasos={home.comoFunciona.pasos} />
+
+      <div>
+        <Button href="/como-funciona" variant="outline">Ver el proceso en detalle</Button>
+      </div>
     </Container>
   </Section>
 </BaseLayout>
