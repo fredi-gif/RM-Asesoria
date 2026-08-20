@@ -1,0 +1,128 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/ui/Container.astro';
+import Section from '../components/ui/Section.astro';
+import Breadcrumbs from '../components/seo/Breadcrumbs.astro';
+import Button from '../components/ui/Button.astro';
+import WhatsAppCTA from '../components/tramite/WhatsAppCTA.astro';
+import PasoFicha from '../components/proceso/PasoFicha.astro';
+
+import home from '../content/home/index.json';
+import pagina from '../content/como-funciona/index.json';
+import { empresa } from '../lib/config';
+
+/**
+ * Los pasos son los mismos que se resumen en la home: se leen del singleton
+ * `home` en lugar de duplicarlos aquí. Lo que añade esta página es el campo
+ * `detalle` de cada paso y su ilustración; el título y la entradilla del
+ * resumen no cambian entre las dos vistas, que es justo lo que se quiere.
+ */
+const pasos = home.comoFunciona.pasos;
+
+const url = `${empresa.url}/como-funciona`;
+const titulo = pagina.hero.titulo || 'Cómo funciona';
+
+/** Para el JSON-LD, cada paso es su resumen y su explicación en un solo texto. */
+const textoPaso = (paso: (typeof pasos)[number]) =>
+  [paso.descripcion, paso.detalle].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+
+const schema: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: titulo,
+    description: pagina.hero.entradilla || empresa.description,
+    url,
+    step: pasos.map((paso, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: paso.titulo.trim(),
+      text: textoPaso(paso),
+      url: `${url}#paso-${i + 1}`,
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: empresa.url },
+      { '@type': 'ListItem', position: 2, name: 'Cómo funciona', item: url },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={pagina.seo.metaTitle || titulo}
+  description={pagina.seo.metaDescription || pagina.hero.entradilla}
+  schema={schema}
+>
+  <!-- 1 · Cabecera -->
+  <Section spacing="tight" tone="brand-soft" class="border-b border-line">
+    <Container class="flex flex-col gap-4">
+      <Breadcrumbs items={[{ label: 'Cómo funciona', href: '/como-funciona' }]} />
+      <h1 class="text-h1">{titulo}</h1>
+      {
+        pagina.hero.entradilla && (
+          <p class="max-w-[62ch] text-[1.125rem] text-ink-muted">{pagina.hero.entradilla}</p>
+        )
+      }
+    </Container>
+  </Section>
+
+  <!-- 2 · Los pasos, uno por ficha. El fondo gris es lo que recorta el panel
+       blanco de cada ilustración. -->
+  <Section tone="alt">
+    <Container>
+      <ol class="flex flex-col gap-16 lg:gap-24">
+        {
+          pasos.map((paso, i) => (
+            <PasoFicha
+              numero={i + 1}
+              titulo={paso.titulo.trim()}
+              descripcion={paso.descripcion}
+              detalle={paso.detalle}
+              ilustracion={paso.ilustracion}
+              invertida={i % 2 === 1}
+            />
+          ))
+        }
+      </ol>
+    </Container>
+  </Section>
+
+  <!-- 3 · Salida hacia el catálogo: quien llega aquí buscando su trámite
+       concreto no debería tener que volver por el menú. -->
+  <Section spacing="tight">
+    <Container class="flex flex-col items-start gap-5">
+      <h2 class="text-h2">¿Cuál es tu trámite?</h2>
+      <p class="max-w-[58ch] text-ink-muted">
+        En la página de cada trámite tienes los pasos concretos, la documentación exacta que pide y
+        el precio antes de contratar nada.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <Button href="/#tramites" variant="secondary">Ver todos los trámites</Button>
+        <Button href="/faqs" variant="outline">Preguntas frecuentes</Button>
+      </div>
+    </Container>
+  </Section>
+
+  <!-- 4 · CTA de cierre -->
+  <Section spacing="none" tone="brand-dark">
+    <Container class="py-14 lg:py-16">
+      <div
+        class="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10"
+      >
+        <div class="flex flex-col gap-2">
+          <h2 class="text-h2 text-white">{pagina.cierre.titulo}</h2>
+          <p class="max-w-[48ch] text-white/70">{pagina.cierre.texto}</p>
+        </div>
+        <WhatsAppCTA
+          mensaje={pagina.cierre.whatsappMensaje}
+          label="Contacta por WhatsApp"
+          class="shrink-0"
+        />
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>

@@ -12,6 +12,23 @@ interface Props {
 const { pasos, class: className } = Astro.props;
 
 /**
+ * La rejilla se ajusta al número de pasos: con cuatro, tres columnas dejaban
+ * el último huérfano en una fila para él solo.
+ *
+ * El conector solo aparece en el breakpoint en el que todos los pasos caben en
+ * una fila. Si no, la línea del último de cada fila apuntaría al vacío.
+ */
+const rejillas: Record<number, { grid: string; conector: string }> = {
+  2: { grid: 'md:grid-cols-2', conector: 'md:block' },
+  3: { grid: 'md:grid-cols-3', conector: 'md:block' },
+  4: { grid: 'md:grid-cols-2 lg:grid-cols-4', conector: 'lg:block' },
+};
+const { grid, conector } = rejillas[pasos.length] ?? {
+  grid: 'md:grid-cols-3',
+  conector: 'md:block',
+};
+
+/**
  * Variante horizontal de los pasos, para la home.
  *
  * La línea conectora sale del número hacia la derecha y se corta en el último
@@ -25,7 +42,7 @@ const { pasos, class: className } = Astro.props;
 
 {
   pasos.length > 0 && (
-    <ol class:list={['grid gap-x-8 gap-y-10 md:grid-cols-3', className]}>
+    <ol class:list={['grid gap-x-8 gap-y-10', grid, className]}>
       {pasos.map((paso, i) => (
         <li class="flex flex-col gap-4">
           <div class="flex items-center gap-4">
@@ -33,7 +50,7 @@ const { pasos, class: className } = Astro.props;
               {i + 1}
             </span>
             {i < pasos.length - 1 && (
-              <span aria-hidden="true" class="hidden h-px flex-1 bg-line md:block" />
+              <span aria-hidden="true" class:list={['hidden h-px flex-1 bg-line', conector]} />
             )}
           </div>
 

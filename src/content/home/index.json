@@ -11,19 +11,27 @@
     "pasos": [
       {
         "titulo": "Rellena el formulario",
-        "descripcion": "Busca el trámite que necesitas y rellena el formulario que te correspondiente. "
+        "descripcion": "Busca el trámite que necesitas y rellena el formulario que te correspondiente. ",
+        "detalle": "Cada trámite tiene su propia página con lo que incluye, la documentación que pide y el precio antes de contratar nada. Empieza por ahí: si no tienes claro cuál es el tuyo, escríbenos y te lo decimos nosotros.\n\nCon los datos del vehículo y los tuyos ya podemos confirmarte qué necesitamos exactamente y cuánto va a costar. No hay que desplazarse a ninguna oficina ni pedir cita.",
+        "ilustracion": "formulario"
       },
       {
         "titulo": "Sube documentación ",
-        "descripcion": "Te indicaremos toda la documentación que necesitamos. Solo haz fotos y asegúrate de que es leíble. "
+        "descripcion": "Te indicaremos toda la documentación que necesitamos. Solo haz fotos y asegúrate de que es leíble. ",
+        "detalle": "Te decimos uno por uno qué documentos hacen falta para tu caso concreto. En la mayoría vale una foto hecha con el móvil: no necesitas escáner.\n\nLo único importante es que se lea bien: que salga el documento entero, sin dedos por medio y sin reflejos. Antes de presentar nada revisamos que esté todo correcto, y si falta algo o no se lee, te lo pedimos de nuevo.",
+        "ilustracion": "documentos"
       },
       {
         "titulo": "Realizamos el trámite",
-        "descripcion": "Nos encargamos de finalizar el trámite con la administración correspondiente. Liquidar impuestos si es necesario y resolver todas las cuestiones administrativas. "
+        "descripcion": "Nos encargamos de finalizar el trámite con la administración correspondiente. Liquidar impuestos si es necesario y resolver todas las cuestiones administrativas. ",
+        "detalle": "A partir de aquí te desentiendes. Presentamos el expediente ante la administración que corresponda y nos ocupamos de todo lo que lleve asociado: liquidar los impuestos cuando el trámite lo exija, pagar las tasas y responder a cualquier requerimiento.\n\nSi surge una incidencia, como una carga sobre el vehículo o un dato que no cuadra, te avisamos y te explicamos qué opciones hay. No paramos el trámite sin decírtelo.",
+        "ilustracion": "gestion"
       },
       {
         "titulo": "Envío de documentación. ",
-        "descripcion": "Te enviamos la documentación a donde nos indiques, en caso de que sea necesario. "
+        "descripcion": "Te enviamos la documentación a donde nos indiques, en caso de que sea necesario. ",
+        "detalle": "Cuando el trámite queda resuelto te enviamos la documentación definitiva a donde nos digas, por correo electrónico o en papel si el documento lo requiere.\n\nGuardamos copia de todo lo presentado, así que si más adelante vuelves a necesitarlo solo tienes que pedírnoslo.",
+        "ilustracion": "envio"
       }
     ]
   },

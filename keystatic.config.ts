@@ -42,6 +42,22 @@ const ILUSTRACIONES = [
   { label: 'Documento genérico', value: 'generico' },
 ] as const;
 
+/**
+ * Ilustraciones de los pasos del proceso.
+ * Debe mantenerse en sintonía con `ILUSTRACIONES` en
+ * `src/components/proceso/PasoIlustracion.astro`.
+ */
+const ILUSTRACIONES_PASO = [
+  { label: 'Formulario rellenado', value: 'formulario' },
+  { label: 'Subir documentación', value: 'documentos' },
+  { label: 'Revisión con lupa', value: 'revision' },
+  { label: 'Gestión ante la administración', value: 'gestion' },
+  { label: 'Pago de tasas e impuestos', value: 'pago' },
+  { label: 'Firma', value: 'firma' },
+  { label: 'Envío de documentación', value: 'envio' },
+  { label: 'Soporte / conversación', value: 'soporte' },
+] as const;
+
 export default config({
   // En local (`astro dev`), Keystatic escribe directamente en disco.
   // En producción (Vercel) no hay acceso de escritura al filesystem del repo,
@@ -56,7 +72,7 @@ export default config({
     brand: { name: 'RM Gestión' },
     navigation: {
       Contenido: ['tramites'],
-      Páginas: ['home', 'paginas'],
+      Páginas: ['home', 'comoFunciona', 'contacto', 'faqs', 'paginas'],
       Configuración: ['configuracion'],
     },
   },
@@ -326,6 +342,18 @@ export default config({
               fields.object({
                 titulo: fields.text({ label: 'Título' }),
                 descripcion: fields.text({ label: 'Descripción', multiline: true }),
+                detalle: fields.text({
+                  label: 'Explicación detallada',
+                  description:
+                    'Solo se ve en la página «Cómo funciona», no en la home. Deja una línea en blanco entre párrafos.',
+                  multiline: true,
+                }),
+                ilustracion: fields.select({
+                  label: 'Ilustración',
+                  description: 'Se usa en la página «Cómo funciona».',
+                  options: ILUSTRACIONES_PASO,
+                  defaultValue: 'formulario',
+                }),
               }),
               {
                 label: 'Pasos',
@@ -334,6 +362,104 @@ export default config({
             ),
           },
           { label: 'Cómo funciona' },
+        ),
+
+        seo: fields.object(
+          {
+            metaTitle: fields.text({ label: 'Título SEO' }),
+            metaDescription: fields.text({ label: 'Meta description', multiline: true }),
+          },
+          { label: 'SEO' },
+        ),
+      },
+    }),
+
+    comoFunciona: singleton({
+      label: 'Página «Cómo funciona»',
+      path: 'src/content/como-funciona/',
+      format: { data: 'json' },
+      schema: {
+        hero: fields.object(
+          {
+            titulo: fields.text({ label: 'Título (H1 de la página)' }),
+            entradilla: fields.text({ label: 'Entradilla', multiline: true }),
+          },
+          { label: 'Cabecera' },
+        ),
+
+        cierre: fields.object(
+          {
+            titulo: fields.text({ label: 'Título' }),
+            texto: fields.text({ label: 'Texto', multiline: true }),
+            whatsappMensaje: fields.text({ label: 'Mensaje prellenado de WhatsApp' }),
+          },
+          {
+            label: 'Bloque de cierre',
+            description: 'La franja azul con el botón de WhatsApp al final de la página.',
+          },
+        ),
+
+        seo: fields.object(
+          {
+            metaTitle: fields.text({ label: 'Título SEO' }),
+            metaDescription: fields.text({ label: 'Meta description', multiline: true }),
+          },
+          { label: 'SEO' },
+        ),
+      },
+    }),
+
+    contacto: singleton({
+      label: 'Página «Contacto»',
+      path: 'src/content/contacto/',
+      format: { data: 'json' },
+      schema: {
+        hero: fields.object(
+          {
+            titulo: fields.text({ label: 'Título (H1 de la página)' }),
+            entradilla: fields.text({ label: 'Entradilla', multiline: true }),
+          },
+          {
+            label: 'Cabecera',
+            description:
+              'El teléfono, el email y el horario que aparecen en la página salen de Configuración, no de aquí.',
+          },
+        ),
+
+        seo: fields.object(
+          {
+            metaTitle: fields.text({ label: 'Título SEO' }),
+            metaDescription: fields.text({ label: 'Meta description', multiline: true }),
+          },
+          { label: 'SEO' },
+        ),
+      },
+    }),
+
+    faqs: singleton({
+      label: 'Página «Preguntas frecuentes»',
+      path: 'src/content/faqs/',
+      format: { data: 'json' },
+      schema: {
+        hero: fields.object(
+          {
+            titulo: fields.text({ label: 'Título (H1 de la página)' }),
+            entradilla: fields.text({ label: 'Entradilla', multiline: true }),
+          },
+          { label: 'Cabecera' },
+        ),
+
+        generales: fields.array(
+          fields.object({
+            pregunta: fields.text({ label: 'Pregunta' }),
+            respuesta: fields.text({ label: 'Respuesta', multiline: true }),
+          }),
+          {
+            label: 'Preguntas generales',
+            description:
+              'Solo las dudas que no son de un trámite concreto. Las de cada trámite se recogen solas desde su ficha, no hay que copiarlas aquí.',
+            itemLabel: (props) => props.fields.pregunta.value || 'Pregunta',
+          },
         ),
 
         seo: fields.object(

@@ -1,0 +1,15 @@
+{
+  "hero": {
+    "titulo": "Así trabajamos tu trámite, paso a paso",
+    "entradilla": "Todos nuestros trámites se hacen a distancia, sin pisar una oficina. Esto es exactamente lo que pasa desde que nos escribes hasta que tienes la documentación en la mano."
+  },
+  "cierre": {
+    "titulo": "¿Empezamos con tu trámite?",
+    "texto": "Escríbenos por WhatsApp y te decimos en el momento qué necesitamos y cuánto costará.",
+    "whatsappMensaje": "Hola, he visto cómo funciona y me gustaría empezar un trámite."
+  },
+  "seo": {
+    "metaTitle": "Cómo funciona: tu trámite de vehículo paso a paso",
+    "metaDescription": "Te explicamos paso a paso cómo gestionamos tu trámite de vehículo: qué nos tienes que enviar, qué hacemos nosotros ante la administración y cómo recibes la documentación."
+  }
+}
