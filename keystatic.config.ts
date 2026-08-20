@@ -62,6 +62,21 @@ const ILUSTRACIONES_PASO = [
   { label: 'Soporte / conversación', value: 'soporte' },
 ] as const;
 
+/**
+ * Iconos para las insignias de «Seguridad y confianza» del pie.
+ * Debe mantenerse en sintonía con `PATHS` en `src/components/ui/Icon.astro`.
+ */
+const ICONOS_CONFIANZA = [
+  { label: 'Candado', value: 'candado' },
+  { label: 'Escudo', value: 'escudo' },
+  { label: 'Check en círculo', value: 'check-circle' },
+  { label: 'Reloj', value: 'reloj' },
+  { label: 'Documento', value: 'documento' },
+  { label: 'Firma', value: 'firma' },
+  { label: 'Euro', value: 'euro' },
+  { label: 'WhatsApp', value: 'whatsapp' },
+] as const;
+
 export default config({
   // En local (`astro dev`), Keystatic escribe directamente en disco.
   // En producción (Vercel) no hay acceso de escritura al filesystem del repo,
@@ -75,9 +90,9 @@ export default config({
   ui: {
     brand: { name: 'RM Gestión' },
     navigation: {
-      Contenido: ['tramites'],
-      Páginas: ['home', 'comoFunciona', 'contacto', 'faqs', 'paginas'],
-      Configuración: ['configuracion'],
+      Contenido: ['tramites', 'paginas'],
+      'Páginas fijas': ['home', 'comoFunciona', 'contacto', 'faqs'],
+      Sitio: ['navegacion', 'configuracion', 'error404'],
     },
   },
 
@@ -89,6 +104,11 @@ export default config({
       format: { contentField: 'contenido' },
       entryLayout: 'content',
       columns: ['title', 'orden', 'estado'],
+      previewUrl: '/tramites/{slug}',
+      // La plantilla vive fuera de `src/content/tramites` a propósito: el loader
+      // de `src/content.config.ts` recoge `**/index.mdoc` de esa carpeta y la
+      // publicaría como un trámite más.
+      template: 'src/content/_plantillas/tramite',
       schema: {
         title: fields.slug({
           name: {
@@ -115,6 +135,14 @@ export default config({
           validation: { length: { min: 20, max: 220 } },
         }),
 
+        imagen: fields.image({
+          label: 'Imagen de la tarjeta',
+          description:
+            'Opcional. Si la subes, sustituye a la ilustración en la rejilla de la portada.',
+          directory: 'src/assets/tramites',
+          publicPath: '/src/assets/tramites/',
+        }),
+
         icon: fields.select({
           label: 'Icono',
           options: ICONOS as unknown as { label: string; value: string }[],
@@ -136,10 +164,10 @@ export default config({
         estado: fields.select({
           label: 'Estado del contenido',
           description:
-            '«Borrador» marca el trámite como pendiente de validar. Se sigue publicando, pero avisa en desarrollo.',
+            'Solo se publican los trámites en «Revisado». Los borradores no salen en la web: no aparecen en la portada, ni en el menú, ni en las preguntas frecuentes, y su página no se genera.',
           options: [
-            { label: 'Borrador — pendiente de revisar', value: 'borrador' },
-            { label: 'Revisado', value: 'revisado' },
+            { label: 'Borrador — no se publica', value: 'borrador' },
+            { label: 'Revisado — publicado', value: 'revisado' },
           ],
           defaultValue: 'borrador',
         }),
@@ -273,16 +301,34 @@ export default config({
     }),
 
     paginas: collection({
-      label: 'Páginas legales',
+      label: 'Páginas',
       path: 'src/content/paginas/*/',
       slugField: 'title',
       format: { contentField: 'contenido' },
       entryLayout: 'content',
+      previewUrl: '/{slug}',
       schema: {
-        title: fields.slug({ name: { label: 'Título' } }),
-        descripcion: fields.text({ label: 'Meta description', multiline: true }),
+        title: fields.slug({
+          name: { label: 'Título' },
+          slug: {
+            label: 'URL',
+            description: 'La página quedará en /{slug}. Para enlazarla, añádela al menú en «Menú y pie».',
+          },
+        }),
+        descripcion: fields.text({ label: 'Descripción breve', multiline: true }),
         actualizado: fields.date({ label: 'Última actualización' }),
         contenido: fields.markdoc({ label: 'Contenido' }),
+
+        seo: fields.object(
+          {
+            metaTitle: fields.text({ label: 'Título SEO' }),
+            metaDescription: fields.text({ label: 'Meta description', multiline: true }),
+          },
+          {
+            label: 'SEO',
+            description: 'Si lo dejas vacío se usan el título y la descripción de arriba.',
+          },
+        ),
       },
     }),
   },
@@ -314,8 +360,91 @@ export default config({
       },
     }),
 
+    navegacion: singleton({
+      label: 'Menú y pie',
+      path: 'src/content/navegacion/',
+      format: { data: 'json' },
+      schema: {
+        menu: fields.array(
+          fields.object({
+            etiqueta: fields.text({ label: 'Texto del enlace' }),
+            enlace: fields.text({
+              label: 'Destino',
+              description: 'Ruta interna como /contacto, un ancla como /#tramites o una URL completa.',
+            }),
+          }),
+          {
+            label: 'Menú principal',
+            description:
+              'El desplegable de «Trámites» se genera solo desde la colección y no hay que ponerlo aquí.',
+            itemLabel: (props) => props.fields.etiqueta.value || 'Enlace',
+          },
+        ),
+
+        pie: fields.array(
+          fields.object({
+            etiqueta: fields.text({ label: 'Texto del enlace' }),
+            enlace: fields.text({
+              label: 'Destino',
+              description: 'Ruta interna como /contacto, un ancla como /#tramites o una URL completa.',
+            }),
+          }),
+          {
+            label: 'Pie · columna «La web»',
+            itemLabel: (props) => props.fields.etiqueta.value || 'Enlace',
+          },
+        ),
+
+        legales: fields.array(
+          fields.object({
+            etiqueta: fields.text({ label: 'Texto del enlace' }),
+            enlace: fields.text({
+              label: 'Destino',
+              description: 'Ruta interna como /contacto, un ancla como /#tramites o una URL completa.',
+            }),
+          }),
+          {
+            label: 'Pie · columna «Legal»',
+            itemLabel: (props) => props.fields.etiqueta.value || 'Enlace',
+          },
+        ),
+
+        confianza: fields.array(
+          fields.object({
+            icono: fields.select({
+              label: 'Icono',
+              options: ICONOS_CONFIANZA,
+              defaultValue: 'check-circle',
+            }),
+            texto: fields.text({ label: 'Texto' }),
+          }),
+          {
+            label: 'Pie · «Seguridad y confianza»',
+            description:
+              'Solo afirmaciones verificables. Nada de logos de medios de pago ni sellos que no se tengan: hoy no se cobra con tarjeta en la web.',
+            itemLabel: (props) => props.fields.texto.value || 'Insignia',
+          },
+        ),
+      },
+    }),
+
+    error404: singleton({
+      label: 'Página de error 404',
+      path: 'src/content/error404/',
+      format: { data: 'json' },
+      previewUrl: '/404',
+      schema: {
+        antetitulo: fields.text({ label: 'Antetítulo' }),
+        titulo: fields.text({ label: 'Título' }),
+        texto: fields.text({ label: 'Texto', multiline: true }),
+        botonPrincipal: fields.text({ label: 'Botón principal' }),
+        botonSecundario: fields.text({ label: 'Botón secundario' }),
+      },
+    }),
+
     home: singleton({
       label: 'Home',
+      previewUrl: '/',
       path: 'src/content/home/',
       format: { data: 'json' },
       schema: {
@@ -368,6 +497,31 @@ export default config({
           { label: 'Cómo funciona' },
         ),
 
+        logos: fields.array(
+          fields.object({
+            imagen: fields.image({
+              label: 'Logo',
+              directory: 'src/assets/logos',
+              publicPath: '/src/assets/logos/',
+            }),
+            alt: fields.text({
+              label: 'Texto alternativo',
+              description: 'Nombre del organismo o empresa. Lo leen los lectores de pantalla.',
+            }),
+            ancho: fields.integer({
+              label: 'Ancho en píxeles',
+              description:
+                'Opcional. Solo hace falta para logos en PNG o JPG; los SVG se ajustan solos.',
+            }),
+          }),
+          {
+            label: 'Logos de la cabecera',
+            description:
+              'Se reparten en dos columnas por orden: la primera mitad arriba y el resto desplazado. Solo se ven en pantallas anchas.',
+            itemLabel: (props) => props.fields.alt.value || 'Logo',
+          },
+        ),
+
         seo: fields.object(
           {
             metaTitle: fields.text({ label: 'Título SEO' }),
@@ -380,6 +534,7 @@ export default config({
 
     comoFunciona: singleton({
       label: 'Página «Cómo funciona»',
+      previewUrl: '/como-funciona',
       path: 'src/content/como-funciona/',
       format: { data: 'json' },
       schema: {
@@ -415,6 +570,7 @@ export default config({
 
     contacto: singleton({
       label: 'Página «Contacto»',
+      previewUrl: '/contacto',
       path: 'src/content/contacto/',
       format: { data: 'json' },
       schema: {
@@ -442,6 +598,7 @@ export default config({
 
     faqs: singleton({
       label: 'Página «Preguntas frecuentes»',
+      previewUrl: '/faqs',
       path: 'src/content/faqs/',
       format: { data: 'json' },
       schema: {

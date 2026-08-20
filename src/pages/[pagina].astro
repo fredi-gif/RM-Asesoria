@@ -1,0 +1,55 @@
+---
+import { getCollection, render } from 'astro:content';
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/ui/Container.astro';
+import Section from '../components/ui/Section.astro';
+import Prose from '../components/ui/Prose.astro';
+import { fechaLarga } from '../lib/format';
+
+/**
+ * Genera una ruta por cada entrada de la colección `paginas`, en la raíz del
+ * sitio: /aviso-legal, /privacidad, /cookies y cualquier otra que se cree desde
+ * el panel. Al ser un parámetro simple no colisiona con las rutas estáticas,
+ * que Astro resuelve antes.
+ */
+export async function getStaticPaths() {
+  const paginas = await getCollection('paginas');
+  return paginas.map((entrada) => ({
+    params: { pagina: entrada.id },
+    props: { entrada },
+  }));
+}
+
+const { entrada } = Astro.props;
+const { Content } = await render(entrada);
+const { data } = entrada;
+
+// El SEO propio manda; si no se rellena, se cae al título y a la descripción de
+// la página, que es lo que había antes de que el campo existiera.
+const titulo = data.seo?.metaTitle || data.title;
+const descripcion = data.seo?.metaDescription || data.descripcion || undefined;
+---
+
+<BaseLayout title={titulo} description={descripcion}>
+  <Section spacing="tight" tone="brand-soft" class="border-b border-line">
+    <Container class="flex flex-col gap-4">
+      <h1 class="text-h1">{data.title}</h1>
+      {
+        data.actualizado && (
+          <p class="text-small text-ink-muted">
+            Última actualización: {fechaLarga(data.actualizado)}
+          </p>
+        )
+      }
+    </Container>
+  </Section>
+
+  <Section>
+    <Container>
+      <Prose>
+        <Content />
+      </Prose>
+    </Container>
+  </Section>
+</BaseLayout>

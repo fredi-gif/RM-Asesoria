@@ -1,11 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 
-import dgt from '../../assets/logos/dgt.svg';
-import agenciaTributaria from '../../assets/logos/agencia-tributaria.svg';
-import eurococ from '../../assets/logos/eurococ.svg';
-import colegio from '../../assets/logos/colegio-gestores.png';
-import docusign from '../../assets/logos/docusign.svg';
+import home from '../../content/home/index.json';
 
 /**
  * Nube de logos institucionales del hero.
@@ -24,63 +20,78 @@ import docusign from '../../assets/logos/docusign.svg';
  * desplazada verticalmente a media altura: entrelazadas, sin hueco y sin
  * leerse como una tabla.
  */
-const COLUMNA_A = [
-  { src: dgt, alt: 'Dirección General de Tráfico', duracion: '7s', retardo: '0s' },
-  { src: colegio, alt: 'Colegio de Gestores Administrativos', duracion: '8s', retardo: '-4s', ancho: 128 },
-  { src: eurococ, alt: 'EuroCOC', duracion: '10s', retardo: '-1.2s' },
-];
 
-const COLUMNA_B = [
-  { src: agenciaTributaria, alt: 'Agencia Tributaria', duracion: '9s', retardo: '-2.5s' },
-  { src: docusign, alt: 'Docusign', duracion: '11s', retardo: '-6s' },
-];
+/**
+ * La lista sale del panel, pero los ficheros siguen viviendo en `src/assets`
+ * para que pasen por el optimizador de Astro: el logo del colegio son 118 kB en
+ * PNG y 7 kB en webp. Como `<Image>` necesita el módulo importado y no una ruta
+ * suelta, se resuelven todos con `import.meta.glob` y se cruzan por nombre de
+ * fichero con lo que guarda Keystatic.
+ */
+const modulos = import.meta.glob<{ default: ImageMetadata }>(
+  '../../assets/logos/*.{svg,png,jpg,jpeg,webp,avif}',
+  { eager: true },
+);
+
+const porFichero = new Map(
+  Object.entries(modulos).map(([ruta, modulo]) => [ruta.split('/').pop()!, modulo.default]),
+);
+
+/** El ritmo de la animación no es una decisión de contenido: se reparte por posición. */
+const DURACIONES = ['7s', '8s', '10s', '9s', '11s'];
+const RETARDOS = ['0s', '-4s', '-1.2s', '-2.5s', '-6s'];
+
+// Se descartan las entradas sin imagen o cuyo fichero ya no está: el panel
+// permite borrar un logo del repositorio sin quitar su fila de la lista.
+const logos = (home.logos ?? [])
+  .map((logo, i) => ({
+    src: porFichero.get((logo?.imagen ?? '').split('/').pop() ?? ''),
+    alt: logo?.alt ?? '',
+    ancho: logo?.ancho ?? undefined,
+    duracion: DURACIONES[i % DURACIONES.length],
+    retardo: RETARDOS[i % RETARDOS.length],
+  }))
+  .filter((logo) => Boolean(logo.src));
+
+// 3 + 2 con cinco logos, que es el reparto de siempre.
+const mitad = Math.ceil(logos.length / 2);
+const columnas = [logos.slice(0, mitad), logos.slice(mitad)];
 ---
 
-<div
-  class="pointer-events-none absolute inset-y-0 right-6 hidden w-[24rem] items-center xl:flex"
->
-  <div class="flex w-full justify-center gap-6">
-    <div class="flex flex-col gap-5">
-      {
-        COLUMNA_A.map((logo) => (
+{
+  logos.length > 0 && (
+    <div class="pointer-events-none absolute inset-y-0 right-6 hidden w-[24rem] items-center xl:flex">
+      <div class="flex w-full justify-center gap-6">
+        {columnas.map((columna, i) => (
           <div
-            class="logo-flotante flex size-24 items-center justify-center rounded-full border border-line bg-surface shadow-[0_4px_12px_-6px_rgb(10_31_68/0.22)]"
-            style={`--duracion:${logo.duracion};--retardo:${logo.retardo}`}
+            class:list={[
+              'flex flex-col gap-5',
+              // Media pitch (círculo + hueco) hacia abajo en la segunda columna,
+              // para entrelazar con la primera en lugar de alinearse en filas.
+              i === 1 && 'translate-y-[3.625rem]',
+            ]}
           >
-            <Image
-              src={logo.src}
-              alt={logo.alt}
-              width={logo.ancho}
-              densities={logo.ancho ? [1, 2] : undefined}
-              class="h-[62%] w-[62%] object-contain"
-              loading="eager"
-            />
+            {columna.map((logo) => (
+              <div
+                class="logo-flotante flex size-24 items-center justify-center rounded-full border border-line bg-surface shadow-[0_4px_12px_-6px_rgb(10_31_68/0.22)]"
+                style={`--duracion:${logo.duracion};--retardo:${logo.retardo}`}
+              >
+                <Image
+                  src={logo.src!}
+                  alt={logo.alt}
+                  width={logo.ancho}
+                  densities={logo.ancho ? [1, 2] : undefined}
+                  class="h-[62%] w-[62%] object-contain"
+                  loading="eager"
+                />
+              </div>
+            ))}
           </div>
-        ))
-      }
+        ))}
+      </div>
     </div>
-
-    <!-- Media pitch (circle + gap) hacia abajo para entrelazar con la
-         columna A en lugar de alinearse en filas. -->
-    <div class="flex translate-y-[3.625rem] flex-col gap-5">
-      {
-        COLUMNA_B.map((logo) => (
-          <div
-            class="logo-flotante flex size-24 items-center justify-center rounded-full border border-line bg-surface shadow-[0_4px_12px_-6px_rgb(10_31_68/0.22)]"
-            style={`--duracion:${logo.duracion};--retardo:${logo.retardo}`}
-          >
-            <Image
-              src={logo.src}
-              alt={logo.alt}
-              class="h-[62%] w-[62%] object-contain"
-              loading="eager"
-            />
-          </div>
-        ))
-      }
-    </div>
-  </div>
-</div>
+  )
+}
 
 <style>
   .logo-flotante {

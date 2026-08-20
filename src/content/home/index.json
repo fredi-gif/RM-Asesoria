@@ -38,5 +38,32 @@
   "seo": {
     "metaTitle": "Trámites de vehículos online | Transferencias, bajas y matriculaciones",
     "metaDescription": "Gestoría online de trámites de vehículos: transferencias, notificaciones de venta, matriculaciones, bajas, duplicados y etiquetas. Precio cerrado y tramitación en 24-48 h."
-  }
+  },
+  "logos": [
+    {
+      "imagen": "/src/assets/logos/dgt.svg",
+      "alt": "Dirección General de Tráfico",
+      "ancho": null
+    },
+    {
+      "imagen": "/src/assets/logos/colegio-gestores.png",
+      "alt": "Colegio de Gestores Administrativos",
+      "ancho": 128
+    },
+    {
+      "imagen": "/src/assets/logos/eurococ.svg",
+      "alt": "EuroCOC",
+      "ancho": null
+    },
+    {
+      "imagen": "/src/assets/logos/agencia-tributaria.svg",
+      "alt": "Agencia Tributaria",
+      "ancho": null
+    },
+    {
+      "imagen": "/src/assets/logos/docusign.svg",
+      "alt": "Docusign",
+      "ancho": null
+    }
+  ]
 }

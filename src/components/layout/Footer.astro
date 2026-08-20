@@ -1,39 +1,22 @@
 ---
 import Logo from './Logo.astro';
 import Container from '../ui/Container.astro';
-import Icon from '../ui/Icon.astro';
+import Icon, { type IconName } from '../ui/Icon.astro';
 import { empresa, whatsapp } from '../../lib/config';
 import { getTramites, tramiteHref } from '../../lib/tramites';
+import { pie, legales, confianza } from '../../lib/navegacion';
 
 const tramites = await getTramites();
 const anio = new Date().getFullYear();
 
-const paginas = [
-  { href: '/como-funciona', label: 'Cómo funciona' },
-  { href: '/faqs', label: 'Preguntas frecuentes' },
-  { href: '/contacto', label: 'Contacto' },
-];
-
-const legales = [
-  { href: '/aviso-legal', label: 'Aviso legal' },
-  { href: '/privacidad', label: 'Política de privacidad' },
-  { href: '/cookies', label: 'Política de cookies' },
-];
-
 /**
- * Franja de confianza del footer.
- *
- * No incluye logos de Visa/Mastercard/Bizum ni un sello «PCI DSS Compliant»:
- * hoy no se cobra con tarjeta en la web (todo el flujo pasa por WhatsApp) y
- * RM Gestión no tiene esa certificación, así que ponerlos sería una afirmación
- * falsa de infraestructura de pago además de usar marcas de terceros sin
- * autorización. En su lugar, señales de confianza reales y verificables.
+ * Las insignias de confianza se editan desde el panel, pero conviene recordar
+ * el criterio con el que se eligieron: nada de logos de Visa/Mastercard/Bizum
+ * ni sellos «PCI DSS Compliant». Hoy no se cobra con tarjeta en la web —todo el
+ * flujo pasa por WhatsApp— y RM Gestión no tiene esa certificación, así que
+ * ponerlos sería afirmar una infraestructura de pago que no existe, además de
+ * usar marcas de terceros sin autorización. Solo señales verificables.
  */
-const confianzaFooter = [
-  { icono: 'candado', texto: 'Datos cifrados y protegidos' },
-  { icono: 'escudo', texto: 'Cumplimos el RGPD' },
-  { icono: 'check-circle', texto: 'Gestoría con acceso directo a la DGT' },
-] as const;
 ---
 
 <footer class="bg-brand-950 text-white">
@@ -70,13 +53,13 @@ const confianzaFooter = [
         </h2>
         <ul class="flex flex-col gap-2">
           {
-            paginas.map((item) => (
+            pie.map((item) => (
               <li>
                 <a
-                  href={item.href}
+                  href={item.enlace}
                   class="text-small text-white/70 transition-colors hover:text-accent-400"
                 >
-                  {item.label}
+                  {item.etiqueta}
                 </a>
               </li>
             ))
@@ -118,10 +101,10 @@ const confianzaFooter = [
             legales.map((item) => (
               <li>
                 <a
-                  href={item.href}
+                  href={item.enlace}
                   class="text-small text-white/70 transition-colors hover:text-accent-400"
                 >
-                  {item.label}
+                  {item.etiqueta}
                 </a>
               </li>
             ))
@@ -136,9 +119,9 @@ const confianzaFooter = [
       </h2>
       <ul class="flex flex-wrap gap-3">
         {
-          confianzaFooter.map((item) => (
+          confianza.map((item) => (
             <li class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-small text-white/70">
-              <Icon name={item.icono} size={16} class="shrink-0 text-accent-400" />
+              <Icon name={item.icono as IconName} size={16} class="shrink-0 text-accent-400" />
               {item.texto}
             </li>
           ))

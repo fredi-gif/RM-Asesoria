@@ -1,0 +1,22 @@
+{
+  "menu": [
+    { "etiqueta": "Cómo funciona", "enlace": "/como-funciona" },
+    { "etiqueta": "Preguntas frecuentes", "enlace": "/faqs" },
+    { "etiqueta": "Contacto", "enlace": "/contacto" }
+  ],
+  "pie": [
+    { "etiqueta": "Cómo funciona", "enlace": "/como-funciona" },
+    { "etiqueta": "Preguntas frecuentes", "enlace": "/faqs" },
+    { "etiqueta": "Contacto", "enlace": "/contacto" }
+  ],
+  "legales": [
+    { "etiqueta": "Aviso legal", "enlace": "/aviso-legal" },
+    { "etiqueta": "Política de privacidad", "enlace": "/privacidad" },
+    { "etiqueta": "Política de cookies", "enlace": "/cookies" }
+  ],
+  "confianza": [
+    { "icono": "candado", "texto": "Datos cifrados y protegidos" },
+    { "icono": "escudo", "texto": "Cumplimos el RGPD" },
+    { "icono": "check-circle", "texto": "Gestoría con acceso directo a la DGT" }
+  ]
+}

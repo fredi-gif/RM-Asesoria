@@ -70,7 +70,11 @@ interface Props {
 }
 
 const { name, size = 24, class: className, label } = Astro.props;
-const path = PATHS[name];
+
+// Hay nombres que llegan del panel, así que el tipo no basta como garantía: un
+// icono que se renombre aquí y siga guardado en el contenido caería a
+// `undefined` y pintaría un SVG vacío, sin decir nada. Mejor un aviso visible.
+const path = PATHS[name] ?? PATHS.aviso;
 ---
 
 <svg

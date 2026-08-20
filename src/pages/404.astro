@@ -5,9 +5,20 @@ import Section from '../components/ui/Section.astro';
 import Button from '../components/ui/Button.astro';
 import TramiteCard from '../components/tramite/TramiteCard.astro';
 import { getTramites } from '../lib/tramites';
+import pagina from '../content/error404/index.json';
 
 /** Mostramos los destacados: si alguien llega aquí, lo útil es ofrecerle salida. */
 const destacados = (await getTramites()).filter((t) => t.data.destacado).slice(0, 3);
+
+// Textos editables desde el panel, con el valor de siempre como respaldo: esta
+// es justo la página que no se puede quedar en blanco.
+const antetitulo = pagina.antetitulo || 'Error 404';
+const titulo = pagina.titulo || 'Esta página no existe';
+const texto =
+  pagina.texto ||
+  'Puede que el enlace esté mal escrito o que hayamos movido el contenido.';
+const botonPrincipal = pagina.botonPrincipal || 'Volver al inicio';
+const botonSecundario = pagina.botonSecundario || 'Ver todos los trámites';
 ---
 
 <BaseLayout title="Página no encontrada" noindex>
@@ -15,16 +26,13 @@ const destacados = (await getTramites()).filter((t) => t.data.destacado).slice(0
     <Container class="flex flex-col gap-10">
       <div class="flex max-w-[46ch] flex-col gap-4">
         <span class="font-display text-caption font-bold tracking-[0.14em] text-accent-600 uppercase">
-          Error 404
+          {antetitulo}
         </span>
-        <h1 class="text-h1">Esta página no existe</h1>
-        <p class="text-ink-muted">
-          Puede que el enlace esté mal escrito o que hayamos movido el contenido. Estos son los
-          trámites que más nos piden.
-        </p>
+        <h1 class="text-h1">{titulo}</h1>
+        <p class="text-ink-muted">{texto}</p>
         <div class="flex flex-wrap gap-3 pt-1">
-          <Button href="/" variant="secondary">Volver al inicio</Button>
-          <Button href="/#tramites" variant="outline">Ver todos los trámites</Button>
+          <Button href="/" variant="secondary">{botonPrincipal}</Button>
+          <Button href="/#tramites" variant="outline">{botonSecundario}</Button>
         </div>
       </div>
 

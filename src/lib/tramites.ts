@@ -10,14 +10,23 @@ function comparar(a: Tramite, b: Tramite): number {
 }
 
 /**
- * Todos los trámites, ya ordenados.
+ * Todos los trámites publicados, ya ordenados.
  *
  * No hay agrupación por categoría: el catálogo se presenta como una única
  * rejilla en la home y en el menú.
+ *
+ * Los borradores solo se ocultan al construir para producción. En local se
+ * siguen viendo todos, que es lo que permite repasar un trámite a medias antes
+ * de darlo por bueno. Como esta función es la única puerta a la colección, el
+ * filtro alcanza de una vez a la home, al menú, al pie, al 404, a /faqs y a las
+ * rutas que se generan.
  */
 export async function getTramites(): Promise<Tramite[]> {
   const tramites = await getCollection('tramites');
-  return tramites.sort(comparar);
+  const publicados = import.meta.env.PROD
+    ? tramites.filter((tramite) => tramite.data.estado === 'revisado')
+    : tramites;
+  return publicados.sort(comparar);
 }
 
 /** URL pública de un trámite. */

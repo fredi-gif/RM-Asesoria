@@ -24,6 +24,8 @@ const tramites = defineCollection({
     shortTitle: z.string(),
     summary: z.string(),
     icon: z.string(),
+    /** Ruta del fichero subido desde el panel. Sustituye a la ilustración. */
+    imagen: z.string().nullable().default(null),
     destacado: z.boolean().default(false),
     orden: z.number().default(100),
     estado: z.enum(['borrador', 'revisado']).default('borrador'),
@@ -91,6 +93,14 @@ const paginas = defineCollection({
     descripcion: z.string().nullable().default(null),
     // Keystatic guarda la fecha sin comillas, así que YAML ya la entrega como Date.
     actualizado: z.coerce.date().nullable().default(null),
+
+    // Opcional entero: las páginas que ya existían no lo traen en el fichero.
+    seo: z
+      .object({
+        metaTitle: z.string().nullable().default(null),
+        metaDescription: z.string().nullable().default(null),
+      })
+      .default({ metaTitle: null, metaDescription: null }),
   }),
 });
 

@@ -4,17 +4,11 @@ import Container from '../ui/Container.astro';
 import Icon, { type IconName } from '../ui/Icon.astro';
 import WhatsAppCTA from '../tramite/WhatsAppCTA.astro';
 import { getTramites, tramiteHref } from '../../lib/tramites';
+import { menu } from '../../lib/navegacion';
 
 const tramites = await getTramites();
 const path = Astro.url.pathname;
 const enTramites = path.startsWith('/tramites');
-
-/** Páginas fijas del menú, aparte del desplegable de trámites. */
-const enlaces = [
-  { href: '/como-funciona', label: 'Cómo funciona' },
-  { href: '/faqs', label: 'Preguntas frecuentes' },
-  { href: '/contacto', label: 'Contacto' },
-];
 
 // Se comparan las dos formas porque `trailingSlash` va en 'ignore': según cómo
 // se llegue a la página, el pathname puede traer la barra final o no.
@@ -94,18 +88,18 @@ const esActivo = (href: string) => path === href || path === `${href}/`;
           </div>
 
           {
-            enlaces.map((enlace) => (
+            menu.map((enlace) => (
               <a
-                href={enlace.href}
+                href={enlace.enlace}
                 class:list={[
                   'rounded-md px-3 py-2 font-display text-small font-semibold transition-colors',
-                  esActivo(enlace.href)
+                  esActivo(enlace.enlace)
                     ? 'text-accent-600'
                     : 'text-brand-900 hover:text-accent-600',
                 ]}
-                aria-current={esActivo(enlace.href) ? 'page' : undefined}
+                aria-current={esActivo(enlace.enlace) ? 'page' : undefined}
               >
-                {enlace.label}
+                {enlace.etiqueta}
               </a>
             ))
           }
@@ -152,17 +146,17 @@ const esActivo = (href: string) => path === href || path === `${href}/`;
 
             <ul class="flex flex-col divide-y divide-line">
               {
-                enlaces.map((enlace) => (
+                menu.map((enlace) => (
                   <li>
                     <a
-                      href={enlace.href}
+                      href={enlace.enlace}
                       class:list={[
                         'flex py-3 font-display font-semibold',
-                        esActivo(enlace.href) ? 'text-accent-600' : 'text-brand-900',
+                        esActivo(enlace.enlace) ? 'text-accent-600' : 'text-brand-900',
                       ]}
-                      aria-current={esActivo(enlace.href) ? 'page' : undefined}
+                      aria-current={esActivo(enlace.enlace) ? 'page' : undefined}
                     >
-                      {enlace.label}
+                      {enlace.etiqueta}
                     </a>
                   </li>
                 ))
