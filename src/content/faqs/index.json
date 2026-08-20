@@ -1,0 +1,36 @@
+{
+  "hero": {
+    "titulo": "Preguntas frecuentes",
+    "entradilla": "Las dudas que más nos llegan, agrupadas. Arriba las generales sobre cómo trabajamos y debajo las de cada trámite."
+  },
+  "generales": [
+    {
+      "pregunta": "¿Tengo que ir a alguna oficina?",
+      "respuesta": "No. Todos nuestros trámites se hacen a distancia: nos envías la documentación desde el móvil y nosotros nos encargamos del resto. No hace falta pedir cita ni desplazarse."
+    },
+    {
+      "pregunta": "¿Cómo os envío la documentación?",
+      "respuesta": "En la mayoría de los casos basta con una foto hecha con el móvil, no necesitas escáner. Lo único importante es que se lea bien: que salga el documento entero, sin dedos por medio y sin reflejos."
+    },
+    {
+      "pregunta": "¿Qué pasa si me falta un documento?",
+      "respuesta": "Dínoslo y te decimos cómo conseguirlo. Antes de presentar nada revisamos que el expediente esté completo, así que si detectamos que falta algo o que no se lee bien, te lo pedimos de nuevo antes de seguir."
+    },
+    {
+      "pregunta": "¿Los precios que aparecen en la web son definitivos?",
+      "respuesta": "Los precios mostrados son orientativos y no incluyen los impuestos de titularidad ni otros conceptos variables que dependen de cada vehículo. Antes de empezar te confirmamos el importe exacto de tu caso."
+    },
+    {
+      "pregunta": "¿Trabajáis en toda España?",
+      "respuesta": "Sí. Al ser una gestión online no dependemos de la provincia en la que estés ni de dónde esté matriculado el vehículo."
+    },
+    {
+      "pregunta": "¿Qué pasa si surge un problema durante el trámite?",
+      "respuesta": "Te avisamos y te explicamos qué opciones hay. Si aparece una carga sobre el vehículo, un dato que no cuadra o un requerimiento de la administración, no seguimos adelante sin decírtelo antes."
+    }
+  ],
+  "seo": {
+    "metaTitle": "Preguntas frecuentes sobre trámites de vehículos",
+    "metaDescription": "Resolvemos las dudas más habituales sobre transferencias, matriculaciones, bajas y duplicados: documentación, precios, plazos y cómo funciona la gestión online."
+  }
+}

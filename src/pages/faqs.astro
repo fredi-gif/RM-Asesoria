@@ -1,0 +1,186 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/ui/Container.astro';
+import Section from '../components/ui/Section.astro';
+import Icon, { type IconName } from '../components/ui/Icon.astro';
+import Button from '../components/ui/Button.astro';
+import Breadcrumbs from '../components/seo/Breadcrumbs.astro';
+import WhatsAppCTA from '../components/tramite/WhatsAppCTA.astro';
+import FaqAccordion from '../components/tramite/FaqAccordion.astro';
+
+import pagina from '../content/faqs/index.json';
+import { getTramites, tramiteHref } from '../lib/tramites';
+import { empresa } from '../lib/config';
+
+/**
+ * Las preguntas de cada trámite no se copian aquí: se leen de la colección.
+ * Así esta página no se queda desfasada cuando el cliente edita un trámite
+ * desde el panel, y no hay dos redacciones de la misma respuesta.
+ *
+ * El bloque «generales» sí es propio, porque cubre dudas transversales que no
+ * pertenecen a ningún trámite concreto.
+ */
+const tramites = await getTramites();
+
+const grupos = tramites
+  .filter((tramite) => tramite.data.faqs.length > 0)
+  .map((tramite) => ({
+    id: `faq-${tramite.id}`,
+    titulo: tramite.data.shortTitle,
+    icono: tramite.data.icon,
+    href: tramiteHref(tramite),
+    faqs: tramite.data.faqs,
+  }));
+
+const generales = pagina.generales ?? [];
+const url = `${empresa.url}/faqs`;
+const titulo = pagina.hero.titulo || 'Preguntas frecuentes';
+const total = generales.length + grupos.reduce((n, grupo) => n + grupo.faqs.length, 0);
+
+const indice = [
+  ...(generales.length > 0 ? [{ id: 'faq-generales', titulo: 'Generales' }] : []),
+  ...grupos.map((grupo) => ({ id: grupo.id, titulo: grupo.titulo })),
+];
+
+const schema: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    name: titulo,
+    url,
+    mainEntity: [...generales, ...grupos.flatMap((grupo) => grupo.faqs)].map((faq) => ({
+      '@type': 'Question',
+      name: faq.pregunta,
+      acceptedAnswer: { '@type': 'Answer', text: faq.respuesta },
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: empresa.url },
+      { '@type': 'ListItem', position: 2, name: 'Preguntas frecuentes', item: url },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={pagina.seo.metaTitle || titulo}
+  description={pagina.seo.metaDescription || pagina.hero.entradilla}
+  schema={schema}
+>
+  <!-- 1 · Cabecera -->
+  <Section spacing="tight" tone="brand-soft" class="border-b border-line">
+    <Container class="flex flex-col gap-4">
+      <Breadcrumbs items={[{ label: 'Preguntas frecuentes', href: '/faqs' }]} />
+      <h1 class="text-h1">{titulo}</h1>
+      {
+        pagina.hero.entradilla && (
+          <p class="max-w-[62ch] text-[1.125rem] text-ink-muted">{pagina.hero.entradilla}</p>
+        )
+      }
+      <p class="text-small text-ink-subtle">{total} preguntas resueltas</p>
+    </Container>
+  </Section>
+
+  <Section spacing="tight">
+    <Container class="grid gap-10 lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] lg:gap-14">
+      <!-- 2 · Índice · en escritorio acompaña el scroll; en móvil es una lista
+           corta al principio, que es más útil que un menú fijo robando alto. -->
+      <nav aria-label="Índice de preguntas" class="lg:sticky lg:top-28 lg:self-start">
+        <h2 class="text-caption font-display font-bold tracking-[0.12em] text-ink-subtle uppercase">
+          En esta página
+        </h2>
+        <ul class="mt-3 flex flex-wrap gap-x-4 gap-y-2 lg:flex-col lg:gap-2">
+          {
+            indice.map((item) => (
+              <li>
+                <a
+                  href={`#${item.id}`}
+                  class="text-small text-ink-muted transition-colors hover:text-accent-600"
+                >
+                  {item.titulo}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="flex flex-col gap-12">
+        <!-- 3 · Dudas transversales -->
+        {
+          generales.length > 0 && (
+            <section id="faq-generales" class="flex flex-col gap-5 scroll-mt-28">
+              <h2 class="text-h2">Generales</h2>
+              <FaqAccordion faqs={generales} />
+            </section>
+          )
+        }
+
+        <!-- 4 · Un bloque por trámite -->
+        {
+          grupos.map((grupo) => (
+            <section id={grupo.id} class="flex flex-col gap-5 scroll-mt-28">
+              <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                <h2 class="flex items-center gap-2.5 text-h2">
+                  <Icon
+                    name={grupo.icono as IconName}
+                    size={24}
+                    class="shrink-0 text-brand-600"
+                  />
+                  {grupo.titulo}
+                </h2>
+                <a
+                  href={grupo.href}
+                  class="inline-flex items-center gap-1.5 text-small font-semibold text-accent-600 transition-colors hover:text-accent-500"
+                >
+                  Ver el trámite
+                  <Icon name="flecha-derecha" size={16} />
+                </a>
+              </div>
+              <FaqAccordion faqs={grupo.faqs} />
+            </section>
+          ))
+        }
+      </div>
+    </Container>
+  </Section>
+
+  <!-- 5 · Salida para la duda que no está resuelta -->
+  <Section tone="alt" spacing="tight">
+    <Container class="flex flex-col items-start gap-5">
+      <h2 class="text-h2">¿No has encontrado tu duda?</h2>
+      <p class="max-w-[58ch] text-ink-muted">
+        Escríbenos y te la resolvemos. Si prefieres ver antes cómo trabajamos, lo tienes explicado
+        paso a paso.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <Button href="/contacto" variant="secondary">Contactar</Button>
+        <Button href="/como-funciona" variant="outline">Cómo funciona</Button>
+      </div>
+    </Container>
+  </Section>
+
+  <!-- 6 · CTA de cierre -->
+  <Section spacing="none" tone="brand-dark">
+    <Container class="py-14 lg:py-16">
+      <div
+        class="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10"
+      >
+        <div class="flex flex-col gap-2">
+          <h2 class="text-h2 text-white">Pregúntanos lo que necesites</h2>
+          <p class="max-w-[48ch] text-white/70">
+            Te respondemos por WhatsApp en horario de oficina, sin compromiso.
+          </p>
+        </div>
+        <WhatsAppCTA
+          mensaje="Hola, tengo una duda sobre un trámite de vehículo."
+          label="Contacta por WhatsApp"
+          class="shrink-0"
+        />
+      </div>
+    </Container>
+  </Section>
+</BaseLayout>
