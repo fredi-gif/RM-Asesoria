@@ -2,8 +2,28 @@
   "hero": {
     "claim": "Todos tus trámites de vehículos, **online y sin colas**",
     "subclaim": "Transferencias, matriculaciones, bajas y duplicados gestionados por profesionales. Nos encargamos del papeleo con la DGT mientras tú sigues con lo tuyo.",
-    "ctaPrimario": "Contacta por WhatsApp",
-    "whatsappMensaje": "Hola, me gustaría información sobre un trámite de vehículo."
+    "ventajas": [
+      {
+        "icono": "pantalla",
+        "texto": "Gestión 100% online"
+      },
+      {
+        "icono": "candado",
+        "texto": "Pago online seguro"
+      },
+      {
+        "icono": "escudo",
+        "texto": "Gestores cualificados"
+      },
+      {
+        "icono": "whatsapp",
+        "texto": "Atención al cliente por WhatsApp"
+      }
+    ]
+  },
+  "tramites": {
+    "tituloDestacados": "Los trámites más solicitados",
+    "tituloTodos": "Todos los trámites"
   },
   "comoFunciona": {
     "titulo": "¿Cómo es nuestro servicio? ",

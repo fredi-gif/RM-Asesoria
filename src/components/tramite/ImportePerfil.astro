@@ -1,0 +1,27 @@
+---
+import { euros, numeroEuros } from '../../lib/format';
+
+/**
+ * Un importe que cambia con el perfil elegido (particular / profesional).
+ *
+ * Se pintan las dos cifras y el CSS oculta la que no toca, según el
+ * `data-perfil` que el selector deja en el `<html>`. Es lo que permite que la
+ * web siga siendo estática: nada de recalcular precios en el cliente ni de
+ * duplicar páginas por perfil.
+ */
+interface Props {
+  particular: number;
+  profesional: number;
+  /** `numero` deja el importe sin el símbolo, para componerlo aparte. */
+  formato?: 'euros' | 'numero';
+  class?: string;
+}
+
+const { particular, profesional, formato = 'euros', class: className } = Astro.props;
+const formatear = formato === 'euros' ? euros : numeroEuros;
+---
+
+<span class={className} data-perfil-solo="particular">{formatear(particular)}</span><span
+  class={className}
+  data-perfil-solo="profesional">{formatear(profesional)}</span
+>

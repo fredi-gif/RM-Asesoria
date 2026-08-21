@@ -4,7 +4,7 @@ import { Image } from 'astro:assets';
 import Card from '../ui/Card.astro';
 import Icon from '../ui/Icon.astro';
 import TramiteIlustracion from './TramiteIlustracion.astro';
-import { euros } from '../../lib/format';
+import ImportePerfil from './ImportePerfil.astro';
 import { tramiteHref, totalTramite, type Tramite } from '../../lib/tramites';
 
 interface Props {
@@ -13,7 +13,6 @@ interface Props {
 
 const { tramite } = Astro.props;
 const { data } = tramite;
-const total = totalTramite(data.precio);
 
 /**
  * Si el trámite trae imagen propia desde el panel, sustituye a la ilustración
@@ -69,7 +68,10 @@ const imagen = fichero
 
     <div class="mt-auto flex items-center justify-between gap-3 pt-3">
       <span class="text-small font-semibold text-brand-900">
-        {data.precio.mostrarDesde ? 'Desde ' : ''}{euros(total)}
+        {data.precio.mostrarDesde ? 'Desde ' : ''}<ImportePerfil
+          particular={totalTramite(data.precio, 'particular')}
+          profesional={totalTramite(data.precio, 'profesional')}
+        />
       </span>
       <Icon
         name="flecha-derecha"

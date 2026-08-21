@@ -43,6 +43,45 @@ export function tramiteHref(tramite: Tramite): string {
  * restos del tipo 197.00000000000003, y este número acaba tal cual en el
  * `price` del JSON-LD.
  */
-export function totalTramite(precio: Tramite['data']['precio']): number {
-  return Math.round((precio.honorarios + (precio.tasaDgt ?? 0)) * 100) / 100;
+export function totalTramite(
+  precio: Tramite['data']['precio'],
+  perfil: Perfil = PERFIL_POR_DEFECTO,
+): number {
+  return Math.round((honorariosPerfil(precio, perfil) + (precio.tasaDgt ?? 0)) * 100) / 100;
+}
+
+/**
+ * Perfiles de precio.
+ *
+ * El mismo trámite se factura distinto a un particular que a un profesional
+ * (compraventas, concesionarios, flotas), y la home permite alternar entre uno
+ * y otro. Lo que cambia son los honorarios: la tasa de la DGT es un tributo y
+ * vale igual para todos.
+ *
+ * El particular es el perfil por defecto en todas partes —es el tráfico
+ * mayoritario y el que llega desde buscadores— y el profesional se activa desde
+ * el selector, que recuerda la elección en el navegador.
+ */
+export const PERFILES = ['particular', 'profesional'] as const;
+export type Perfil = (typeof PERFILES)[number];
+
+export const PERFIL_POR_DEFECTO: Perfil = 'particular';
+
+/** Etiquetas del selector y de los textos que acompañan al precio. */
+export const ETIQUETA_PERFIL: Record<Perfil, string> = {
+  particular: 'Particulares',
+  profesional: 'Profesionales',
+};
+
+/**
+ * Honorarios del perfil pedido.
+ *
+ * Si el trámite no tiene tarifa de profesional, se cobra la de particular: un
+ * campo vacío en el panel significa «aquí no hay precio especial», no un cero.
+ */
+export function honorariosPerfil(precio: Tramite['data']['precio'], perfil: Perfil): number {
+  if (perfil === 'profesional' && precio.honorariosProfesional !== null) {
+    return precio.honorariosProfesional;
+  }
+  return precio.honorarios;
 }

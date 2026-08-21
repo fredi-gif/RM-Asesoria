@@ -2,8 +2,9 @@
 import Card from '../ui/Card.astro';
 import Icon from '../ui/Icon.astro';
 import WhatsAppCTA from './WhatsAppCTA.astro';
-import { euros, numeroEuros } from '../../lib/format';
-import { totalTramite, type Tramite } from '../../lib/tramites';
+import ImportePerfil from './ImportePerfil.astro';
+import PerfilSwitch from './PerfilSwitch.astro';
+import { honorariosPerfil, totalTramite, type Tramite } from '../../lib/tramites';
 
 interface Props {
   precio: Tramite['data']['precio'];
@@ -20,7 +21,6 @@ interface Props {
 }
 
 const { precio, plazo, cta = null, tone = 'white', class: className } = Astro.props;
-const total = totalTramite(precio);
 
 /** Tipo general de IVA aplicable a los servicios de gestoría. */
 const IVA = 0.21;
@@ -30,15 +30,41 @@ const IVA = 0.21;
  * derivan de ahí. Se redondea la base y la cuota se calcula por diferencia,
  * de modo que las dos líneas suman siempre exactamente los honorarios.
  */
-const baseImponible = Math.round((precio.honorarios / (1 + IVA)) * 100) / 100;
-const cuotaIva = Math.round((precio.honorarios - baseImponible) * 100) / 100;
+function desglosar(honorarios: number) {
+  const base = Math.round((honorarios / (1 + IVA)) * 100) / 100;
+  return { base, iva: Math.round((honorarios - base) * 100) / 100 };
+}
+
+/**
+ * La tarjeta trae el desglose de los dos perfiles y el CSS enseña el del que
+ * esté activo. La tasa de la DGT es un tributo y no cambia de un perfil a otro.
+ */
+const particular = desglosar(honorariosPerfil(precio, 'particular'));
+const profesional = desglosar(honorariosPerfil(precio, 'profesional'));
 
 /** Conceptos cerrados, los que componen el total. */
 const incluido = [
-  { concepto: 'Nuestro servicio', detalle: 'base imponible', importe: euros(baseImponible) },
-  { concepto: `IVA (${IVA * 100} %)`, detalle: 'sobre nuestro servicio', importe: euros(cuotaIva) },
+  {
+    concepto: 'Nuestro servicio',
+    detalle: 'base imponible',
+    particular: particular.base,
+    profesional: profesional.base,
+  },
+  {
+    concepto: `IVA (${IVA * 100} %)`,
+    detalle: 'sobre nuestro servicio',
+    particular: particular.iva,
+    profesional: profesional.iva,
+  },
   ...(precio.tasaDgt !== null
-    ? [{ concepto: 'Tasa DGT', detalle: 'no sujeta a IVA', importe: euros(precio.tasaDgt) }]
+    ? [
+        {
+          concepto: 'Tasa DGT',
+          detalle: 'no sujeta a IVA',
+          particular: precio.tasaDgt,
+          profesional: precio.tasaDgt,
+        },
+      ]
     : []),
 ];
 
@@ -48,6 +74,11 @@ const grupoTitulo =
 
 <Card tone={tone} class:list={['flex flex-col overflow-hidden', className]}>
   <div class="flex flex-col gap-6 p-6">
+    <!-- El selector también aquí, no solo en la home: hay tráfico que entra
+         directo a la ficha desde el buscador y un profesional tiene que poder
+         ver su tarifa sin volver a la portada. -->
+    <PerfilSwitch size="sm" fullWidth />
+
     <!-- Precio destacado. La cifra y el «€» van separados para poder darles
          tamaños distintos, como el «$299/month» de la referencia pero con el
          símbolo detrás, que es como se escribe en castellano. -->
@@ -60,11 +91,12 @@ const grupoTitulo =
         )
       }
       <p class="flex items-baseline gap-1.5">
-        <span
+        <ImportePerfil
+          particular={totalTramite(precio, 'particular')}
+          profesional={totalTramite(precio, 'profesional')}
+          formato="numero"
           class="font-display text-[3.25rem] leading-none font-bold tracking-[-0.03em] text-brand-900 tabular-nums"
-        >
-          {numeroEuros(total)}
-        </span>
+        />
         <span class="font-display text-h3 font-bold text-ink-subtle">€</span>
       </p>
       {
@@ -99,9 +131,11 @@ const grupoTitulo =
                     <span class="text-caption text-ink-subtle">{linea.detalle}</span>
                   </span>
                 </span>
-                <span class="shrink-0 font-display text-small font-semibold text-brand-900 tabular-nums">
-                  {linea.importe}
-                </span>
+                <ImportePerfil
+                  particular={linea.particular}
+                  profesional={linea.profesional}
+                  class="shrink-0 font-display text-small font-semibold text-brand-900 tabular-nums"
+                />
               </li>
             ))
           }

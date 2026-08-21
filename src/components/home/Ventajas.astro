@@ -1,0 +1,40 @@
+---
+import Icon, { type IconName } from '../ui/Icon.astro';
+
+/**
+ * Franja de ventajas de la cabecera de la home.
+ *
+ * Ocupa el sitio donde antes estaba el botón de WhatsApp. No es un CTA: son las
+ * cuatro cosas que valen para cualquier trámite y que el visitante quiere
+ * confirmar antes de bajar a la rejilla. El botón de contacto sigue en el
+ * header, en la barra fija de móvil y en la ficha de cada trámite, así que la
+ * conversión no se pierde por quitarlo de aquí.
+ *
+ * El filete entre celdas es el `gap-px` sobre un fondo del color de la línea:
+ * evita bordes dobles y no deja el borde suelto del último elemento.
+ */
+interface Props {
+  ventajas: { icono: string; texto: string }[];
+  class?: string;
+}
+
+const { ventajas, class: className } = Astro.props;
+---
+
+{
+  ventajas.length > 0 && (
+    <ul
+      class:list={[
+        'grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2 lg:grid-cols-4',
+        className,
+      ]}
+    >
+      {ventajas.map((ventaja) => (
+        <li class="flex items-center gap-3 bg-surface px-4 py-4 sm:px-5">
+          <Icon name={ventaja.icono as IconName} size={20} class="shrink-0 text-accent-500" />
+          <span class="font-display text-small font-semibold text-brand-900">{ventaja.texto}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}

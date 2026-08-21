@@ -38,6 +38,8 @@ const tramites = defineCollection({
 
     precio: z.object({
       honorarios: z.number(),
+      /** Tarifa para gestorías, compraventas y flotas. Vacío = mismo precio. */
+      honorariosProfesional: z.number().nullable().default(null),
       tasaDgt: z.number().nullable().default(null),
       notas: z.array(z.string()).default([]),
       mostrarDesde: z.boolean().default(true),

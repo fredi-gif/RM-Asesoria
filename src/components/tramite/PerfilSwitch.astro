@@ -1,0 +1,60 @@
+---
+import { PERFILES, PERFIL_POR_DEFECTO, ETIQUETA_PERFIL } from '../../lib/tramites';
+
+/**
+ * Selector de perfil de precio: particulares o profesionales.
+ *
+ * Se eligió un control segmentado sobre la rejilla y no unas pestañas por
+ * encima del menú porque lo único que cambia es el precio. Unas pestañas al
+ * nivel de la navegación prometen otra web —otro menú, otros contenidos— y aquí
+ * no la hay; puesto junto a los precios, el efecto se ve en el sitio donde
+ * ocurre.
+ *
+ * La elección se guarda en el navegador y se aplica a toda la web (`data-perfil`
+ * en el `<html>`, que pone el script de `BaseLayout`), de modo que quien entra
+ * como profesional sigue viendo su tarifa al abrir la ficha de un trámite.
+ */
+interface Props {
+  /** `sm` para la tarjeta de precio, donde el espacio es estrecho. */
+  size?: 'sm' | 'md';
+  /** Reparte las dos opciones a todo el ancho disponible. */
+  fullWidth?: boolean;
+  class?: string;
+}
+
+const { size = 'md', fullWidth = false, class: className } = Astro.props;
+
+const tamanos = {
+  sm: 'px-3 py-1.5 text-caption',
+  md: 'px-4 py-2 text-small',
+};
+---
+
+<div
+  class:list={[
+    'rounded-full border border-line bg-surface-muted p-1',
+    fullWidth ? 'flex w-full' : 'inline-flex',
+    className,
+  ]}
+  role="group"
+  aria-label="Perfil de precios"
+>
+  {
+    PERFILES.map((perfil) => (
+      <button
+        type="button"
+        data-perfil-opcion={perfil}
+        aria-pressed={perfil === PERFIL_POR_DEFECTO}
+        class:list={[
+          'cursor-pointer rounded-full font-display font-semibold whitespace-nowrap text-ink-muted transition-colors',
+          'hover:text-brand-900',
+          'aria-pressed:bg-surface aria-pressed:text-brand-900 aria-pressed:shadow-[var(--shadow-card)]',
+          fullWidth && 'flex-1',
+          tamanos[size],
+        ]}
+      >
+        {ETIQUETA_PERFIL[perfil]}
+      </button>
+    ))
+  }
+</div>

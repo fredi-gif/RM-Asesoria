@@ -33,6 +33,10 @@ const { tramite } = Astro.props;
 const { data } = tramite;
 const { Content } = await render(tramite);
 
+/**
+ * El precio del JSON-LD es el de particular: es la tarifa pública, la que ve
+ * quien llega desde el buscador y la que debe indexarse.
+ */
 const total = totalTramite(data.precio);
 const mensaje = data.whatsappMensaje ?? `Hola, quiero información sobre: ${data.title}`;
 const ctaLabel = data.ctaLabel ?? 'Empezar por WhatsApp';
@@ -220,5 +224,5 @@ const bloque = 'flex scroll-mt-24 flex-col gap-8 py-12 lg:py-16';
     </Container>
   </Section>
 
-  <StickyMobileCTA slot="after" mensaje={mensaje} label={ctaLabel} precioDesde={total} />
+  <StickyMobileCTA slot="after" mensaje={mensaje} label={ctaLabel} precio={data.precio} />
 </BaseLayout>

@@ -4,10 +4,11 @@ import Container from '../components/ui/Container.astro';
 import Section from '../components/ui/Section.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
 import Button from '../components/ui/Button.astro';
-import WhatsAppCTA from '../components/tramite/WhatsAppCTA.astro';
 import TramiteCard from '../components/tramite/TramiteCard.astro';
+import PerfilSwitch from '../components/tramite/PerfilSwitch.astro';
 import StepsRow from '../components/tramite/StepsRow.astro';
 import LogoCloud from '../components/home/LogoCloud.astro';
+import Ventajas from '../components/home/Ventajas.astro';
 
 import home from '../content/home/index.json';
 import { getTramites } from '../lib/tramites';
@@ -15,6 +16,21 @@ import { resaltar } from '../lib/format';
 import { empresa } from '../lib/config';
 
 const tramites = await getTramites();
+
+/**
+ * Los trámites marcados como destacados abren el listado en una fila propia:
+ * son los que más se piden y la mayoría de visitas entran buscando uno de
+ * ellos. El resto va debajo, en la rejilla de siempre.
+ *
+ * Si nadie ha marcado ninguno, no se inventa una primera fila: se pinta el
+ * catálogo entero de una vez, como antes.
+ */
+const destacados = tramites.filter((tramite) => tramite.data.destacado);
+const resto =
+  destacados.length > 0 ? tramites.filter((tramite) => !tramite.data.destacado) : tramites;
+
+const rejilla = 'grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4';
+const titulos = home.tramites ?? { tituloDestacados: '', tituloTodos: '' };
 ---
 
 <BaseLayout
@@ -27,32 +43,72 @@ const tramites = await getTramites();
        gana lo decide el orden del CSS, no el del atributo. -->
   <Section spacing="none" tone="white" class="relative overflow-hidden">
     <Container class="relative pt-14 pb-10 lg:pt-20 lg:pb-14">
-      <LogoCloud />
+      <!-- La nube de logos se ancla a este bloque, no al contenedor entero: se
+           centra con `inset-y-0` y, si abarcara también la franja de abajo,
+           bajaría hasta cruzarse con ella. -->
+      <div class="relative">
+        <LogoCloud />
 
-      <div class="relative flex max-w-[42rem] flex-col gap-6">
-        <h1 class="text-display" set:html={resaltar(home.hero.claim)} />
-        <p class="max-w-[54ch] text-[1.125rem] text-ink-muted">{home.hero.subclaim}</p>
-
-        <div class="pt-2">
-          <WhatsAppCTA
-            mensaje={home.hero.whatsappMensaje}
-            label={home.hero.ctaPrimario}
-            size="lg"
-          />
+        <div class="relative flex max-w-[42rem] flex-col gap-6">
+          <h1 class="text-display" set:html={resaltar(home.hero.claim)} />
+          <p class="max-w-[54ch] text-[1.125rem] text-ink-muted">{home.hero.subclaim}</p>
         </div>
       </div>
+
+      <!-- Donde antes estaba el botón de WhatsApp. Lo que hay debajo es la
+           rejilla de trámites, que es el verdadero punto de entrada; la franja
+           resuelve las cuatro dudas comunes a todos ellos sin desviar a nadie a
+           una conversación antes de tiempo. -->
+      <Ventajas ventajas={home.hero.ventajas ?? []} class="relative mt-12 lg:mt-16" />
     </Container>
   </Section>
 
-  <!-- 2 · Listado de trámites, sin encabezado ni categorías: la rejilla se
-       explica sola y es el motivo por el que se entra en la home.
+  <!-- 2 · Listado de trámites, sin categorías: la rejilla se explica sola y es
+       el motivo por el que se entra en la home.
        Comparte el blanco con la cabecera; lo que separa un bloque de otro es
        el gris de las tarjetas, no un cambio de fondo. -->
   <Section id="tramites" spacing="none">
-    <Container class="pb-16 lg:pb-24">
-      <ul class="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {tramites.map((tramite) => <TramiteCard tramite={tramite} />)}
-      </ul>
+    <Container class="flex flex-col gap-6 pb-16 lg:pb-24">
+      <!-- El selector de perfil va aquí, pegado a la rejilla, porque lo que
+           cambia son los precios de las tarjetas que hay justo debajo. -->
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        {
+          destacados.length > 0 && titulos.tituloDestacados && (
+            <h2 class="text-h2">{titulos.tituloDestacados}</h2>
+          )
+        }
+        <div class="flex flex-col items-start gap-1.5 sm:ml-auto sm:items-end">
+          <PerfilSwitch />
+          <p class="text-caption text-ink-subtle">
+            Los precios cambian según quién haga el trámite.
+          </p>
+        </div>
+      </div>
+
+      {
+        destacados.length > 0 && (
+          <ul class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {destacados.map((tramite) => (
+              <TramiteCard tramite={tramite} />
+            ))}
+          </ul>
+        )
+      }
+
+      {
+        resto.length > 0 && (
+          <div class="flex flex-col gap-6 pt-6 lg:pt-10">
+            {destacados.length > 0 && titulos.tituloTodos && (
+              <h2 class="text-h2">{titulos.tituloTodos}</h2>
+            )}
+            <ul class={rejilla}>
+              {resto.map((tramite) => (
+                <TramiteCard tramite={tramite} />
+              ))}
+            </ul>
+          </div>
+        )
+      }
     </Container>
   </Section>
 

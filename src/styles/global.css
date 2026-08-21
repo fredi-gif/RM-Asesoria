@@ -74,3 +74,16 @@
     text-decoration-skip-ink: none;
   }
 }
+
+@layer utilities {
+  /* Precios por perfil.
+     Cada importe se pinta dos veces —tarifa de particular y de profesional— y
+     el `data-perfil` que el selector deja en el <html> decide cuál se ve. Va en
+     la capa `utilities` y con dos selectores de atributo a propósito: así gana
+     a cualquier utilidad de display que traiga el propio importe (`sm:block`
+     y compañía) sin recurrir a `!important`. */
+  [data-perfil='particular'] [data-perfil-solo='profesional'],
+  [data-perfil='profesional'] [data-perfil-solo='particular'] {
+    display: none;
+  }
+}

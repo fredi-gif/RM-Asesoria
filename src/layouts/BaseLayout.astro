@@ -5,6 +5,7 @@ import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
 import { empresa } from '../lib/config';
+import { PERFIL_POR_DEFECTO } from '../lib/tramites';
 import { LANG } from '../config/site';
 
 interface Props {
@@ -53,7 +54,11 @@ const organizacion = {
 ---
 
 <!doctype html>
-<html lang={LANG}>
+<!-- `data-perfil` manda sobre qué precio se ve en toda la web. Se sirve
+     siempre con el de particular, que es el tráfico mayoritario y lo que debe
+     indexar Google; el script de abajo lo cambia antes del primer pintado si
+     el visitante ya eligió «profesionales» en otra página. -->
+<html lang={LANG} data-perfil={PERFIL_POR_DEFECTO}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -74,6 +79,19 @@ const organizacion = {
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#0a1f44" />
 
+    <!-- Va aquí y en línea, no como script del <head> normal: tiene que
+         ejecutarse antes de pintar nada o el precio parpadearía del perfil de
+         particular al de profesional. -->
+    <script is:inline>
+      try {
+        if (localStorage.getItem('rm-perfil') === 'profesional') {
+          document.documentElement.dataset.perfil = 'profesional';
+        }
+      } catch {
+        /* Modo privado o cookies bloqueadas: se queda el perfil por defecto. */
+      }
+    </script>
+
     <JsonLd schema={organizacion} />
     {schema.map((item) => <JsonLd schema={item} />)}
   </head>
@@ -92,5 +110,43 @@ const organizacion = {
     </main>
     <Footer />
     <slot name="after" />
+
+    <!--
+      Selector de perfil de precio, para todas las instancias de la página: la
+      de la home sobre la rejilla y la de la tarjeta de precio del trámite.
+
+      El listener va delegado en el documento, así que da igual cuántos
+      selectores haya y no hace falta un script por componente.
+    -->
+    <script>
+      const CLAVE = 'rm-perfil';
+
+      /** Marca el botón activo de todos los selectores que haya en la página. */
+      function sincronizar(perfil: string) {
+        document.querySelectorAll<HTMLElement>('[data-perfil-opcion]').forEach((boton) => {
+          boton.setAttribute('aria-pressed', String(boton.dataset.perfilOpcion === perfil));
+        });
+      }
+
+      document.addEventListener('click', (evento) => {
+        const destino = evento.target as HTMLElement | null;
+        const boton = destino?.closest<HTMLElement>('[data-perfil-opcion]');
+        const perfil = boton?.dataset.perfilOpcion;
+        if (!perfil) return;
+
+        document.documentElement.dataset.perfil = perfil;
+        sincronizar(perfil);
+        try {
+          localStorage.setItem(CLAVE, perfil);
+        } catch {
+          /* Sin almacenamiento el cambio vale solo para esta página. */
+        }
+      });
+
+      // El script en línea del <head> ya pudo cambiar el perfil: aquí solo se
+      // ponen al día los botones. No se escribe en localStorage, que guardaría
+      // una elección que el visitante no ha hecho.
+      sincronizar(document.documentElement.dataset.perfil ?? 'particular');
+    </script>
   </body>
 </html>

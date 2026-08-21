@@ -7,6 +7,21 @@ import { getTramites, tramiteHref } from '../../lib/tramites';
 import { pie, legales, confianza } from '../../lib/navegacion';
 
 const tramites = await getTramites();
+
+/**
+ * En el pie solo van los trámites destacados.
+ *
+ * Con el catálogo entero la columna crecía hasta hacer el pie más largo que
+ * algunas páginas, y una lista de doce enlaces no se lee: se salta. Los
+ * destacados son los que de verdad se buscan; para el resto está el enlace al
+ * listado de la home, que es donde está el catálogo completo.
+ *
+ * Si nadie ha marcado ninguno como destacado, se cae a los cuatro primeros del
+ * orden ya establecido en lugar de dejar la columna vacía.
+ */
+const enlacesTramites = tramites.filter((tramite) => tramite.data.destacado);
+const destacados = (enlacesTramites.length > 0 ? enlacesTramites : tramites).slice(0, 4);
+
 const anio = new Date().getFullYear();
 
 /**
@@ -33,7 +48,7 @@ const anio = new Date().getFullYear();
         </h2>
         <ul class="flex flex-col gap-2">
           {
-            tramites.map((tramite) => (
+            destacados.map((tramite) => (
               <li>
                 <a
                   href={tramiteHref(tramite)}
@@ -44,6 +59,14 @@ const anio = new Date().getFullYear();
               </li>
             ))
           }
+          <li>
+            <a
+              href="/#tramites"
+              class="text-small font-semibold text-accent-400 transition-colors hover:text-accent-500"
+            >
+              Ver todos los trámites
+            </a>
+          </li>
         </ul>
       </div>
 

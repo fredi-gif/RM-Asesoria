@@ -77,6 +77,22 @@ const ICONOS_CONFIANZA = [
   { label: 'WhatsApp', value: 'whatsapp' },
 ] as const;
 
+/**
+ * Iconos para la franja de ventajas de la cabecera de la home.
+ * Debe mantenerse en sintonía con `PATHS` en `src/components/ui/Icon.astro`.
+ */
+const ICONOS_VENTAJA = [
+  { label: 'Pantalla / online', value: 'pantalla' },
+  { label: 'Candado / pago seguro', value: 'candado' },
+  { label: 'Escudo', value: 'escudo' },
+  { label: 'Check en círculo', value: 'check-circle' },
+  { label: 'WhatsApp', value: 'whatsapp' },
+  { label: 'Reloj', value: 'reloj' },
+  { label: 'Euro', value: 'euro' },
+  { label: 'Documento', value: 'documento' },
+  { label: 'Firma', value: 'firma' },
+] as const;
+
 export default config({
   // En local (`astro dev`), Keystatic escribe directamente en disco.
   // En producción (Vercel) no hay acceso de escritura al filesystem del repo,
@@ -194,6 +210,11 @@ export default config({
               description:
                 'Nuestro servicio con el IVA ya sumado, no la base imponible. Ej.: para una base de 57,27 € pon 69,30.',
               validation: { isRequired: true },
+            }),
+            honorariosProfesional: fields.number({
+              label: 'Honorarios para profesionales (€, IVA incluido)',
+              description:
+                'Tarifa que se muestra cuando en la home se elige el perfil «Profesionales» (gestorías, compraventas, flotas). Déjalo vacío si este trámite cuesta lo mismo para todos.',
             }),
             tasaDgt: fields.number({
               label: 'Tasa DGT (€)',
@@ -457,10 +478,36 @@ export default config({
               multiline: true,
             }),
             subclaim: fields.text({ label: 'Subclaim', multiline: true }),
-            ctaPrimario: fields.text({ label: 'Texto del botón' }),
-            whatsappMensaje: fields.text({ label: 'Mensaje prellenado de WhatsApp' }),
+            ventajas: fields.array(
+              fields.object({
+                icono: fields.select({
+                  label: 'Icono',
+                  options: ICONOS_VENTAJA as unknown as { label: string; value: string }[],
+                  defaultValue: 'check-circle',
+                }),
+                texto: fields.text({ label: 'Texto' }),
+              }),
+              {
+                label: 'Franja de ventajas',
+                description:
+                  'Lo que vale para todos los trámites, no para uno concreto. Cuatro entradas es lo que cuadra con la franja; con más, se parten en varias filas.',
+                itemLabel: (props) => props.fields.texto.value || 'Ventaja',
+              },
+            ),
           },
           { label: 'Cabecera' },
+        ),
+
+        tramites: fields.object(
+          {
+            tituloDestacados: fields.text({ label: 'Título de la primera fila' }),
+            tituloTodos: fields.text({ label: 'Título del resto del listado' }),
+          },
+          {
+            label: 'Listado de trámites',
+            description:
+              'La primera fila la componen los trámites marcados como «destacados» en la colección.',
+          },
         ),
 
         comoFunciona: fields.object(
