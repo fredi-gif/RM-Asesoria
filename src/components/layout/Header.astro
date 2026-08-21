@@ -5,6 +5,28 @@ import Icon, { type IconName } from '../ui/Icon.astro';
 import WhatsAppCTA from '../tramite/WhatsAppCTA.astro';
 import { getTramites, tramiteHref } from '../../lib/tramites';
 import { menu } from '../../lib/navegacion';
+import { temaOscuro } from '../../lib/tema';
+
+/**
+ * `integrada` quita el fondo de la barra para que se vea el color del hero por
+ * debajo. Sólo la pide la home, que es la única página con hero de color; el
+ * resto siguen con la barra blanca de siempre, que es el valor por defecto.
+ */
+interface Props {
+  variante?: 'solida' | 'integrada';
+}
+
+const { variante = 'solida' } = Astro.props;
+const integrada = variante === 'integrada';
+
+/**
+ * Sobre el hero oscuro el menú va en blanco. El resto del tiempo —barra
+ * sólida, o barra integrada sobre el tema claro— manda el azul de marca.
+ */
+const sobreOscuro = integrada && temaOscuro;
+const tinta = sobreOscuro ? 'text-white/85' : 'text-brand-900';
+const tintaHover = sobreOscuro ? 'hover:text-white' : 'hover:text-accent-600';
+const tintaActiva = sobreOscuro ? 'text-white' : 'text-accent-600';
 
 const tramites = await getTramites();
 const path = Astro.url.pathname;
@@ -15,7 +37,7 @@ const enTramites = path.startsWith('/tramites');
 const esActivo = (href: string) => path === href || path === `${href}/`;
 ---
 
-<header class="sticky top-0 z-50">
+<header class:list={['sticky top-0 z-50', integrada && 'nav-integrada']}>
   <!-- El fondo con desenfoque va en una capa aparte, no en <header>.
        `backdrop-filter` crea un «containing block» para los descendientes en
        position:fixed (igual que `transform`): el panel del menú móvil,
@@ -24,7 +46,20 @@ const esActivo = (href: string) => path === href || path === `${href}/`;
        detrás del contenido de la página. Al mover el blur a esta capa, el
        header deja de ser containing block y el panel vuelve a posicionarse
        respecto al viewport. -->
-  <div aria-hidden="true" class="absolute inset-0 -z-10 border-b border-line bg-surface/90 backdrop-blur-md"></div>
+  <!-- Integrada, esta capa nace transparente y se enciende sola al salir el
+       hero de pantalla (ver el script del final). El color al que se enciende
+       lo pone el tema, no el blanco: así el texto del menú no tiene que
+       cambiar de color a mitad de scroll. -->
+  <div
+    aria-hidden="true"
+    class:list={[
+      'absolute inset-0 -z-10 border-b backdrop-blur-md',
+      integrada
+        ? 'nav-fondo border-transparent transition-[background-color,border-color] duration-300'
+        : 'border-line bg-surface/90',
+    ]}
+  >
+  </div>
   <Container>
     <div class="flex h-16 items-center justify-between gap-4 lg:h-18">
       <div class="flex items-center gap-8">
@@ -34,7 +69,7 @@ const esActivo = (href: string) => path === href || path === `${href}/`;
              de 34 y subía el logo 4,5px respecto a los enlaces del menú.
              Como contenedor flex desaparece la línea base y ambos centran. -->
         <a href="/" class="flex shrink-0 items-center" aria-label="Ir a la página de inicio">
-          <Logo />
+          <Logo inverse={sobreOscuro} />
         </a>
 
         <!-- Navegación de escritorio, junto al logo. El desplegable se abre
@@ -46,7 +81,7 @@ const esActivo = (href: string) => path === href || path === `${href}/`;
               href="/#tramites"
               class:list={[
                 'flex items-center gap-1 rounded-md px-3 py-2 font-display text-small font-semibold transition-colors',
-                enTramites ? 'text-accent-600' : 'text-brand-900 hover:text-accent-600',
+                enTramites ? tintaActiva : `${tinta} ${tintaHover}`,
               ]}
               aria-current={enTramites ? 'page' : undefined}
             >
@@ -93,9 +128,7 @@ const esActivo = (href: string) => path === href || path === `${href}/`;
                 href={enlace.enlace}
                 class:list={[
                   'rounded-md px-3 py-2 font-display text-small font-semibold transition-colors',
-                  esActivo(enlace.enlace)
-                    ? 'text-accent-600'
-                    : 'text-brand-900 hover:text-accent-600',
+                  esActivo(enlace.enlace) ? tintaActiva : `${tinta} ${tintaHover}`,
                 ]}
                 aria-current={esActivo(enlace.enlace) ? 'page' : undefined}
               >
@@ -113,7 +146,10 @@ const esActivo = (href: string) => path === href || path === `${href}/`;
       <!-- Menú móvil: <details> nativo, sin JavaScript. -->
       <details class="group lg:hidden">
         <summary
-          class="flex size-10 cursor-pointer list-none items-center justify-center rounded-md border border-line text-brand-900 [&::-webkit-details-marker]:hidden"
+          class:list={[
+            'flex size-10 cursor-pointer list-none items-center justify-center rounded-md border [&::-webkit-details-marker]:hidden',
+            sobreOscuro ? 'border-white/25 text-white' : 'border-line text-brand-900',
+          ]}
           aria-label="Abrir menú"
         >
           <Icon name="menu" size={20} class="group-open:hidden" />
@@ -170,3 +206,34 @@ const esActivo = (href: string) => path === href || path === `${href}/`;
     </div>
   </Container>
 </header>
+
+{
+  integrada && (
+    <>
+      {/*
+        Testigo de un píxel justo debajo de la barra. Mientras se ve, la barra
+        está sobre el hero y va transparente; cuando sale de pantalla, se
+        enciende. Se hace con IntersectionObserver y no escuchando `scroll`
+        porque el observador no dispara en cada píxel: sólo en el cruce.
+      */}
+      <div data-nav-testigo aria-hidden="true" class="pointer-events-none h-px -mt-px w-full" />
+
+      <script>
+        const testigo = document.querySelector('[data-nav-testigo]');
+        const barra = document.querySelector('.nav-integrada');
+
+        if (testigo && barra) {
+          const observador = new IntersectionObserver(
+            ([entrada]) => {
+              // El atributo lo lee la regla `.nav-integrada[data-fija]`
+              // de `global.css`, que es quien enciende el fondo.
+              barra.toggleAttribute('data-fija', !entrada.isIntersecting);
+            },
+            { rootMargin: '0px' },
+          );
+          observador.observe(testigo);
+        }
+      </script>
+    </>
+  )
+}

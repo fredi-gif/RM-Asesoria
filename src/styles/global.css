@@ -87,3 +87,65 @@
     display: none;
   }
 }
+
+/**
+ * Temas de la cabecera de la home.
+ *
+ * `data-tema` lo pone `BaseLayout` en el <html>, y sólo en la home: el resto
+ * de páginas no tienen hero de color y conservan la cabecera blanca de
+ * siempre. Cada tema define el fondo del hero, el color de la reja de líneas
+ * y el fondo que adopta la barra de navegación cuando deja de estar sobre el
+ * hero al bajar.
+ *
+ * Van fuera de `@theme` a propósito: no son tokens de marca reutilizables,
+ * son la piel de un bloque concreto. Los de marca siguen en `tokens.css`.
+ */
+[data-tema='atardecer'] {
+  /* El azul institucional se calienta hacia el naranja en la esquina baja:
+     es lo que separa esta variante de un hero azul cualquiera. */
+  --hero-base: #0a1f44;
+  --hero-degradado: linear-gradient(150deg, #0a1f44 0%, #132b4f 45%, #3b2a3f 78%, #5a2f2a 100%);
+  --hero-reja: rgba(255, 255, 255, 0.055);
+  --hero-reja-paso: 64px;
+  --hero-grano: 0.07;
+  --hero-grano-mezcla: overlay;
+  --hero-resplandor-a: rgba(36, 82, 143, 0.45);
+  --hero-resplandor-b: rgba(249, 115, 22, 0.42);
+  /* Al bajar, la barra se vuelve sólida en el color del propio tema en lugar
+     de en blanco: así el texto del menú no tiene que cambiar de color a mitad
+     de scroll, que es lo que delata una cabecera transparente mal resuelta. */
+  --nav-fijo: rgba(10, 31, 68, 0.92);
+  --nav-fijo-linea: rgba(255, 255, 255, 0.12);
+}
+
+[data-tema='crema'] {
+  --hero-base: #fcf9f3;
+  /* El crema es color plano: no hay degradado que superponer. */
+  --hero-degradado: none;
+  --hero-reja: rgba(10, 31, 68, 0.055);
+  --hero-reja-paso: 56px;
+  --hero-grano: 0.05;
+  --hero-grano-mezcla: multiply;
+  --hero-resplandor-a: rgba(234, 106, 11, 0.07);
+  --hero-resplandor-b: rgba(36, 82, 143, 0.05);
+  --nav-fijo: rgba(252, 249, 243, 0.92);
+  --nav-fijo-linea: var(--color-line);
+}
+
+/**
+ * Barra de navegación integrada (sólo la home).
+ *
+ * Nace transparente sobre el hero y se enciende cuando el testigo que hay
+ * bajo ella sale de pantalla. El color al que se enciende es el del tema, no
+ * el blanco: si fuera blanco habría que cambiar además el color del texto del
+ * menú a mitad de scroll, que es lo que hace que estas cabeceras se noten mal
+ * resueltas.
+ */
+.nav-integrada .nav-fondo {
+  background-color: transparent;
+}
+
+.nav-integrada[data-fija] .nav-fondo {
+  background-color: var(--nav-fijo);
+  border-color: var(--nav-fijo-linea);
+}

@@ -1,11 +1,15 @@
 ---
-type Tone = 'white' | 'alt' | 'brand-soft' | 'brand-dark';
+type Tone = 'white' | 'alt' | 'brand-soft' | 'brand-dark' | 'hero';
 type Spacing = 'none' | 'tight' | 'normal';
 
 interface Props {
   class?: string;
   id?: string;
-  /** Fondo de la sección. Alternar `alt` da ritmo vertical sin usar bordes. */
+  /**
+   * Fondo de la sección. Alternar `alt` da ritmo vertical sin usar bordes.
+   * `hero` toma el color del tema elegido en el panel: es el único que cambia
+   * de una home a otra, y por eso va por variable y no por token fijo.
+   */
   tone?: Tone;
   /** `tight` para bloques secundarios, `none` cuando el hijo controla el padding. */
   spacing?: Spacing;
@@ -24,6 +28,7 @@ const tones: Record<Tone, string> = {
   alt: 'bg-surface-alt',
   'brand-soft': 'bg-brand-50',
   'brand-dark': 'bg-brand-950 text-white',
+  hero: 'bg-[var(--hero-base)]',
 };
 
 const spacings: Record<Spacing, string> = {

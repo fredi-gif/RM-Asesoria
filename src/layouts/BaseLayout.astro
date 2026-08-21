@@ -6,6 +6,7 @@ import Footer from '../components/layout/Footer.astro';
 import JsonLd from '../components/seo/JsonLd.astro';
 import { empresa } from '../lib/config';
 import { PERFIL_POR_DEFECTO } from '../lib/tramites';
+import { tema } from '../lib/tema';
 import { LANG } from '../config/site';
 
 interface Props {
@@ -16,6 +17,12 @@ interface Props {
   noindex?: boolean;
   /** Deja hueco al final para la barra fija de móvil. */
   stickyCta?: boolean;
+  /**
+   * `integrada` quita el fondo a la barra de navegación para que se vea el
+   * hero por debajo, y activa el tema de color elegido en el panel. Sólo lo
+   * pide la home: es la única página con hero de color.
+   */
+  header?: 'solida' | 'integrada';
 }
 
 const {
@@ -24,6 +31,7 @@ const {
   schema = [],
   noindex = false,
   stickyCta = false,
+  header = 'solida',
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? empresa.url).href;
@@ -58,7 +66,7 @@ const organizacion = {
      siempre con el de particular, que es el tráfico mayoritario y lo que debe
      indexar Google; el script de abajo lo cambia antes del primer pintado si
      el visitante ya eligió «profesionales» en otra página. -->
-<html lang={LANG} data-perfil={PERFIL_POR_DEFECTO}>
+<html lang={LANG} data-perfil={PERFIL_POR_DEFECTO} data-tema={header === 'integrada' ? tema : undefined}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -104,7 +112,7 @@ const organizacion = {
       Saltar al contenido
     </a>
 
-    <Header />
+    <Header variante={header} />
     <main id="contenido">
       <slot />
     </main>

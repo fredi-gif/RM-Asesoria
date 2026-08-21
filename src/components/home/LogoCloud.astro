@@ -28,6 +28,19 @@ import home from '../../content/home/index.json';
  * suelta, se resuelven todos con `import.meta.glob` y se cruzan por nombre de
  * fichero con lo que guarda Keystatic.
  */
+interface Props {
+  /**
+   * Sobre el hero oscuro la burbuja SIGUE siendo blanca, sólo cambia su
+   * sombra. Se probó con vidrio translúcido y no vale: estos son logos
+   * institucionales reales, casi todos en azul oscuro, y sobre el navy se
+   * volvían ilegibles. El fondo blanco es lo que los mantiene legibles, y
+   * sobre el azul se leen como monedas claras, que además destacan más.
+   */
+  oscuro?: boolean;
+}
+
+const { oscuro = false } = Astro.props;
+
 const modulos = import.meta.glob<{ default: ImageMetadata }>(
   '../../assets/logos/*.{svg,png,jpg,jpeg,webp,avif}',
   { eager: true },
@@ -73,7 +86,13 @@ const columnas = [logos.slice(0, mitad), logos.slice(mitad)];
           >
             {columna.map((logo) => (
               <div
-                class="logo-flotante flex size-24 items-center justify-center rounded-full border border-line bg-surface shadow-[0_4px_12px_-6px_rgb(10_31_68/0.22)]"
+                class:list={[
+                  'logo-flotante flex size-24 items-center justify-center rounded-full border',
+                  'bg-surface',
+                  oscuro
+                    ? 'border-white/25 shadow-[0_8px_24px_-10px_rgb(0_0_0/0.5)]'
+                    : 'border-line shadow-[0_4px_12px_-6px_rgb(10_31_68/0.22)]',
+                ]}
                 style={`--duracion:${logo.duracion};--retardo:${logo.retardo}`}
               >
                 <Image

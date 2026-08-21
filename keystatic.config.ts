@@ -468,6 +468,17 @@ export default config({
       path: 'src/content/home/',
       format: { data: 'json' },
       schema: {
+        tema: fields.select({
+          label: 'Tema de la cabecera',
+          description:
+            'Cambia el color y la textura del bloque superior de la home. En los dos, la barra de navegación va integrada —sin fondo propio— sobre el hero, y se vuelve sólida al bajar.',
+          options: [
+            { label: 'Atardecer — azul de marca calentado hacia el naranja', value: 'atardecer' },
+            { label: 'Crema — papel cálido, texto en azul', value: 'crema' },
+          ],
+          defaultValue: 'atardecer',
+        }),
+
         hero: fields.object(
           {
             claim: fields.text({

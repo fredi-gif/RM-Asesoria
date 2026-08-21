@@ -9,11 +9,13 @@ import PerfilSwitch from '../components/tramite/PerfilSwitch.astro';
 import StepsRow from '../components/tramite/StepsRow.astro';
 import LogoCloud from '../components/home/LogoCloud.astro';
 import Ventajas from '../components/home/Ventajas.astro';
+import HeroFondo from '../components/home/HeroFondo.astro';
 
 import home from '../content/home/index.json';
 import { getTramites } from '../lib/tramites';
 import { resaltar } from '../lib/format';
 import { empresa } from '../lib/config';
+import { temaOscuro } from '../lib/tema';
 
 const tramites = await getTramites();
 
@@ -36,22 +38,37 @@ const titulos = home.tramites ?? { tituloDestacados: '', tituloTodos: '' };
 <BaseLayout
   title={home.seo.metaTitle || empresa.name}
   description={home.seo.metaDescription || empresa.description}
+  header="integrada"
 >
   <!-- 1 · Cabecera -->
-  <!-- El fondo se pide con `tone`, no con una clase suelta: una `bg-*` pasada
-       por `class` empata en especificidad con la del propio Section y quién
-       gana lo decide el orden del CSS, no el del atributo. -->
-  <Section spacing="none" tone="white" class="relative overflow-hidden">
-    <Container class="relative pt-14 pb-10 lg:pt-20 lg:pb-14">
+  <!-- El hero arranca pegado al borde superior de la página: la barra de
+       navegación va integrada, sin fondo propio, y se pinta encima de este
+       mismo color. El `pt` compensa su altura para que el titular no se meta
+       debajo. El fondo lo pone `HeroFondo` según el tema elegido en el panel;
+       aquí sólo se declara la superficie sobre la que se apoya. -->
+  <Section spacing="none" tone="hero" class="relative -mt-16 overflow-hidden lg:-mt-18">
+    <HeroFondo />
+
+    <Container class="relative pt-30 pb-10 lg:pt-38 lg:pb-14">
       <!-- La nube de logos se ancla a este bloque, no al contenedor entero: se
            centra con `inset-y-0` y, si abarcara también la franja de abajo,
            bajaría hasta cruzarse con ella. -->
       <div class="relative">
-        <LogoCloud />
+        <LogoCloud oscuro={temaOscuro} />
 
         <div class="relative flex max-w-[42rem] flex-col gap-6">
-          <h1 class="text-display" set:html={resaltar(home.hero.claim)} />
-          <p class="max-w-[54ch] text-[1.125rem] text-ink-muted">{home.hero.subclaim}</p>
+          <h1
+            class:list={['text-display', temaOscuro && 'text-white']}
+            set:html={resaltar(home.hero.claim)}
+          />
+          <p
+            class:list={[
+              'max-w-[54ch] text-[1.125rem]',
+              temaOscuro ? 'text-white/70' : 'text-ink-muted',
+            ]}
+          >
+            {home.hero.subclaim}
+          </p>
         </div>
       </div>
 
@@ -63,7 +80,11 @@ const titulos = home.tramites ?? { tituloDestacados: '', tituloTodos: '' };
            El margen es mayor que el que separa el claim del subclaim: tiene
            que despegarse tanto del texto como de las burbujas de logos, que
            al flotar pueden acabar más abajo que el propio párrafo. -->
-      <Ventajas ventajas={home.hero.ventajas ?? []} class="relative mt-16 lg:mt-24" />
+      <Ventajas
+        ventajas={home.hero.ventajas ?? []}
+        oscuro={temaOscuro}
+        class="relative mt-16 lg:mt-24"
+      />
     </Container>
   </Section>
 
@@ -71,8 +92,8 @@ const titulos = home.tramites ?? { tituloDestacados: '', tituloTodos: '' };
        el motivo por el que se entra en la home.
        Comparte el blanco con la cabecera; lo que separa un bloque de otro es
        el gris de las tarjetas, no un cambio de fondo. -->
-  <Section id="tramites" spacing="none">
-    <Container class="flex flex-col gap-6 pb-16 lg:pb-24">
+  <Section id="tramites" spacing="none" tone="white">
+    <Container class="flex flex-col gap-6 pt-16 pb-16 lg:pt-20 lg:pb-24">
       <!-- El selector de perfil va aquí, pegado a la rejilla, porque lo que
            cambia son los precios de las tarjetas que hay justo debajo. -->
       <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">

@@ -1,0 +1,70 @@
+---
+/**
+ * Fondo de la cabecera de la home.
+ *
+ * Tres capas, todas gobernadas por las variables que define el tema activo en
+ * `global.css`:
+ *
+ *   1. Dos resplandores muy difuminados que dan volumen al color plano.
+ *   2. La reja de líneas, que es lo que hace que el bloque se lea como una
+ *      superficie construida y no como un degradado suelto.
+ *   3. Un grano finísimo, que quita el aspecto de plástico al degradado.
+ *
+ * La reja se recorta con una máscara radial para que se apague hacia los
+ * bordes: a sangre, las líneas chocan con el corte de la sección y se ve el
+ * final del patrón, que es justo lo que delata una textura pegada encima.
+ *
+ * Todo el bloque es decorativo: `aria-hidden` y sin eventos de puntero, para
+ * que no se interponga con el enlace del logo ni con el menú.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+/**
+ * El `id` del filtro tiene que ser único en el documento: si algún día se
+ * pinta este fondo dos veces en la misma página, el primer filtro ganaría y
+ * el segundo heredaría su ruido. Mismo criterio que las ilustraciones de
+ * trámite, que ya sufrieron este problema con sus degradados.
+ */
+const filtro = 'grano-hero-' + Math.random().toString(36).slice(2, 9);
+---
+
+<div aria-hidden="true" class:list={['pointer-events-none absolute inset-0 overflow-hidden', className]}>
+  <!-- El degradado del tema. Va aquí y no en el `background` de la sección
+       porque `background-color` no admite un gradiente, y el tema claro no
+       tiene ninguno: allí esta capa es `none` y no pinta nada. -->
+  <div class="absolute inset-0" style="background-image:var(--hero-degradado)"></div>
+
+  <div
+    class="absolute -top-52 -left-40 size-[46rem] rounded-full"
+    style="background:radial-gradient(circle,var(--hero-resplandor-a) 0%,transparent 70%)"
+  >
+  </div>
+  <div
+    class="absolute -right-32 -bottom-64 size-[44rem] rounded-full"
+    style="background:radial-gradient(circle,var(--hero-resplandor-b) 0%,transparent 70%)"
+  >
+  </div>
+
+  <!-- La reja. `background-size` toma el paso del tema: el crema lo lleva más
+       apretado porque sobre claro la línea se ve menos y necesita más
+       densidad para leerse como trama. -->
+  <div
+    class="absolute inset-0"
+    style="background-image:linear-gradient(var(--hero-reja) 1px,transparent 1px),linear-gradient(90deg,var(--hero-reja) 1px,transparent 1px);background-size:var(--hero-reja-paso) var(--hero-reja-paso);-webkit-mask-image:radial-gradient(120% 85% at 50% 0%,#000 30%,transparent 78%);mask-image:radial-gradient(120% 85% at 50% 0%,#000 30%,transparent 78%)"
+  >
+  </div>
+
+  <svg
+    class="absolute inset-0 h-full w-full"
+    style="opacity:var(--hero-grano);mix-blend-mode:var(--hero-grano-mezcla)"
+  >
+    <filter id={filtro}>
+      <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="2" stitchTiles="stitch" />
+    </filter>
+    <rect width="100%" height="100%" filter={`url(#${filtro})`}></rect>
+  </svg>
+</div>
