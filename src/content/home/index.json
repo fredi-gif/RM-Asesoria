@@ -1,5 +1,5 @@
 {
-  "tema": "atardecer",
+  "tema": "crema",
   "hero": {
     "claim": "Todos tus trámites de vehículos, **online y sin colas**",
     "subclaim": "Transferencias, matriculaciones, bajas y duplicados gestionados por profesionales. Nos encargamos del papeleo con la DGT mientras tú sigues con lo tuyo.",
@@ -56,35 +56,31 @@
       }
     ]
   },
-  "seo": {
-    "metaTitle": "Trámites de vehículos online | Transferencias, bajas y matriculaciones",
-    "metaDescription": "Gestoría online de trámites de vehículos: transferencias, notificaciones de venta, matriculaciones, bajas, duplicados y etiquetas. Precio cerrado y tramitación en 24-48 h."
-  },
   "logos": [
     {
-      "imagen": "/src/assets/logos/dgt.svg",
-      "alt": "Dirección General de Tráfico",
-      "ancho": null
+      "imagen": "/src/assets/logos/logos/0/imagen.svg",
+      "alt": "Dirección General de Tráfico"
     },
     {
-      "imagen": "/src/assets/logos/colegio-gestores.png",
+      "imagen": "/src/assets/logos/logos/1/imagen.png",
       "alt": "Colegio de Gestores Administrativos",
       "ancho": 128
     },
     {
-      "imagen": "/src/assets/logos/eurococ.svg",
-      "alt": "EuroCOC",
-      "ancho": null
+      "imagen": "/src/assets/logos/logos/2/imagen.svg",
+      "alt": "EuroCOC"
     },
     {
-      "imagen": "/src/assets/logos/agencia-tributaria.svg",
-      "alt": "Agencia Tributaria",
-      "ancho": null
+      "imagen": "/src/assets/logos/logos/3/imagen.svg",
+      "alt": "Agencia Tributaria"
     },
     {
-      "imagen": "/src/assets/logos/docusign.svg",
-      "alt": "Docusign",
-      "ancho": null
+      "imagen": "/src/assets/logos/logos/4/imagen.svg",
+      "alt": "Docusign"
     }
-  ]
+  ],
+  "seo": {
+    "metaTitle": "Trámites de vehículos online | Transferencias, bajas y matriculaciones",
+    "metaDescription": "Gestoría online de trámites de vehículos: transferencias, notificaciones de venta, matriculaciones, bajas, duplicados y etiquetas. Precio cerrado y tramitación en 24-48 h."
+  }
 }
