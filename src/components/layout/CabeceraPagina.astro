@@ -1,0 +1,76 @@
+---
+import Container from '../ui/Container.astro';
+import Section from '../ui/Section.astro';
+import HeroFondo from './HeroFondo.astro';
+import { temaOscuro } from '../../lib/tema';
+
+/**
+ * Cabecera de una página interior.
+ *
+ * Es la misma pieza que el hero de la home pero en corto: mismo color, misma
+ * reja y mismo grano del tema elegido en el panel, con la barra de navegación
+ * integrada encima. Es lo que hace que el tema se reconozca en toda la web y
+ * no sólo en la portada.
+ *
+ * Antes esta cabecera estaba copiada literalmente en cinco páginas
+ * (`contacto`, `como-funciona`, `faqs`, las legales y la guía de estilo) como
+ * una sección `brand-soft` con borde inferior. Al tener que responder al tema
+ * se convirtió en el sitio evidente para extraerla: cualquier página que la
+ * use hereda el tema sin tocar nada.
+ *
+ * El margen negativo sube la sección por debajo de la barra —que es
+ * transparente y se pinta encima— y el `padding-top` devuelve el hueco para
+ * que el titular no se meta debajo de ella.
+ */
+interface Props {
+  titulo: string;
+  entradilla?: string | null;
+  /**
+   * `display` es el tamaño del titular de la home; lo usa la ficha de trámite,
+   * donde el nombre del trámite es el reclamo de la página. El resto de
+   * páginas van con `h1`, un escalón por debajo.
+   */
+  tamano?: 'h1' | 'display';
+  class?: string;
+}
+
+const { titulo, entradilla, tamano = 'h1', class: className } = Astro.props;
+---
+
+<Section
+  spacing="none"
+  tone="hero"
+  class:list={[
+    'relative -mt-16 overflow-hidden border-b border-[var(--hero-linea)] lg:-mt-18',
+    className,
+  ]}
+>
+  <HeroFondo />
+
+  <Container class="relative pt-26 pb-10 lg:pt-32 lg:pb-14">
+    <div class="flex flex-col gap-4">
+      <!-- `antes` es para lo que va por encima del titular, como el antetítulo
+           del 404: dentro del mismo flujo, para que comparta el `gap`. -->
+      <slot name="antes" />
+
+      <h1 class:list={[tamano === 'display' ? 'text-display' : 'text-h1', temaOscuro && 'text-white']}>
+        {titulo}
+      </h1>
+
+      {
+        entradilla && (
+          <p
+            class:list={[
+              'max-w-[62ch] text-[1.125rem]',
+              temaOscuro ? 'text-white/70' : 'text-ink-muted',
+            ]}
+          >
+            {entradilla}
+          </p>
+        )
+      }
+
+      <slot />
+    </div>
+  </Container>
+</Section>

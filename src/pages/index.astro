@@ -9,7 +9,7 @@ import PerfilSwitch from '../components/tramite/PerfilSwitch.astro';
 import StepsRow from '../components/tramite/StepsRow.astro';
 import LogoCloud from '../components/home/LogoCloud.astro';
 import Ventajas from '../components/home/Ventajas.astro';
-import HeroFondo from '../components/home/HeroFondo.astro';
+import HeroFondo from '../components/layout/HeroFondo.astro';
 
 import home from '../content/home/index.json';
 import { getTramites } from '../lib/tramites';
@@ -38,7 +38,6 @@ const titulos = home.tramites ?? { tituloDestacados: '', tituloTodos: '' };
 <BaseLayout
   title={home.seo.metaTitle || empresa.name}
   description={home.seo.metaDescription || empresa.description}
-  header="integrada"
 >
   <!-- 1 · Cabecera -->
   <!-- El hero arranca pegado al borde superior de la página: la barra de

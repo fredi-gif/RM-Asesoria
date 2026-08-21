@@ -1,10 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import CabeceraPagina from '../components/layout/CabeceraPagina.astro';
 import Container from '../components/ui/Container.astro';
 import Section from '../components/ui/Section.astro';
 import Button from '../components/ui/Button.astro';
 import TramiteCard from '../components/tramite/TramiteCard.astro';
 import { getTramites } from '../lib/tramites';
+import { temaOscuro } from '../lib/tema';
 import pagina from '../content/error404/index.json';
 
 /** Mostramos los destacados: si alguien llega aquí, lo útil es ofrecerle salida. */
@@ -22,18 +24,27 @@ const botonSecundario = pagina.botonSecundario || 'Ver todos los trámites';
 ---
 
 <BaseLayout title="Página no encontrada" noindex>
+  <CabeceraPagina titulo={titulo} entradilla={texto}>
+    <Fragment slot="antes">
+      <span
+        class:list={[
+          'font-display text-caption font-bold tracking-[0.14em] uppercase',
+          temaOscuro ? 'text-accent-400' : 'text-accent-600',
+        ]}
+      >
+        {antetitulo}
+      </span>
+    </Fragment>
+  </CabeceraPagina>
+
+  <!-- Los botones bajan al cuerpo blanco: sus variantes están pensadas para
+       fondo claro y sobre el tema oscuro el `secondary`, que es azul de marca,
+       se perdía contra el propio azul de la cabecera. -->
   <Section>
     <Container class="flex flex-col gap-10">
-      <div class="flex max-w-[46ch] flex-col gap-4">
-        <span class="font-display text-caption font-bold tracking-[0.14em] text-accent-600 uppercase">
-          {antetitulo}
-        </span>
-        <h1 class="text-h1">{titulo}</h1>
-        <p class="text-ink-muted">{texto}</p>
-        <div class="flex flex-wrap gap-3 pt-1">
-          <Button href="/" variant="secondary">{botonPrincipal}</Button>
-          <Button href="/#tramites" variant="outline">{botonSecundario}</Button>
-        </div>
+      <div class="flex flex-wrap gap-3">
+        <Button href="/" variant="secondary">{botonPrincipal}</Button>
+        <Button href="/#tramites" variant="outline">{botonSecundario}</Button>
       </div>
 
       {

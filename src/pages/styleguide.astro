@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import CabeceraPagina from '../components/layout/CabeceraPagina.astro';
 import Container from '../components/ui/Container.astro';
 import Section from '../components/ui/Section.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
@@ -17,6 +18,7 @@ import PriceBreakdown from '../components/tramite/PriceBreakdown.astro';
 import FaqAccordion from '../components/tramite/FaqAccordion.astro';
 import TramiteCard from '../components/tramite/TramiteCard.astro';
 import { getTramites } from '../lib/tramites';
+import { temaOscuro } from '../lib/tema';
 
 /**
  * Guía de estilo interna. No se indexa ni entra en el sitemap.
@@ -118,16 +120,13 @@ const iconos = [
 ---
 
 <BaseLayout title="Guía de estilo" noindex>
-  <Section spacing="tight" tone="brand-soft" class="border-b border-line">
-    <Container class="flex flex-col gap-3">
-      <h1 class="text-h1">Guía de estilo</h1>
-      <p class="max-w-[62ch] text-ink-muted">
-        Página interna de trabajo. Todos los colores salen de <code
-          class="rounded-sm bg-white px-1.5 py-0.5 text-small">src/styles/tokens.css</code
-        >: cambiar la marca es editar ese archivo.
-      </p>
-    </Container>
-  </Section>
+  <CabeceraPagina titulo="Guía de estilo">
+    <p class:list={['max-w-[62ch]', temaOscuro ? 'text-white/70' : 'text-ink-muted']}>
+      Página interna de trabajo. Todos los colores salen de <code
+        class="rounded-sm bg-white px-1.5 py-0.5 text-small text-brand-900">src/styles/tokens.css</code
+      >: cambiar la marca es editar ese archivo.
+    </p>
+  </CabeceraPagina>
 
   <!-- Color -->
   <Section spacing="tight">

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import CabeceraPagina from '../components/layout/CabeceraPagina.astro';
 import Container from '../components/ui/Container.astro';
 import Section from '../components/ui/Section.astro';
 import Button from '../components/ui/Button.astro';
@@ -57,16 +58,7 @@ const schema: Record<string, unknown>[] = [
   schema={schema}
 >
   <!-- 1 · Cabecera -->
-  <Section spacing="tight" tone="brand-soft" class="border-b border-line">
-    <Container class="flex flex-col gap-4">
-      <h1 class="text-h1">{titulo}</h1>
-      {
-        pagina.hero.entradilla && (
-          <p class="max-w-[62ch] text-[1.125rem] text-ink-muted">{pagina.hero.entradilla}</p>
-        )
-      }
-    </Container>
-  </Section>
+  <CabeceraPagina titulo={titulo} entradilla={pagina.hero.entradilla} />
 
   <!-- 2 · Los pasos, uno por ficha. El fondo gris es lo que recorta el panel
        blanco de cada ilustración. -->

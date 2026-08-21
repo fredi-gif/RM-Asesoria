@@ -18,9 +18,13 @@ interface Props {
   /** Deja hueco al final para la barra fija de móvil. */
   stickyCta?: boolean;
   /**
-   * `integrada` quita el fondo a la barra de navegación para que se vea el
-   * hero por debajo, y activa el tema de color elegido en el panel. Sólo lo
-   * pide la home: es la única página con hero de color.
+   * `integrada` —el comportamiento normal— quita el fondo a la barra para que
+   * se vea por debajo el color del tema. Lo aguantan todas las páginas porque
+   * todas abren con una cabecera tematizada: el hero en la home,
+   * `CabeceraPagina` en el resto.
+   *
+   * Una página que NO empiece con una de esas dos tiene que pedir `solida`, o
+   * la barra quedará transparente sobre contenido claro.
    */
   header?: 'solida' | 'integrada';
 }
@@ -31,7 +35,7 @@ const {
   schema = [],
   noindex = false,
   stickyCta = false,
-  header = 'solida',
+  header = 'integrada',
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? empresa.url).href;
@@ -66,7 +70,7 @@ const organizacion = {
      siempre con el de particular, que es el tráfico mayoritario y lo que debe
      indexar Google; el script de abajo lo cambia antes del primer pintado si
      el visitante ya eligió «profesionales» en otra página. -->
-<html lang={LANG} data-perfil={PERFIL_POR_DEFECTO} data-tema={header === 'integrada' ? tema : undefined}>
+<html lang={LANG} data-perfil={PERFIL_POR_DEFECTO} data-tema={tema}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

@@ -116,6 +116,8 @@
      de scroll, que es lo que delata una cabecera transparente mal resuelta. */
   --nav-fijo: rgba(10, 31, 68, 0.92);
   --nav-fijo-linea: rgba(255, 255, 255, 0.12);
+  /* El salto de navy a blanco ya separa la cabecera del cuerpo. */
+  --hero-linea: transparent;
 }
 
 [data-tema='crema'] {
@@ -130,6 +132,8 @@
   --hero-resplandor-b: rgba(36, 82, 143, 0.05);
   --nav-fijo: rgba(252, 249, 243, 0.92);
   --nav-fijo-linea: var(--color-line);
+  /* Crema y blanco se tocan casi sin contraste: aquí el filete sí hace falta. */
+  --hero-linea: var(--color-line);
 }
 
 /**

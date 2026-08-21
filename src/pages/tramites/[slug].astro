@@ -12,6 +12,7 @@ import DocGrid from '../../components/tramite/DocGrid.astro';
 import PriceBreakdown from '../../components/tramite/PriceBreakdown.astro';
 import FaqAccordion from '../../components/tramite/FaqAccordion.astro';
 import StickyMobileCTA from '../../components/layout/StickyMobileCTA.astro';
+import CabeceraPagina from '../../components/layout/CabeceraPagina.astro';
 
 import { getTramites, totalTramite, type Tramite } from '../../lib/tramites';
 import { textoPlano } from '../../lib/format';
@@ -113,53 +114,39 @@ const bloque = 'flex scroll-mt-24 flex-col gap-8 py-12 lg:py-16';
   schema={schema}
   stickyCta
 >
-  <!--
-    Toda la página es una sola rejilla de dos columnas en escritorio: el
-    contenido a la izquierda y la tarjeta de precio a la derecha, que acompaña
-    el scroll. Antes el precio salía dos veces —en la cabecera y en una sección
-    propia más abajo— porque al bajar se perdía de vista; con la tarjeta fija
-    esa repetición sobra y se ha retirado.
+  <!-- 1 · Titular, en la cabecera con el color y la textura del tema. Antes el
+       titular vivía dentro de la rejilla y el color lo ponían unas manchas
+       desenfocadas propias de esta página; ahora comparte cabecera con el
+       resto del sitio y las manchas sobran. -->
+  <CabeceraPagina
+    titulo={data.hero.claim || data.title}
+    entradilla={data.hero.subtitulo}
+    tamano="display"
+  />
 
-    Los tres hijos se colocan por `col-start`/`row-start` en vez de por orden
-    en el DOM, para que en móvil, donde no hay dos columnas, el orden de
-    lectura siga siendo el correcto: titular, precio y después el detalle.
+  <!--
+    El cuerpo es una rejilla de dos columnas en escritorio: el contenido a la
+    izquierda y la tarjeta de precio a la derecha, que acompaña el scroll.
+    Antes el precio salía dos veces —en la cabecera y en una sección propia más
+    abajo— porque al bajar se perdía de vista; con la tarjeta fija esa
+    repetición sobra y se ha retirado.
+
+    La tarjeta va ANTES que el contenido en el DOM y se recoloca con
+    `col-start`: en móvil, donde no hay dos columnas, el orden de lectura tiene
+    que ser precio y después detalle.
   -->
   <!-- Sin `overflow-hidden` en la sección: un ancestro con overflow recortado
-       rompe el `position: sticky` de la tarjeta. El recorte de las manchas lo
-       hace su propia capa, que sí puede llevarlo. -->
+       rompe el `position: sticky` de la tarjeta. -->
   <Section spacing="none" tone="white" class="relative">
-    <!-- Manchas de color muy desenfocadas, acotadas a la franja superior: la
-         sección ahora abarca la página entera y sin este recorte el degradado
-         se estiraría hasta las preguntas frecuentes.
-
-         El final lo marca una máscara, no el `overflow-hidden`: recortar a
-         secas dejaba una raya horizontal nítida cruzando la página justo por
-         debajo del titular, porque el corte parte el desenfoque por la mitad. -->
-    <div
-      aria-hidden="true"
-      class="pointer-events-none absolute inset-x-0 top-0 h-[36rem] overflow-hidden [-webkit-mask-image:linear-gradient(to_bottom,#000_50%,transparent)] [mask-image:linear-gradient(to_bottom,#000_50%,transparent)]"
-    >
-      <div class="absolute -top-40 -left-32 size-[36rem] rounded-full bg-brand-600/20 blur-3xl"></div>
-      <div class="absolute -top-24 right-[6%] size-[28rem] rounded-full bg-accent-400/25 blur-3xl"></div>
-      <div class="absolute top-64 left-[30%] size-[32rem] rounded-full bg-brand-100/70 blur-3xl"></div>
-    </div>
-
     <Container class="relative py-12 lg:py-16">
       <div
         class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,21rem)] lg:items-start lg:gap-12"
       >
-        <!-- 1 · Titular -->
-        <div class="flex flex-col gap-5 lg:col-start-1 lg:row-start-1">
-          <!-- `text-display`, el mismo tamaño que el H1 de la home. -->
-          <h1 class="text-display">{data.hero.claim || data.title}</h1>
-          {data.hero.subtitulo && <p class="max-w-[58ch] text-ink-muted">{data.hero.subtitulo}</p>}
-        </div>
-
         <!-- 2 · Tarjeta de precio · el único CTA persistente en escritorio.
              `max-h` con scroll interno es una red de seguridad para pantallas
              bajas: si la tarjeta cabe, no aparece ninguna barra. -->
         <aside
-          class="lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto"
+          class="lg:sticky lg:top-24 lg:col-start-2 lg:row-start-1 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto"
         >
           <PriceBreakdown
             precio={data.precio}
@@ -169,7 +156,7 @@ const bloque = 'flex scroll-mt-24 flex-col gap-8 py-12 lg:py-16';
         </aside>
 
         <!-- 3 · Contenido del trámite -->
-        <div class="flex flex-col divide-y divide-line lg:col-start-1 lg:row-start-2">
+        <div class="flex flex-col divide-y divide-line lg:col-start-1 lg:row-start-1">
           {
             data.pasos.length > 0 && (
               <section id="pasos" class={bloque}>

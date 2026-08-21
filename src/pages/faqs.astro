@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import CabeceraPagina from '../components/layout/CabeceraPagina.astro';
 import Container from '../components/ui/Container.astro';
 import Section from '../components/ui/Section.astro';
 import Icon, { type IconName } from '../components/ui/Icon.astro';
@@ -8,6 +9,7 @@ import WhatsAppCTA from '../components/tramite/WhatsAppCTA.astro';
 import FaqAccordion from '../components/tramite/FaqAccordion.astro';
 
 import pagina from '../content/faqs/index.json';
+import { temaOscuro } from '../lib/tema';
 import { getTramites, tramiteHref } from '../lib/tramites';
 import { empresa } from '../lib/config';
 
@@ -70,17 +72,11 @@ const schema: Record<string, unknown>[] = [
   schema={schema}
 >
   <!-- 1 · Cabecera -->
-  <Section spacing="tight" tone="brand-soft" class="border-b border-line">
-    <Container class="flex flex-col gap-4">
-      <h1 class="text-h1">{titulo}</h1>
-      {
-        pagina.hero.entradilla && (
-          <p class="max-w-[62ch] text-[1.125rem] text-ink-muted">{pagina.hero.entradilla}</p>
-        )
-      }
-      <p class="text-small text-ink-subtle">{total} preguntas resueltas</p>
-    </Container>
-  </Section>
+  <CabeceraPagina titulo={titulo} entradilla={pagina.hero.entradilla}>
+    <p class:list={['text-small', temaOscuro ? 'text-white/55' : 'text-ink-subtle']}>
+      {total} preguntas resueltas
+    </p>
+  </CabeceraPagina>
 
   <Section spacing="tight">
     <Container class="grid gap-10 lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] lg:gap-14">
