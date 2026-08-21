@@ -77,12 +77,7 @@ const titulos = home.tramites ?? { tituloDestacados: '', tituloTodos: '' };
             <h2 class="text-h2">{titulos.tituloDestacados}</h2>
           )
         }
-        <div class="flex flex-col items-start gap-1.5 sm:ml-auto sm:items-end">
-          <PerfilSwitch />
-          <p class="text-caption text-ink-subtle">
-            Los precios cambian según quién haga el trámite.
-          </p>
-        </div>
+        <PerfilSwitch size="sm" class="sm:ml-auto" />
       </div>
 
       {
