@@ -58,8 +58,12 @@ const titulos = home.tramites ?? { tituloDestacados: '', tituloTodos: '' };
       <!-- Donde antes estaba el botón de WhatsApp. Lo que hay debajo es la
            rejilla de trámites, que es el verdadero punto de entrada; la franja
            resuelve las cuatro dudas comunes a todos ellos sin desviar a nadie a
-           una conversación antes de tiempo. -->
-      <Ventajas ventajas={home.hero.ventajas ?? []} class="relative mt-12 lg:mt-16" />
+           una conversación antes de tiempo.
+
+           El margen es mayor que el que separa el claim del subclaim: tiene
+           que despegarse tanto del texto como de las burbujas de logos, que
+           al flotar pueden acabar más abajo que el propio párrafo. -->
+      <Ventajas ventajas={home.hero.ventajas ?? []} class="relative mt-16 lg:mt-24" />
     </Container>
   </Section>
 

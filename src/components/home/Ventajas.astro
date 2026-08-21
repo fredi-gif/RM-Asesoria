@@ -12,6 +12,9 @@ import Icon, { type IconName } from '../ui/Icon.astro';
  *
  * El filete entre celdas es el `gap-px` sobre un fondo del color de la línea:
  * evita bordes dobles y no deja el borde suelto del último elemento.
+ *
+ * Franja deliberadamente fina: es un recordatorio de cuatro puntos, no un
+ * bloque que compita en peso visual con el titular de encima.
  */
 interface Props {
   ventajas: { icono: string; texto: string }[];
@@ -30,8 +33,8 @@ const { ventajas, class: className } = Astro.props;
       ]}
     >
       {ventajas.map((ventaja) => (
-        <li class="flex items-center gap-3 bg-surface px-4 py-4 sm:px-5">
-          <Icon name={ventaja.icono as IconName} size={20} class="shrink-0 text-accent-500" />
+        <li class="flex items-center gap-2.5 bg-surface px-4 py-3 sm:px-5">
+          <Icon name={ventaja.icono as IconName} size={18} class="shrink-0 text-accent-500" />
           <span class="font-display text-small font-semibold text-brand-900">{ventaja.texto}</span>
         </li>
       ))}

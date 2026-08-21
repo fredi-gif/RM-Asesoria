@@ -337,7 +337,6 @@ export default config({
           },
         }),
         descripcion: fields.text({ label: 'Descripción breve', multiline: true }),
-        actualizado: fields.date({ label: 'Última actualización' }),
         contenido: fields.markdoc({ label: 'Contenido' }),
 
         seo: fields.object(

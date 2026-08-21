@@ -93,8 +93,6 @@ const paginas = defineCollection({
   schema: z.object({
     title: z.string(),
     descripcion: z.string().nullable().default(null),
-    // Keystatic guarda la fecha sin comillas, así que YAML ya la entrega como Date.
-    actualizado: z.coerce.date().nullable().default(null),
 
     // Opcional entero: las páginas que ya existían no lo traen en el fichero.
     seo: z

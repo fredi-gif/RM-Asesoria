@@ -35,12 +35,6 @@ export function numeroEuros(valor: number): string {
   return Number.isInteger(valor) ? numeroEntero.format(valor) : numeroDecimal.format(valor);
 }
 
-/** Fecha larga en castellano, para el «última actualización» de las legales. */
-export function fechaLarga(fecha: Date | string): string {
-  const valor = typeof fecha === 'string' ? new Date(fecha) : fecha;
-  return new Intl.DateTimeFormat(LOCALE, { dateStyle: 'long' }).format(valor);
-}
-
 /**
  * Reduce un cuerpo Markdoc a texto corrido.
  *
