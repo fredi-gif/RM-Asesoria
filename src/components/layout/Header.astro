@@ -160,43 +160,72 @@ const esActivo = (href: string) => path === href || path === `${href}/`;
           class="fixed inset-x-0 top-16 bottom-0 overflow-y-auto border-t border-line bg-surface px-5 py-6"
         >
           <nav class="flex flex-col gap-6 pb-24" aria-label="Principal">
+            <!-- Un solo listado: «Trámites» es una entrada más del menú, al
+                 mismo nivel que las demás, y los doce trámites cuelgan de ella
+                 plegados. Antes se volcaban sueltos en cabeza del panel y
+                 quien abría el menú se encontraba de golpe con una lista larga
+                 sin saber de qué era. -->
             <ul class="flex flex-col divide-y divide-line">
-              {
-                tramites.map((tramite) => (
-                  <li>
-                    <a
-                      href={tramiteHref(tramite)}
-                      class="flex items-center gap-3 py-3 font-display font-semibold text-brand-900"
-                    >
-                      <Icon
-                        name={tramite.data.icon as IconName}
-                        size={19}
-                        class="shrink-0 text-brand-600"
-                      />
-                      {tramite.data.shortTitle}
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
+              <li>
+                <!-- `<details>` anidado dentro del `<details>` del menú: el
+                     desplegable sigue sin JavaScript. El grupo va con nombre
+                     (`group/tramites`) para que su `open` no se confunda con
+                     el del panel, que usa el `group` sin nombre. -->
+                <details class="group/tramites" open={enTramites}>
+                  <summary
+                    class:list={[
+                      'flex cursor-pointer list-none items-center justify-between gap-3 py-3 font-display font-semibold [&::-webkit-details-marker]:hidden',
+                      enTramites ? 'text-accent-600' : 'text-brand-900',
+                    ]}
+                  >
+                    Trámites
+                    <Icon
+                      name="chevron"
+                      size={18}
+                      class="shrink-0 text-ink-subtle transition-transform duration-200 group-open/tramites:-rotate-180"
+                    />
+                  </summary>
 
-            <ul class="flex flex-col divide-y divide-line">
-              {
-                menu.map((enlace) => (
-                  <li>
-                    <a
-                      href={enlace.enlace}
-                      class:list={[
-                        'flex py-3 font-display font-semibold',
-                        esActivo(enlace.enlace) ? 'text-accent-600' : 'text-brand-900',
-                      ]}
-                      aria-current={esActivo(enlace.enlace) ? 'page' : undefined}
-                    >
-                      {enlace.etiqueta}
-                    </a>
-                  </li>
-                ))
-              }
+                  <ul class="flex flex-col gap-0.5 pb-3">
+                    {tramites.map((tramite) => (
+                      <li>
+                        <a
+                          href={tramiteHref(tramite)}
+                          class:list={[
+                            'flex items-center gap-3 rounded-sm px-3 py-2.5 text-small',
+                            esActivo(tramiteHref(tramite))
+                              ? 'bg-brand-50 font-semibold text-brand-900'
+                              : 'text-ink-muted',
+                          ]}
+                          aria-current={esActivo(tramiteHref(tramite)) ? 'page' : undefined}
+                        >
+                          <Icon
+                            name={tramite.data.icon as IconName}
+                            size={18}
+                            class="shrink-0 text-brand-600"
+                          />
+                          {tramite.data.shortTitle}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              </li>
+
+              {menu.map((enlace) => (
+                <li>
+                  <a
+                    href={enlace.enlace}
+                    class:list={[
+                      'flex py-3 font-display font-semibold',
+                      esActivo(enlace.enlace) ? 'text-accent-600' : 'text-brand-900',
+                    ]}
+                    aria-current={esActivo(enlace.enlace) ? 'page' : undefined}
+                  >
+                    {enlace.etiqueta}
+                  </a>
+                </li>
+              ))}
             </ul>
 
             <WhatsAppCTA fullWidth label="Contactar por WhatsApp" />
