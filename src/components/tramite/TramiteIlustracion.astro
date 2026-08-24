@@ -84,6 +84,7 @@ const NAVY = '#0a1f44';
 const BLANCO = '#ffffff';
 const VERDE_OK = '#15803d';
 const ROJO_KO = '#b91c1c';
+const AZUL_CLARO = '#e9f1fc'; // relleno del globo, para que no se lea como un hueco
 
 const defs = `
   <defs>
@@ -415,6 +416,213 @@ const ILUSTRACIONES = {
       <rect x="136" y="66" width="8" height="15" rx="2" fill="${BLANCO}"/>
       <rect x="148" y="66" width="8" height="15" rx="2" fill="${BLANCO}"/>
     </g>
+  `,
+
+  /**
+   * Entrega a compraventa: el permiso con la etiqueta de stock colgando. El
+   * coche queda en depósito del profesional, no cambia de dueño — de ahí la
+   * etiqueta y no una insignia de estado.
+   */
+  entrega: `
+    ${defs}
+    ${sombraAncha}
+    ${permiso}
+    <path d="M138 42c5-9 10-14 16-17" stroke="${NAVY}" stroke-width="2" fill="none" stroke-linecap="round" opacity=".5"/>
+    <g transform="rotate(14 152 24)">
+      <path d="M140 12h24a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5h-24l-9-10z" fill="${NARANJA}"/>
+      <path d="M140 12h24a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5h-24l-9-10z" fill="none" stroke="${NARANJA_OSCURO}" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="138.5" cy="22" r="2.6" fill="${BLANCO}"/>
+      <rect x="146" y="17.5" width="17" height="2.8" rx="1.4" fill="${BLANCO}" opacity=".92"/>
+      <rect x="146" y="23.5" width="11" height="2.8" rx="1.4" fill="${BLANCO}" opacity=".62"/>
+    </g>
+  `,
+
+  /**
+   * Finalización de la entrega: el contrato cerrado y sellado. Se separa del
+   * resto de la familia verde por el sello grande, que es lo que se lee a
+   * 120 px, no una insignia más en la esquina.
+   */
+  finalizacion: `
+    ${defs}
+    ${sombraMedia}
+    <g transform="rotate(-7 92 58)">
+      <rect x="46" y="16" width="86" height="84" rx="6" fill="${CANTO}"/>
+      <rect x="46" y="12" width="86" height="84" rx="6" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
+      <path d="M52 12h74a6 6 0 0 1 6 6v8H46v-8a6 6 0 0 1 6-6Z" fill="url(#${gVerdePermiso})"/>
+      <rect x="58" y="16" width="36" height="3" rx="1.5" fill="${BLANCO}" opacity=".8"/>
+      <rect x="57" y="36" width="40" height="4" rx="2" fill="${BARRA_FUERTE}"/>
+      <rect x="57" y="47" width="62" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="57" y="55" width="62" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="57" y="63" width="42" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <path d="M59 84c8-12 12 7 19-2s10 6 17-5" stroke="${NAVY}" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".8"/>
+      <rect x="57" y="89" width="50" height="1.6" rx="0.8" fill="${BARRA}"/>
+    </g>
+    <g transform="rotate(-12 138 74)">
+      <circle cx="138" cy="74" r="26" fill="${BLANCO}" opacity=".55"/>
+      <circle cx="138" cy="74" r="26" fill="none" stroke="${VERDE_OK}" stroke-width="5"/>
+      <circle cx="138" cy="74" r="19" fill="none" stroke="${VERDE_OK}" stroke-width="1.8" opacity=".5"/>
+      <path d="M129 74.5l6.5 6.5L147 68" stroke="${VERDE_OK}" stroke-width="5.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  `,
+
+  /**
+   * Notificación a compraventa: el impreso que se cursa, con la campana como
+   * atrezzo. La campana va grande y no como insignia para no confundirse con
+   * la notificación de venta, que comparte impreso azul.
+   */
+  campana: `
+    ${defs}
+    ${sombraMedia}
+    <g transform="rotate(-7 90 56)">
+      <rect x="44" y="16" width="84" height="82" rx="6" fill="${CANTO}"/>
+      <rect x="44" y="12" width="84" height="82" rx="6" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
+      <path d="M50 12h72a6 6 0 0 1 6 6v9H44v-9a6 6 0 0 1 6-6Z" fill="url(#${gAzul})"/>
+      <g transform="translate(55 19.5)">${estrellasUE}</g>
+      <rect x="68" y="18" width="40" height="3" rx="1.5" fill="${BLANCO}" opacity=".75"/>
+      <rect x="55" y="38" width="34" height="4" rx="2" fill="${BARRA_FUERTE}"/>
+      <rect x="55" y="49" width="58" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="55" y="57" width="58" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="55" y="65" width="58" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="55" y="73" width="36" height="3.2" rx="1.6" fill="${BARRA}"/>
+    </g>
+    <path d="M140 62v5" stroke="${NARANJA_OSCURO}" stroke-width="3.6" stroke-linecap="round"/>
+    <path d="M122 85a18 18 0 0 1 36 0v6l4 8h-44l4-8Z" fill="${NARANJA}"/>
+    <path d="M122 85a18 18 0 0 1 36 0v6l4 8h-44l4-8Z" fill="none" stroke="${NARANJA_OSCURO}" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M134 99a6 6 0 0 0 12 0Z" fill="${NARANJA_OSCURO}"/>
+  `,
+
+  /**
+   * Importación: la ficha técnica extranjera, en grafito, con el globo al
+   * lado. El documento sigue siendo el sujeto; el globo dice de dónde viene.
+   */
+  globo: `
+    ${defs}
+    ${sombraMedia}
+    <g transform="rotate(-7 88 56)">
+      <rect x="42" y="16" width="84" height="82" rx="6" fill="${CANTO}"/>
+      <rect x="42" y="12" width="84" height="82" rx="6" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
+      <path d="M48 12h72a6 6 0 0 1 6 6v9H42v-9a6 6 0 0 1 6-6Z" fill="url(#${gGrafito})"/>
+      <rect x="52" y="17" width="44" height="3" rx="1.5" fill="${BLANCO}" opacity=".8"/>
+      <rect x="52" y="37" width="28" height="3.4" rx="1.7" fill="${BARRA_FUERTE}"/>
+      <rect x="86" y="37" width="30" height="3.4" rx="1.7" fill="${BARRA}"/>
+      <rect x="52" y="46" width="28" height="3.2" rx="1.6" fill="${BARRA_FUERTE}"/>
+      <rect x="86" y="46" width="30" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="52" y="55" width="28" height="3.2" rx="1.6" fill="${BARRA_FUERTE}"/>
+      <rect x="86" y="55" width="22" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="52" y="70" width="30" height="4" rx="2" fill="${BARRA_FUERTE}"/>
+    </g>
+    <circle cx="138" cy="72" r="26" fill="${AZUL_CLARO}"/>
+    <circle cx="138" cy="72" r="26" fill="none" stroke="${AZUL_UE}" stroke-width="4.5"/>
+    <path d="M112 72h52" stroke="${AZUL_UE}" stroke-width="2.8"/>
+    <path d="M116 60h44M116 84h44" stroke="${AZUL_UE}" stroke-width="2" opacity=".5"/>
+    <path d="M138 46c6.6 7.2 10.2 16.1 10.2 26s-3.6 18.8-10.2 26c-6.6-7.2-10.2-16.1-10.2-26s3.6-18.8 10.2-26Z" fill="none" stroke="${AZUL_UE}" stroke-width="2.8"/>
+  `,
+
+  /**
+   * Carta de pago: la carta de la financiera, con membrete en vez de banda a
+   * todo el ancho —no es un impreso oficial— y el sello de pagado.
+   */
+  'carta-pago': `
+    ${defs}
+    ${sombraMedia}
+    <g transform="rotate(-7 92 58)">
+      <rect x="46" y="16" width="86" height="84" rx="6" fill="${CANTO}"/>
+      <rect x="46" y="12" width="86" height="84" rx="6" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
+      <rect x="57" y="23" width="22" height="11" rx="2.5" fill="url(#${gAzul})"/>
+      <rect x="84" y="25" width="26" height="3.2" rx="1.6" fill="${BARRA_FUERTE}"/>
+      <rect x="84" y="31" width="18" height="2.8" rx="1.4" fill="${BARRA}"/>
+      <rect x="57" y="47" width="62" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="57" y="55" width="62" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="57" y="63" width="40" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <path d="M59 84c8-11 12 6 18-2s10 5 16-4" stroke="${NAVY}" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".75"/>
+      <rect x="57" y="90" width="48" height="1.6" rx="0.8" fill="${BARRA}"/>
+    </g>
+    <circle cx="140" cy="74" r="26" fill="${NARANJA}"/>
+    <circle cx="140" cy="74" r="26" fill="none" stroke="${NARANJA_OSCURO}" stroke-width="1.4"/>
+    <path d="M149 64.5a10.5 10.5 0 0 0-16.6 8.5 10.5 10.5 0 0 0 16.6 8.5" stroke="${BLANCO}" stroke-width="4.2" fill="none" stroke-linecap="round"/>
+    <path d="M128.5 70.5h14M128.5 77h12" stroke="${BLANCO}" stroke-width="3.4" stroke-linecap="round"/>
+  `,
+
+  /**
+   * Liquidación del ITP: el impreso autonómico con casillas y el sello del
+   * tipo impositivo. Las tres liquidaciones comparten familia y se separan
+   * por el atrezzo: aquí el porcentaje, que es lo que define este impuesto.
+   */
+  itp: `
+    ${defs}
+    ${sombraMedia}
+    <g transform="rotate(-7 90 56)">
+      <rect x="44" y="14" width="86" height="84" rx="6" fill="${CANTO}"/>
+      <rect x="44" y="10" width="86" height="84" rx="6" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
+      <path d="M50 10h74a6 6 0 0 1 6 6v9H44v-9a6 6 0 0 1 6-6Z" fill="url(#${gAzul})"/>
+      <rect x="54" y="15" width="42" height="3" rx="1.5" fill="${BLANCO}" opacity=".8"/>
+      <rect x="54" y="33" width="30" height="13" rx="2.5" fill="${BLANCO}" stroke="${BORDE}" stroke-width="1"/>
+      <rect x="90" y="33" width="30" height="13" rx="2.5" fill="${BLANCO}" stroke="${BORDE}" stroke-width="1"/>
+      <rect x="58" y="38" width="18" height="2.8" rx="1.4" fill="${BARRA}"/>
+      <rect x="94" y="38" width="18" height="2.8" rx="1.4" fill="${BARRA}"/>
+      <rect x="54" y="54" width="66" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="54" y="62" width="66" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="54" y="70" width="40" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="54" y="81" width="30" height="4.4" rx="2.2" fill="${BARRA_FUERTE}"/>
+    </g>
+    <g transform="rotate(-12 142 76)">
+      <circle cx="142" cy="76" r="25" fill="${NARANJA}"/>
+      <circle cx="142" cy="76" r="25" fill="none" stroke="${BLANCO}" stroke-width="2.5"/>
+      <path d="m134 85 16-18" stroke="${BLANCO}" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="135" cy="69.5" r="4.3" fill="none" stroke="${BLANCO}" stroke-width="3.2"/>
+      <circle cx="149" cy="82.5" r="4.3" fill="none" stroke="${BLANCO}" stroke-width="3.2"/>
+    </g>
+  `,
+
+  /**
+   * Liquidación del Impuesto de Matriculación: el modelo estatal en grafito
+   * con la nube de emisiones, que es lo que fija el tramo del impuesto.
+   */
+  iedmt: `
+    ${defs}
+    ${sombraMedia}
+    <g transform="rotate(-7 88 56)">
+      <rect x="42" y="14" width="86" height="84" rx="6" fill="${CANTO}"/>
+      <rect x="42" y="10" width="86" height="84" rx="6" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
+      <path d="M48 10h74a6 6 0 0 1 6 6v9H42v-9a6 6 0 0 1 6-6Z" fill="url(#${gGrafito})"/>
+      <rect x="52" y="15" width="42" height="3" rx="1.5" fill="${BLANCO}" opacity=".8"/>
+      <rect x="52" y="34" width="64" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="52" y="42" width="64" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="52" y="50" width="42" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="52" y="60" width="64" height="26" rx="3" fill="${BLANCO}" stroke="${BORDE}" stroke-width="1"/>
+      <rect x="58" y="65" width="26" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="58" y="75" width="38" height="4.4" rx="2.2" fill="${BARRA_FUERTE}"/>
+    </g>
+    <path d="M120 98h32a13 13 0 0 0 1.4-25.9 17.5 17.5 0 0 0-32.9-4A12.5 12.5 0 0 0 120 98Z" fill="${GRAFITO_ITV}"/>
+    <path d="M120 98h32a13 13 0 0 0 1.4-25.9 17.5 17.5 0 0 0-32.9-4A12.5 12.5 0 0 0 120 98Z" fill="none" stroke="${BLANCO}" stroke-width="2.2"/>
+    <path d="M127 80h20M131 88h14" stroke="${BLANCO}" stroke-width="3.4" stroke-linecap="round" opacity=".95"/>
+  `,
+
+  /**
+   * Liquidación del IVTM: el recibo municipal, con su línea de troquelado, y
+   * el edificio del ayuntamiento que lo cobra.
+   */
+  ivtm: `
+    ${defs}
+    ${sombraMedia}
+    <g transform="rotate(-7 82 56)">
+      <rect x="44" y="16" width="74" height="82" rx="6" fill="${CANTO}"/>
+      <rect x="44" y="12" width="74" height="82" rx="6" fill="url(#${gPapel})" stroke="${BORDE}" stroke-width="1.2"/>
+      <path d="M50 12h62a6 6 0 0 1 6 6v9H44v-9a6 6 0 0 1 6-6Z" fill="${NAVY}"/>
+      <rect x="54" y="17" width="34" height="3" rx="1.5" fill="${BLANCO}" opacity=".7"/>
+      <rect x="54" y="37" width="32" height="3.4" rx="1.7" fill="${BARRA_FUERTE}"/>
+      <rect x="54" y="46" width="54" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="54" y="54" width="54" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <path d="M46 66h70" stroke="${BARRA}" stroke-width="1.6" stroke-dasharray="4 3.5"/>
+      <rect x="54" y="74" width="24" height="3.2" rx="1.6" fill="${BARRA}"/>
+      <rect x="54" y="83" width="38" height="4.4" rx="2.2" fill="${BARRA_FUERTE}"/>
+    </g>
+    <path d="M132 64V52" stroke="${NARANJA_OSCURO}" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M132 52h12l-3.2 3.6 3.2 3.6h-12Z" fill="${NARANJA}"/>
+    <rect x="122" y="64" width="26" height="38" rx="3" fill="url(#${gAzul})"/>
+    <rect x="148" y="76" width="20" height="26" rx="3" fill="${NAVY}" opacity=".8"/>
+    <path d="M127 72h4M138 72h4M127 81h4M138 81h4M127 90h4M138 90h4" stroke="${BLANCO}" stroke-width="2.8" stroke-linecap="round" opacity=".85"/>
+    <path d="M153 83h3.5M161 83h3.5M153 92h3.5M161 92h3.5" stroke="${BLANCO}" stroke-width="2.4" stroke-linecap="round" opacity=".65"/>
   `,
 
   /**

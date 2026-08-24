@@ -18,6 +18,14 @@ const ICONOS = [
   { label: 'Candado / reserva de dominio', value: 'candado' },
   { label: 'Hoja / medioambiental', value: 'hoja' },
   { label: 'Placas', value: 'placas' },
+  { label: 'Entrega a compraventa', value: 'entrega' },
+  { label: 'Finalización / bandera', value: 'finalizacion' },
+  { label: 'Campana / notificación', value: 'campana' },
+  { label: 'Globo / importación', value: 'globo' },
+  { label: 'Carta de pago', value: 'carta-pago' },
+  { label: 'ITP / impreso sellado', value: 'itp' },
+  { label: 'Impuesto de matriculación (CO₂)', value: 'iedmt' },
+  { label: 'IVTM / ayuntamiento', value: 'ivtm' },
 ] as const;
 
 /**
