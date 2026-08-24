@@ -121,6 +121,7 @@ const bloque = 'flex scroll-mt-24 flex-col gap-8 py-12 lg:py-16';
     titulo={data.hero.claim || data.title}
     entradilla={data.hero.subtitulo}
     tamano="display"
+    reservaColumna
   />
 
   <!--
@@ -148,14 +149,23 @@ const bloque = 'flex scroll-mt-24 flex-col gap-8 py-12 lg:py-16';
              El margen negativo la sube hasta montarla sobre la franja de
              color del titular: el precio deja de ser una caja más de la
              columna derecha y pasa a solaparse con la cabecera, que es lo que
-             lo saca del fondo blanco. Se compensa el `padding` del contenedor
-             (3rem en móvil, 4rem a partir de `lg`) y se roban 1,5 y 3rem más,
-             que es lo que entra en la franja sin comerse el titular.
+             lo saca del fondo blanco.
+
+             En escritorio sube del todo: la franja lleva reservada la columna
+             de la derecha (`reservaColumna` en la cabecera) y la tarjeta se
+             coloca ahí, a la altura del titular. Los 18,75rem son el
+             `padding` del contenedor (4rem) más los 14,75rem que se meten en
+             la franja, que con el alto mínimo del titular dejan el borde de
+             la tarjeta a la altura de la primera línea del H1.
+
+             En móvil no hay dos columnas y el titular ocupa todo el ancho, así
+             que ahí sigue montándose sólo lo justo: 1,5rem por encima del
+             filete, compensando antes el `padding` de 3rem del contenedor.
 
              `relative z-10` para que quede por encima de la cabecera: sin él
              la tarjeta se pinta debajo del fondo del hero. -->
         <aside
-          class="relative z-10 -mt-18 lg:sticky lg:top-24 lg:col-start-2 lg:row-start-1 lg:-mt-28 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto"
+          class="relative z-10 -mt-18 lg:sticky lg:top-24 lg:col-start-2 lg:row-start-1 lg:-mt-[18.75rem] lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto"
         >
           <PriceBreakdown
             precio={data.precio}

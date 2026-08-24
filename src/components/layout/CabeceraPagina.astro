@@ -31,10 +31,28 @@ interface Props {
    * páginas van con `h1`, un escalón por debajo.
    */
   tamano?: 'h1' | 'display';
+  /**
+   * Reserva a la derecha del titular el hueco de la columna de la tarjeta de
+   * precio: los 21rem de la columna más el medianil de 3rem de la rejilla del
+   * cuerpo. Lo pide la ficha de trámite, donde la tarjeta sube hasta montarse
+   * sobre la franja y tiene que quedar al lado del titular, no encima.
+   *
+   * Trae además un alto mínimo para el bloque de texto. La tarjeta se sube con
+   * un margen negativo fijo, que se mide desde el final de la franja: sin ese
+   * mínimo, un trámite de titular corto dejaba la franja 60px más baja y la
+   * tarjeta se subía hasta meterse debajo de la barra de navegación.
+   */
+  reservaColumna?: boolean;
   class?: string;
 }
 
-const { titulo, entradilla, tamano = 'h1', class: className } = Astro.props;
+const {
+  titulo,
+  entradilla,
+  tamano = 'h1',
+  reservaColumna = false,
+  class: className,
+} = Astro.props;
 ---
 
 <Section
@@ -48,7 +66,12 @@ const { titulo, entradilla, tamano = 'h1', class: className } = Astro.props;
   <HeroFondo />
 
   <Container class="relative pt-26 pb-10 lg:pt-32 lg:pb-14">
-    <div class="flex flex-col gap-4">
+    <div
+      class:list={[
+        'flex flex-col gap-4',
+        reservaColumna && 'lg:min-h-[12rem] lg:max-w-[calc(100%-24rem)]',
+      ]}
+    >
       <!-- `antes` es para lo que va por encima del titular, como el antetítulo
            del 404: dentro del mismo flujo, para que comparta el `gap`. -->
       <slot name="antes" />
