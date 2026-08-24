@@ -6,7 +6,6 @@ import Container from '../../components/ui/Container.astro';
 import Section from '../../components/ui/Section.astro';
 import SectionHeading from '../../components/ui/SectionHeading.astro';
 import Prose from '../../components/ui/Prose.astro';
-import WhatsAppCTA from '../../components/tramite/WhatsAppCTA.astro';
 import StepList from '../../components/tramite/StepList.astro';
 import DocGrid from '../../components/tramite/DocGrid.astro';
 import PriceBreakdown from '../../components/tramite/PriceBreakdown.astro';
@@ -144,14 +143,25 @@ const bloque = 'flex scroll-mt-24 flex-col gap-8 py-12 lg:py-16';
       >
         <!-- 2 · Tarjeta de precio · el único CTA persistente en escritorio.
              `max-h` con scroll interno es una red de seguridad para pantallas
-             bajas: si la tarjeta cabe, no aparece ninguna barra. -->
+             bajas: si la tarjeta cabe, no aparece ninguna barra.
+
+             El margen negativo la sube hasta montarla sobre la franja de
+             color del titular: el precio deja de ser una caja más de la
+             columna derecha y pasa a solaparse con la cabecera, que es lo que
+             lo saca del fondo blanco. Se compensa el `padding` del contenedor
+             (3rem en móvil, 4rem a partir de `lg`) y se roban 1,5 y 3rem más,
+             que es lo que entra en la franja sin comerse el titular.
+
+             `relative z-10` para que quede por encima de la cabecera: sin él
+             la tarjeta se pinta debajo del fondo del hero. -->
         <aside
-          class="lg:sticky lg:top-24 lg:col-start-2 lg:row-start-1 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto"
+          class="relative z-10 -mt-18 lg:sticky lg:top-24 lg:col-start-2 lg:row-start-1 lg:-mt-28 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto"
         >
           <PriceBreakdown
             precio={data.precio}
             plazo={data.hero.plazo}
             cta={{ mensaje, label: ctaLabel }}
+            class="shadow-[var(--shadow-card-hover)]"
           />
         </aside>
 
@@ -190,23 +200,6 @@ const bloque = 'flex scroll-mt-24 flex-col gap-8 py-12 lg:py-16';
             </FaqAccordion>
           </section>
         </div>
-      </div>
-    </Container>
-  </Section>
-
-  <!-- 4 · CTA de cierre -->
-  <Section spacing="none" tone="brand-dark">
-    <Container class="py-14 lg:py-16">
-      <div
-        class="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-10"
-      >
-        <div class="flex flex-col gap-2">
-          <h2 class="text-h2 text-white">¿Empezamos con tu {data.shortTitle.toLowerCase()}?</h2>
-          <p class="max-w-[48ch] text-white/70">
-            Escríbenos por WhatsApp y te decimos en el momento qué necesitamos y cuánto costará.
-          </p>
-        </div>
-        <WhatsAppCTA mensaje={mensaje} label={ctaLabel} class="shrink-0" />
       </div>
     </Container>
   </Section>
