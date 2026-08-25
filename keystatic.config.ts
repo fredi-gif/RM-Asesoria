@@ -29,6 +29,17 @@ const ICONOS = [
 ] as const;
 
 /**
+ * Grupos del desplegable de trámites del menú.
+ * Debe mantenerse en sintonía con `GRUPOS` en `src/lib/tramites.ts`.
+ */
+const GRUPOS = [
+  { label: 'Compraventas', value: 'compraventas' },
+  { label: 'Impuestos', value: 'impuestos' },
+  { label: 'Reserva de dominio', value: 'reserva-de-dominio' },
+  { label: 'Otros', value: 'otros' },
+] as const;
+
+/**
  * Ilustraciones de documento disponibles.
  * Debe mantenerse en sintonía con `ILUSTRACIONES` en
  * `src/components/tramite/DocIlustracion.astro`.
@@ -171,6 +182,14 @@ export default config({
           label: 'Icono',
           options: ICONOS as unknown as { label: string; value: string }[],
           defaultValue: 'documento',
+        }),
+
+        grupo: fields.select({
+          label: 'Grupo del menú',
+          description:
+            'Bloque en el que sale el trámite dentro del desplegable «Trámites». No cambia el orden de la portada.',
+          options: GRUPOS as unknown as { label: string; value: string }[],
+          defaultValue: 'otros',
         }),
 
         destacado: fields.checkbox({

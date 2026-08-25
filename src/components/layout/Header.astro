@@ -3,7 +3,7 @@ import Logo from './Logo.astro';
 import Container from '../ui/Container.astro';
 import Icon, { type IconName } from '../ui/Icon.astro';
 import WhatsAppCTA from '../tramite/WhatsAppCTA.astro';
-import { getTramites, tramiteHref } from '../../lib/tramites';
+import { getTramites, tramiteHref, agruparTramites } from '../../lib/tramites';
 import { menu } from '../../lib/navegacion';
 import { temaOscuro } from '../../lib/tema';
 
@@ -29,6 +29,7 @@ const tintaHover = sobreOscuro ? 'hover:text-white' : 'hover:text-accent-600';
 const tintaActiva = sobreOscuro ? 'text-white' : 'text-accent-600';
 
 const tramites = await getTramites();
+const grupos = agruparTramites(tramites);
 const path = Astro.url.pathname;
 const enTramites = path.startsWith('/tramites');
 
@@ -93,31 +94,57 @@ const esActivo = (href: string) => path === href || path === `${href}/`;
               />
             </a>
 
+            <!-- Con veinte trámites la lista plana obligaba a leerla entera;
+                 los encabezados de grupo dan el atajo.
+
+                 El reparto va con `columns` y no con una rejilla de una
+                 columna por grupo: los grupos tienen tamaños muy dispares
+                 —«Otros» es más largo que los otros tres juntos— y una columna
+                 por grupo dejaba una muy alta al lado de dos casi vacías. Así
+                 el navegador equilibra las tres columnas solo, y sigue
+                 haciéndolo si el cliente recoloca trámites desde el panel.
+                 `break-inside-avoid` es lo que impide que un grupo se parta
+                 dejando su encabezado al final de una columna. -->
             <div
-              class="invisible absolute top-full left-0 w-[36rem] pt-2 opacity-0 transition-[opacity,visibility] duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
+              class="invisible absolute top-full left-0 w-[44rem] pt-2 opacity-0 transition-[opacity,visibility] duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 xl:w-[54rem]"
             >
               <div
-                class="rounded-lg border border-line bg-surface p-3 shadow-[var(--shadow-card-hover)]"
+                class="columns-3 gap-x-4 rounded-lg border border-line bg-surface p-4 shadow-[var(--shadow-card-hover)]"
               >
-                <ul class="grid grid-cols-2 gap-x-2">
-                  {
-                    tramites.map((tramite) => (
-                      <li>
-                        <a
-                          href={tramiteHref(tramite)}
-                          class="flex items-center gap-2.5 rounded-sm px-2 py-1.5 text-small text-ink-muted transition-colors hover:bg-brand-50 hover:text-brand-900"
-                        >
-                          <Icon
-                            name={tramite.data.icon as IconName}
-                            size={17}
-                            class="shrink-0 text-brand-600"
-                          />
-                          {tramite.data.shortTitle}
-                        </a>
-                      </li>
-                    ))
-                  }
-                </ul>
+                {
+                  grupos.map((grupo) => (
+                    <div class="mb-5 break-inside-avoid last:mb-0">
+                      <p class="px-2 pb-1 font-display text-caption font-semibold tracking-wide text-ink-subtle uppercase">
+                        {grupo.etiqueta}
+                      </p>
+                      <ul>
+                        {grupo.tramites.map((tramite) => (
+                          <li>
+                            <a
+                              href={tramiteHref(tramite)}
+                              class:list={[
+                                'flex items-start gap-2.5 rounded-sm px-2 py-1.5 text-small transition-colors hover:bg-brand-50 hover:text-brand-900',
+                                esActivo(tramiteHref(tramite))
+                                  ? 'font-semibold text-brand-900'
+                                  : 'text-ink-muted',
+                              ]}
+                              aria-current={esActivo(tramiteHref(tramite)) ? 'page' : undefined}
+                            >
+                              {/* Alineado con la primera línea, no con el
+                                  centro: hay etiquetas que ocupan dos. */}
+                              <Icon
+                                name={tramite.data.icon as IconName}
+                                size={17}
+                                class="mt-0.5 shrink-0 text-brand-600"
+                              />
+                              {tramite.data.shortTitle}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))
+                }
               </div>
             </div>
           </div>
@@ -161,10 +188,10 @@ const esActivo = (href: string) => path === href || path === `${href}/`;
         >
           <nav class="flex flex-col gap-6 pb-24" aria-label="Principal">
             <!-- Un solo listado: «Trámites» es una entrada más del menú, al
-                 mismo nivel que las demás, y los doce trámites cuelgan de ella
-                 plegados. Antes se volcaban sueltos en cabeza del panel y
-                 quien abría el menú se encontraba de golpe con una lista larga
-                 sin saber de qué era. -->
+                 mismo nivel que las demás, y el catálogo cuelga de ella
+                 plegado y repartido en grupos. Antes se volcaba suelto en
+                 cabeza del panel y quien abría el menú se encontraba de golpe
+                 con una lista larga sin saber de qué era. -->
             <ul class="flex flex-col divide-y divide-line">
               <li>
                 <!-- `<details>` anidado dentro del `<details>` del menú: el
@@ -186,29 +213,42 @@ const esActivo = (href: string) => path === href || path === `${href}/`;
                     />
                   </summary>
 
-                  <ul class="flex flex-col gap-0.5 pb-3">
-                    {tramites.map((tramite) => (
-                      <li>
-                        <a
-                          href={tramiteHref(tramite)}
-                          class:list={[
-                            'flex items-center gap-3 rounded-sm px-3 py-2.5 text-small',
-                            esActivo(tramiteHref(tramite))
-                              ? 'bg-brand-50 font-semibold text-brand-900'
-                              : 'text-ink-muted',
-                          ]}
-                          aria-current={esActivo(tramiteHref(tramite)) ? 'page' : undefined}
-                        >
-                          <Icon
-                            name={tramite.data.icon as IconName}
-                            size={18}
-                            class="shrink-0 text-brand-600"
-                          />
-                          {tramite.data.shortTitle}
-                        </a>
-                      </li>
+                  <!-- Los mismos grupos que en escritorio, aquí apilados. En
+                       móvil la lista es aún más larga, así que los
+                       encabezados son lo que evita el rollo de veinte
+                       enlaces seguidos. -->
+                  <div class="flex flex-col gap-4 pb-3">
+                    {grupos.map((grupo) => (
+                      <div>
+                        <p class="px-3 pb-1 font-display text-caption font-semibold tracking-wide text-ink-subtle uppercase">
+                          {grupo.etiqueta}
+                        </p>
+                        <ul class="flex flex-col gap-0.5">
+                          {grupo.tramites.map((tramite) => (
+                            <li>
+                              <a
+                                href={tramiteHref(tramite)}
+                                class:list={[
+                                  'flex items-center gap-3 rounded-sm px-3 py-2.5 text-small',
+                                  esActivo(tramiteHref(tramite))
+                                    ? 'bg-brand-50 font-semibold text-brand-900'
+                                    : 'text-ink-muted',
+                                ]}
+                                aria-current={esActivo(tramiteHref(tramite)) ? 'page' : undefined}
+                              >
+                                <Icon
+                                  name={tramite.data.icon as IconName}
+                                  size={18}
+                                  class="shrink-0 text-brand-600"
+                                />
+                                {tramite.data.shortTitle}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </details>
               </li>
 

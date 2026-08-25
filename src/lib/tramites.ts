@@ -85,3 +85,52 @@ export function honorariosPerfil(precio: Tramite['data']['precio'], perfil: Perf
   }
   return precio.honorarios;
 }
+
+/**
+ * Grupos del desplegable de trámites.
+ *
+ * Solo los usa el menú: la portada sigue siendo una única rejilla ordenada por
+ * `destacado` y `orden`. Con veinte trámites, una lista plana en el desplegable
+ * obliga a leerla entera para encontrar el propio, y estos cuatro bloques son
+ * las cuatro razones por las que alguien llega a la web.
+ *
+ * El orden del array es el orden en que salen las columnas.
+ */
+export const GRUPOS = [
+  { id: 'compraventas', etiqueta: 'Compraventas' },
+  { id: 'impuestos', etiqueta: 'Impuestos' },
+  { id: 'reserva-de-dominio', etiqueta: 'Reserva de dominio' },
+  { id: 'otros', etiqueta: 'Otros' },
+] as const;
+
+export type Grupo = (typeof GRUPOS)[number]['id'];
+
+export const GRUPO_POR_DEFECTO: Grupo = 'otros';
+
+export interface GrupoDeTramites {
+  id: Grupo;
+  etiqueta: string;
+  tramites: Tramite[];
+}
+
+/**
+ * Reparte los trámites en los grupos, conservando dentro de cada uno el orden
+ * general (`destacado`, luego `orden`).
+ *
+ * Se descartan los grupos vacíos: si el cliente deja un grupo sin trámites
+ * desde el panel, el menú no debe pintar un encabezado suelto. Y un `grupo` que
+ * ya no exista —renombrado aquí pero todavía guardado en el contenido— cae al
+ * grupo por defecto en lugar de perder el trámite.
+ */
+export function agruparTramites(tramites: Tramite[]): GrupoDeTramites[] {
+  const conocidos = new Set<string>(GRUPOS.map((grupo) => grupo.id));
+
+  return GRUPOS.map(({ id, etiqueta }) => ({
+    id,
+    etiqueta,
+    tramites: tramites.filter((tramite) => {
+      const suyo = conocidos.has(tramite.data.grupo) ? tramite.data.grupo : GRUPO_POR_DEFECTO;
+      return suyo === id;
+    }),
+  })).filter((grupo) => grupo.tramites.length > 0);
+}

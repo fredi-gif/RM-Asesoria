@@ -24,6 +24,8 @@ const tramites = defineCollection({
     shortTitle: z.string(),
     summary: z.string(),
     icon: z.string(),
+    /** Bloque del desplegable de trámites. No afecta al orden de la portada. */
+    grupo: z.string().default('otros'),
     /** Ruta del fichero subido desde el panel. Sustituye a la ilustración. */
     imagen: z.string().nullable().default(null),
     destacado: z.boolean().default(false),
