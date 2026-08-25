@@ -2,29 +2,52 @@
 import { empresa } from '../../lib/config';
 
 /**
- * ⚠️ LOGO PROVISIONAL — monograma + wordmark generados con los tokens de marca.
- * Cuando llegue el logo real del cliente, sustituye el contenido del <svg>
- * (o cámbialo por un <img> al SVG definitivo) sin tocar nada más.
+ * Logotipo de RM Gestión: tesela con el monograma RM más el nombre.
+ *
+ * La tesela no es el cuadrado redondeado de cualquier app: la esquina inferior
+ * derecha se abre en un arco de radio 38 y una franja naranja lo recorre. Esa
+ * silueta es lo que hace reconocible la marca a 16 px, donde las letras ya no
+ * se distinguen — por eso el favicon puede prescindir del nombre.
+ *
+ * Las letras van como trazados, no como texto: un logotipo no puede depender
+ * de que una webfont haya cargado. Están sacadas de la Plus Jakarta Sans en
+ * peso 800 —la misma familia que compone el nombre al lado— a cuerpo 50,38 y
+ * con las dos letras solapadas 0,06 em, que es donde la R y la M se ligan sin
+ * que la pata de la R se pierda. El `paint-order="stroke"` de la M pinta el
+ * contorno del color de la tesela ANTES del relleno: eso abre el corte de aire
+ * que separa las dos letras sin adelgazar ninguna.
+ *
+ * Regenerar los trazados (si cambia la tipografía o el peso) está documentado
+ * en `docs/logo.md`.
  */
 interface Props {
-  /** Versión para fondos oscuros (footer). */
+  /** Versión para fondos oscuros: la tesela se vuelve blanca y las letras azules. */
   inverse?: boolean;
   class?: string;
 }
 
 const { inverse = false, class: className } = Astro.props;
 
-const marca = inverse ? '#ffffff' : 'var(--color-brand-900)';
+const tesela = inverse ? '#ffffff' : 'var(--color-brand-900)';
+const letra = inverse ? 'var(--color-brand-900)' : '#ffffff';
 ---
 
 <span class:list={['inline-flex items-center gap-2.5', className]}>
-  <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
-    <rect width="34" height="34" rx="9" fill={marca}></rect>
+  <svg width="34" height="34" viewBox="0 0 100 100" fill="none" aria-hidden="true">
     <path
-      d="M9.4 24V10.2h5.35c2.9 0 4.55 1.55 4.55 4.05 0 1.85-.95 3.15-2.6 3.7L19.6 24h-3.1l-2.5-5.55h-1.85V24H9.4Zm2.75-7.85h2.35c1.3 0 2.05-.7 2.05-1.85s-.75-1.85-2.05-1.85h-2.35v3.7Z"
-      fill={inverse ? 'var(--color-brand-900)' : '#ffffff'}></path>
-    <path d="M20.9 24V10.2h2.6l2.55 6.15 2.55-6.15h.4V24h-2.5v-6.4L24.5 22h-1.1l-2-4.4V24h-.5Z" fill="var(--color-accent-500)"
+      d="M24 0H76A24 24 0 0 1 100 24V62A38 38 0 0 1 62 100H24A24 24 0 0 1 0 76V24A24 24 0 0 1 24 0Z"
+      fill={tesela}></path>
+    <path d="M100 62A38 38 0 0 1 62 100L62 86A24 24 0 0 0 86 62Z" fill="var(--color-accent-500)"
     ></path>
+    <path
+      d="M15.00 66.00V28.47H29.36Q33.24 28.47 36.24 29.83Q39.23 31.19 40.95 33.86Q42.66 36.53 42.66 40.46Q42.66 44.29 40.90 46.98Q39.13 49.68 36.16 51.04L44.73 66.00H35.96L26.69 49.42L31.73 52.40H22.81V66.00ZM22.81 45.60H29.41Q31.07 45.60 32.28 44.94Q33.49 44.29 34.17 43.13Q34.85 41.97 34.85 40.46Q34.85 38.89 34.17 37.74Q33.49 36.58 32.28 35.92Q31.07 35.27 29.41 35.27H22.81Z"
+      fill={letra}></path>
+    <path
+      d="M41.70 66.00V28.47H49.26L63.32 47.11H59.79L73.44 28.47H81.00V66.00H73.19V37.08L76.31 37.79L61.85 56.43H60.85L46.89 37.79L49.51 37.08V66.00Z"
+      fill={letra}
+      stroke={tesela}
+      stroke-width="4.5"
+      paint-order="stroke"></path>
   </svg>
   <span
     class:list={[
