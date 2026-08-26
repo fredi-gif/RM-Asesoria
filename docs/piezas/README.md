@@ -3,50 +3,31 @@
 La herramienta que usa el cliente para sacar sus propias piezas: elige
 plantilla y formato, edita el texto y descarga el archivo.
 
-Se publica en dos sitios, con el mismo contenido montado desde las mismas
-fuentes:
+**No se publica en la web.** `docs/` no entra en el build de Astro, así que
+nada de esto llega al sitio. Se monta en dos versiones:
 
-| Dónde | Archivo | Para quién |
-|---|---|---|
-| Artefacto de Claude | `piezas-rm.html` | nosotros, mientras se itera — [enlace](https://claude.ai/code/artifact/e8148cc6-5161-4c42-80e1-04aa6909f6e5) |
-| La propia web, en `/marca/piezas/` | `public/marca/piezas/index.html` | el cliente, sin cuenta de nada |
+| Archivo | Para qué |
+|---|---|
+| `piezas-rm.html` | publicar como artefacto de Claude — [enlace](https://claude.ai/code/artifact/e8148cc6-5161-4c42-80e1-04aa6909f6e5) |
+| `piezas-rm-standalone.html` | pasárselo al cliente por correo |
 
-La versión de la web va con `noindex`: es una herramienta de trabajo, no una
-página de captación, y no debe competir en el buscador con los trámites.
-
-### La clave de acceso
-
-La versión de la web lleva delante una cortina (`fuentes/7-cerrojo.html`).
-**Clave actual: `rmgestion2026`.**
-
-Para cambiarla, calcula la huella nueva y sustitúyela en `HUELLA`:
-
-```sh
-python3 -c "
-h=0x811c9dc5
-for c in 'rm-piezas·' + 'LA-CLAVE-NUEVA'.strip().lower():
-    h ^= ord(c); h = (h*0x01000193) & 0xFFFFFFFF
-print(format(h,'08x'))"
-```
-
-Se guarda la huella y no la clave para que no esté escrita en claro, pero
-conviene no engañarse: **esto es una cortina, no una cerradura.** La página es
-un archivo estático, así que la clave viaja dentro y cualquiera que mire el
-código fuente puede saltársela. Sirve para que la herramienta no quede a la
-vista de quien pase por ahí. Si algún día hay que proteger algo de verdad,
-tiene que hacerlo el servidor —Vercel Pro, Cloudflare Access—, no esta página.
-
-La cortina va **solo** en la versión de la web: el artefacto ya es privado de
-la cuenta de Claude y ahí una clave solo estorbaría.
+El standalone es un documento completo, sin dependencias externas y con la
+tipografía y el icono incrustados: doble clic y se abre en el navegador, sin
+servidor y sin conexión. Cada copia que se manda es una versión congelada; si
+cambian precios o plantillas, hay que reenviarla.
 
 ### Las descargas tienen dos vías
 
 Dentro del visor de artefactos de Claude un enlace de descarga está capado, y
 hay que pedirle al anfitrión que guarde el archivo (`window.claude.downloads`);
 además el visor solo admite una lista cerrada de extensiones, en la que el PDF
-no está. Alojada en un servidor normal no hay ninguna de las dos limitaciones y
+no está. Abierto como archivo suelto no hay ninguna de las dos limitaciones y
 basta con un `<a download>`. `entregar()` elige la vía según dónde se esté
-ejecutando, así que el mismo archivo sirve para los dos sitios.
+ejecutando, así que el mismo código sirve para las dos versiones.
+
+Comprobado abriendo el standalone con `file://`: se rasteriza a PNG, JPG y
+WEBP sin que el navegador manche el canvas, y el SVG sale sin restricción de
+extensión.
 
 ## Qué hay dentro
 
@@ -89,11 +70,11 @@ fuera de pantalla que usa exactamente la misma tipografía que luego dibuja.
 Las fuentes están troceadas en `fuentes/` y se montan en un único archivo:
 
 ```sh
-cd docs/piezas/fuentes
-# la tipografía sale del paquete que ya usa la web
-python3 -c "import base64;open('font.b64','w').write(base64.b64encode(open('../../../node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2','rb').read()).decode())"
-python3 build.py && mv piezas-rm.html ..
+python3 docs/piezas/fuentes/build.py
 ```
+
+La tipografía y el icono los coge solo, del paquete que ya usa la web y de
+`public/favicon.svg`.
 
 El orden de montaje importa: `3-motor.js` define la clase `Lienzo`,
 `5a-guias.js` y `5-plantillas2.js` le añaden métodos, y `6-app.js` da por hecho

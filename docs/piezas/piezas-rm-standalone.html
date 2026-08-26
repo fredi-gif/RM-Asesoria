@@ -2,8 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="robots" content="noindex, nofollow">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj4KICA8cGF0aCBkPSJNMjQgMEg3NkEyNCAyNCAwIDAgMSAxMDAgMjRWNjJBMzggMzggMCAwIDEgNjIgMTAwSDI0QTI0IDI0IDAgMCAxIDAgNzZWMjRBMjQgMjQgMCAwIDEgMjQgMFoiIGZpbGw9IiMwYTFmNDQiLz4KICA8cGF0aCBkPSJNMTAwIDYyQTM4IDM4IDAgMCAxIDYyIDEwMEw2MiA4NkEyNCAyNCAwIDAgMCA4NiA2MloiIGZpbGw9IiNmOTczMTYiLz4KICA8cGF0aCBkPSJNMTUuMDAgNjYuMDBWMjguNDdIMjkuMzZRMzMuMjQgMjguNDcgMzYuMjQgMjkuODNRMzkuMjMgMzEuMTkgNDAuOTUgMzMuODZRNDIuNjYgMzYuNTMgNDIuNjYgNDAuNDZRNDIuNjYgNDQuMjkgNDAuOTAgNDYuOThRMzkuMTMgNDkuNjggMzYuMTYgNTEuMDRMNDQuNzMgNjYuMDBIMzUuOTZMMjYuNjkgNDkuNDJMMzEuNzMgNTIuNDBIMjIuODFWNjYuMDBaTTIyLjgxIDQ1LjYwSDI5LjQxUTMxLjA3IDQ1LjYwIDMyLjI4IDQ0Ljk0UTMzLjQ5IDQ0LjI5IDM0LjE3IDQzLjEzUTM0Ljg1IDQxLjk3IDM0Ljg1IDQwLjQ2UTM0Ljg1IDM4Ljg5IDM0LjE3IDM3Ljc0UTMzLjQ5IDM2LjU4IDMyLjI4IDM1LjkyUTMxLjA3IDM1LjI3IDI5LjQxIDM1LjI3SDIyLjgxWiIgZmlsbD0iI2ZmZmZmZiIvPgogIDxwYXRoIGQ9Ik00MS43MCA2Ni4wMFYyOC40N0g0OS4yNkw2My4zMiA0Ny4xMUg1OS43OUw3My40NCAyOC40N0g4MS4wMFY2Ni4wMEg3My4xOVYzNy4wOEw3Ni4zMSAzNy43OUw2MS44NSA1Ni40M0g2MC44NUw0Ni44OSAzNy43OUw0OS41MSAzNy4wOFY2Ni4wMFoiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzBhMWY0NCIgc3Ryb2tlLXdpZHRoPSI0LjUiIHBhaW50LW9yZGVyPSJzdHJva2UiLz4KPC9zdmc+Cg==">
 <title>Piezas RM Gestión</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
@@ -1691,94 +1690,6 @@ if(document.fonts && document.fonts.load){
     .then(arrancar).catch(arrancar);
 } else arrancar();
 
-</script>
-<style>
-#cerrojo{
-  position:fixed;inset:0;z-index:50;display:grid;place-items:center;
-  background:#0a1f44;padding:24px;
-}
-#cerrojo[hidden]{display:none}
-#cerrojo form{
-  width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;text-align:center;
-}
-#cerrojo svg{margin:0 auto;display:block}
-#cerrojo h1{margin:0;font-size:19px;font-weight:800;color:#fff;letter-spacing:-.01em}
-#cerrojo p{margin:0;font-size:13.5px;line-height:1.5;color:#8fa6cc}
-#cerrojo input{
-  width:100%;padding:11px 13px;border-radius:8px;text-align:center;
-  border:1.5px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);
-  color:#fff;font-size:15px;font-weight:600;letter-spacing:.02em;
-}
-#cerrojo input::placeholder{color:#6f83a6}
-#cerrojo input:focus{outline:none;border-color:#f97316;background:rgba(255,255,255,.1)}
-#cerrojo button{
-  padding:11px;border:0;border-radius:8px;background:#f97316;color:#0a1f44;
-  font-size:14.5px;font-weight:800;cursor:pointer;
-}
-#cerrojo button:hover{background:#fb923c}
-#cerrojo .mal{color:#fb923c;font-weight:600;min-height:1.4em;font-size:12.5px}
-</style>
-<div id="cerrojo" hidden>
-  <form id="cerrojo-form">
-    <svg width="52" height="52" viewBox="0 0 100 100" aria-hidden="true"></svg>
-    <h1>Piezas RM Gestión</h1>
-    <p>Herramienta interna. Introduce la clave que te hemos pasado.</p>
-    <input id="cerrojo-clave" type="password" placeholder="Clave" autocomplete="current-password"
-      aria-label="Clave de acceso" autofocus>
-    <button type="submit">Entrar</button>
-    <span class="mal" id="cerrojo-error" role="status"></span>
-  </form>
-</div>
-<script>
-/* Cortina de acceso, no cerradura.
-   La página es un archivo estático: la clave viaja dentro del propio archivo,
-   así que cualquiera que mire el código fuente puede saltársela. Sirve para
-   que la herramienta no quede a la vista de quien pase por ahí, no para
-   guardar nada. Si algún día hace falta un acceso de verdad, tiene que
-   ponerlo el servidor, no esta página.
-   Se guarda la huella y no la clave, para que no esté escrita en claro. */
-(function(){
-  const HUELLA = '3bb87f5e';           /* clave actual: rmgestion2026 */
-  const LLAVE = 'rm-piezas-acceso';
-  const caja = document.getElementById('cerrojo');
-
-  function huella(s){
-    let h = 0x811c9dc5;
-    const t = 'rm-piezas·' + String(s).trim().toLowerCase();
-    for(let i = 0; i < t.length; i++){
-      h ^= t.charCodeAt(i);
-      h = Math.imul(h, 0x01000193) >>> 0;
-    }
-    return h.toString(16).padStart(8, '0');
-  }
-  function recordado(){
-    try{ return localStorage.getItem(LLAVE) === HUELLA; }catch(e){ return false; }
-  }
-  function abrir(){
-    caja.hidden = true;
-    document.body.style.overflow = '';
-  }
-  if(recordado()) { abrir(); return; }
-
-  caja.hidden = false;
-  document.body.style.overflow = 'hidden';
-  caja.querySelector('svg').innerHTML =
-    '<path d="' + TESELA + '" fill="#fff"/><path d="' + FRANJA + '" fill="#f97316"/>'
-    + '<path d="' + LETRA_R + '" fill="#0a1f44"/><path d="' + LETRA_M + '" fill="#0a1f44"'
-    + ' stroke="#fff" stroke-width="4.5" paint-order="stroke"/>';
-
-  document.getElementById('cerrojo-form').addEventListener('submit', e => {
-    e.preventDefault();
-    const campo = document.getElementById('cerrojo-clave');
-    if(huella(campo.value) === HUELLA){
-      try{ localStorage.setItem(LLAVE, HUELLA); }catch(err){}
-      abrir();
-    } else {
-      document.getElementById('cerrojo-error').textContent = 'Esa clave no es.';
-      campo.select();
-    }
-  });
-})();
 </script>
 </body>
 </html>

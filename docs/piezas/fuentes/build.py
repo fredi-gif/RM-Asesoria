@@ -1,11 +1,12 @@
 """Monta el generador de piezas en un único archivo.
 
-Salen dos versiones del mismo contenido:
+Salen dos versiones del mismo contenido, ninguna de las dos publicada en la
+web: `docs/` no entra en el build de Astro.
 
-  ../piezas-rm.html                  cuerpo suelto, para publicar como artefacto
-                                     (el runtime le pone doctype, head y body)
-  public/marca/piezas/index.html     documento completo, para servirlo desde la
-                                     web como una página más
+  ../piezas-rm.html              cuerpo suelto, para publicar como artefacto
+                                 (el runtime le pone doctype, head y body)
+  ../piezas-rm-standalone.html   documento completo, el que se le pasa al
+                                 cliente por correo
 
 El orden de los trozos importa: 3-motor.js define la clase Lienzo, 5a-guias.js
 y 5-plantillas2.js le añaden métodos, y 6-app.js da por hecho que PLANTILLAS ya
@@ -18,6 +19,8 @@ RAIZ = AQUI.parents[2]
 FUENTE = RAIZ / 'node_modules/@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2'
 
 b64 = base64.b64encode(FUENTE.read_bytes()).decode()
+# El icono va incrustado: abierto con doble clic no hay servidor al que pedirlo.
+ICONO = base64.b64encode((RAIZ / 'public/favicon.svg').read_bytes()).decode()
 partes = ['3-motor.js', '5a-guias.js', '4-plantillas.js', '5-plantillas2.js', '6-app.js']
 
 cabeza = (AQUI / '1-head.html').read_text().replace('__FONT_B64__', b64)
@@ -28,19 +31,12 @@ resto += ('<script>\nconst FUENTE_B64 = "' + b64 + '";\n'
 # El artefacto va sin envoltorio: el runtime le pone doctype, head y body.
 (AQUI.parent / 'piezas-rm.html').write_text(cabeza + resto)
 
-# La cortina de acceso va SOLO en la versión de la web. El artefacto ya es
-# privado de la cuenta de Claude y ahí una clave estorbaría.
-cerrojo = (AQUI / '7-cerrojo.html').read_text()
-
-suelta = RAIZ / 'public/marca/piezas'
-suelta.mkdir(parents=True, exist_ok=True)
-(suelta / 'index.html').write_text(
+# El standalone se abre con doble clic desde el escritorio, así que lleva el
+# documento entero y el icono incrustado (no puede pedirle nada a un servidor).
+(AQUI.parent / 'piezas-rm-standalone.html').write_text(
     '<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n'
-    # Es una herramienta de trabajo, no una página de captación: que no compita
-    # en el buscador con los trámites.
-    '<meta name="robots" content="noindex, nofollow">\n'
-    '<link rel="icon" href="/favicon.svg" type="image/svg+xml">\n'
-    + cabeza + '</head>\n<body>\n' + resto + cerrojo + '</body>\n</html>\n')
+    '<link rel="icon" href="data:image/svg+xml;base64,' + ICONO + '">\n'
+    + cabeza + '</head>\n<body>\n' + resto + '</body>\n</html>\n')
 
-print('artefacto  docs/piezas/piezas-rm.html      ', round(len(cabeza + resto) / 1024), 'KB')
-print('web        public/marca/piezas/index.html')
+print('artefacto   docs/piezas/piezas-rm.html            ', round(len(cabeza + resto) / 1024), 'KB')
+print('standalone  docs/piezas/piezas-rm-standalone.html ')
