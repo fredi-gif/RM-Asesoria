@@ -14,6 +14,31 @@ fuentes:
 La versión de la web va con `noindex`: es una herramienta de trabajo, no una
 página de captación, y no debe competir en el buscador con los trámites.
 
+### La clave de acceso
+
+La versión de la web lleva delante una cortina (`fuentes/7-cerrojo.html`).
+**Clave actual: `rmgestion2026`.**
+
+Para cambiarla, calcula la huella nueva y sustitúyela en `HUELLA`:
+
+```sh
+python3 -c "
+h=0x811c9dc5
+for c in 'rm-piezas·' + 'LA-CLAVE-NUEVA'.strip().lower():
+    h ^= ord(c); h = (h*0x01000193) & 0xFFFFFFFF
+print(format(h,'08x'))"
+```
+
+Se guarda la huella y no la clave para que no esté escrita en claro, pero
+conviene no engañarse: **esto es una cortina, no una cerradura.** La página es
+un archivo estático, así que la clave viaja dentro y cualquiera que mire el
+código fuente puede saltársela. Sirve para que la herramienta no quede a la
+vista de quien pase por ahí. Si algún día hay que proteger algo de verdad,
+tiene que hacerlo el servidor —Vercel Pro, Cloudflare Access—, no esta página.
+
+La cortina va **solo** en la versión de la web: el artefacto ya es privado de
+la cuenta de Claude y ahí una clave solo estorbaría.
+
 ### Las descargas tienen dos vías
 
 Dentro del visor de artefactos de Claude un enlace de descarga está capado, y

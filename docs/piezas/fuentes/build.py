@@ -28,6 +28,10 @@ resto += ('<script>\nconst FUENTE_B64 = "' + b64 + '";\n'
 # El artefacto va sin envoltorio: el runtime le pone doctype, head y body.
 (AQUI.parent / 'piezas-rm.html').write_text(cabeza + resto)
 
+# La cortina de acceso va SOLO en la versión de la web. El artefacto ya es
+# privado de la cuenta de Claude y ahí una clave estorbaría.
+cerrojo = (AQUI / '7-cerrojo.html').read_text()
+
 suelta = RAIZ / 'public/marca/piezas'
 suelta.mkdir(parents=True, exist_ok=True)
 (suelta / 'index.html').write_text(
@@ -36,7 +40,7 @@ suelta.mkdir(parents=True, exist_ok=True)
     # en el buscador con los trámites.
     '<meta name="robots" content="noindex, nofollow">\n'
     '<link rel="icon" href="/favicon.svg" type="image/svg+xml">\n'
-    + cabeza + '</head>\n<body>\n' + resto + '</body>\n</html>\n')
+    + cabeza + '</head>\n<body>\n' + resto + cerrojo + '</body>\n</html>\n')
 
 print('artefacto  docs/piezas/piezas-rm.html      ', round(len(cabeza + resto) / 1024), 'KB')
 print('web        public/marca/piezas/index.html')
