@@ -1,0 +1,55 @@
+<div class="app">
+
+  <div class="col rail">
+    <div class="cabecera">
+      <span id="marca-mini"></span>
+      <div>
+        <h1>Piezas RM Gestión</h1>
+        <p>Elige, edita, descarga</p>
+      </div>
+    </div>
+    <div class="scroll" id="rail"></div>
+  </div>
+
+  <div class="col centro">
+    <div class="barra">
+      <div class="seg" id="formatos" role="group" aria-label="Formato de salida"></div>
+      <span class="medida" id="medida"></span>
+    </div>
+    <div class="escena"><div id="pieza" role="img" aria-label="Vista previa de la pieza"></div></div>
+  </div>
+
+  <div class="col editor">
+    <div class="cabecera">
+      <div>
+        <h1 id="tit-plantilla">Contenido</h1>
+        <p id="sub-plantilla">Todo lo que escribas se ve al momento</p>
+      </div>
+    </div>
+    <div class="scroll"><div class="campos" id="campos"></div></div>
+
+    <div class="descargas">
+      <h2>Descargar</h2>
+      <div class="formatos">
+        <button class="fmt principal" data-bajar="png"><b>PNG</b><span>fondo plano</span></button>
+        <button class="fmt" data-bajar="jpg"><b>JPG</b><span>más ligero</span></button>
+        <button class="fmt" data-bajar="webp"><b>WEBP</b><span>web</span></button>
+        <button class="fmt" data-bajar="svg"><b>SVG</b><span>vectorial</span></button>
+        <button class="fmt" data-bajar="pdf"><b>PDF</b><span>por impresión</span></button>
+        <button class="fmt" data-bajar="copiar"><b>Copiar</b><span>al portapapeles</span></button>
+      </div>
+      <div class="escala">
+        <span>Resolución</span>
+        <div class="seg" id="escalas" role="group" aria-label="Resolución de exportación"></div>
+      </div>
+      <p class="aviso" id="aviso"></p>
+    </div>
+    <div class="pie-editor">
+      <button id="guardar-textos">Guardar mis textos</button>
+      <button id="cargar-textos">Cargar</button>
+      <button id="reiniciar">Restaurar</button>
+    </div>
+  </div>
+
+</div>
+<input type="file" id="fichero" accept="application/json" hidden>
