@@ -17,9 +17,9 @@ export const SITE = {
   /** Sin barra final. */
   url: 'https://rmgestion.es',
   /** Formato internacional sin «+» ni espacios — es lo que espera wa.me. */
-  whatsapp: '34600000000',
+  whatsapp: '34681879306',
   email: 'hola@rmgestion.es',
-  telefono: '+34 600 00 00 00',
+  telefono: '+34 681 879 306',
   horario: 'Lunes a viernes, de 9:00 a 19:00',
 
   /** Datos registrales — obligatorios en el aviso legal. */
