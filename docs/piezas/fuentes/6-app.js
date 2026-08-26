@@ -242,13 +242,32 @@ const MENSAJES = {
   declined:'Descarga cancelada.',
   rate_limited:'Espera un momento y vuelve a intentarlo.',
   too_large:'El archivo pasa de 16 MB. Baja la resolución.',
-  extension_not_enabled:'Este formato no está habilitado en tu visor. Descárgalo en PNG.',
-  rejected_extension:'Este formato no está habilitado en tu visor. Descárgalo en PNG.',
+  extension_not_enabled:'Tu visor no admite este formato. Descarga PNG, o abre la herramienta en el navegador para bajar el SVG.',
+  rejected_extension:'Tu visor no admite este formato. Descarga PNG, o abre la herramienta en el navegador para bajar el SVG.',
 };
+const TIPOS = { png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', webp:'image/webp',
+  svg:'image/svg+xml', json:'application/json' };
+/* Descarga de toda la vida. Es la que funciona cuando la página está alojada
+   en un servidor normal; dentro del visor de artefactos de Claude está
+   capada, y por eso existe la otra rama. */
+function descargaDirecta(nombre, datos){
+  const ext = nombre.split('.').pop().toLowerCase();
+  const blob = datos instanceof Blob
+    ? datos
+    : new Blob([datos], { type:(TIPOS[ext] || 'application/octet-stream') + ';charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = nombre; a.style.display = 'none';
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 8000);
+  aviso('Descargado como ' + nombre + '.');
+  return true;
+}
+/* Dos entornos, dos vías. Dentro del visor de Claude hay que pedirle al
+   anfitrión que guarde el archivo y el visor pregunta al usuario; alojada en
+   un servidor normal, basta con un enlace de descarga. */
 async function entregar(nombre, datos){
-  if(!window.claude || !window.claude.downloads){
-    aviso('Las descargas no están disponibles en esta vista.', true); return false;
-  }
+  if(!window.claude || !window.claude.downloads) return descargaDirecta(nombre, datos);
   try{
     await window.claude.downloads.save({ filename:nombre, data:datos });
     aviso('Guardado como ' + nombre + '.');

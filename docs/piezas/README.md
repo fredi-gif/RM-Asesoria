@@ -1,9 +1,27 @@
 # Generador de piezas
 
-`piezas-rm.html` es la herramienta que usa el cliente para sacar sus propias
-piezas: elige plantilla y formato, edita el texto y descarga el archivo.
-Está publicada como artefacto en
-<https://claude.ai/code/artifact/e8148cc6-5161-4c42-80e1-04aa6909f6e5>.
+La herramienta que usa el cliente para sacar sus propias piezas: elige
+plantilla y formato, edita el texto y descarga el archivo.
+
+Se publica en dos sitios, con el mismo contenido montado desde las mismas
+fuentes:
+
+| Dónde | Archivo | Para quién |
+|---|---|---|
+| Artefacto de Claude | `piezas-rm.html` | nosotros, mientras se itera — [enlace](https://claude.ai/code/artifact/e8148cc6-5161-4c42-80e1-04aa6909f6e5) |
+| La propia web, en `/marca/piezas/` | `public/marca/piezas/index.html` | el cliente, sin cuenta de nada |
+
+La versión de la web va con `noindex`: es una herramienta de trabajo, no una
+página de captación, y no debe competir en el buscador con los trámites.
+
+### Las descargas tienen dos vías
+
+Dentro del visor de artefactos de Claude un enlace de descarga está capado, y
+hay que pedirle al anfitrión que guarde el archivo (`window.claude.downloads`);
+además el visor solo admite una lista cerrada de extensiones, en la que el PDF
+no está. Alojada en un servidor normal no hay ninguna de las dos limitaciones y
+basta con un `<a download>`. `entregar()` elige la vía según dónde se esté
+ejecutando, así que el mismo archivo sirve para los dos sitios.
 
 ## Qué hay dentro
 
