@@ -1,7 +1,7 @@
 import navegacion from '../content/navegacion/index.json';
 
 /**
- * Menú, pie de página e insignias de confianza, editables desde Keystatic.
+ * Menú y pie de página, editables desde Keystatic.
  *
  * Mismo planteamiento que `empresa` en `src/lib/config.ts`: aquí está la red de
  * seguridad, no en los componentes. Un guardado desde el panel puede dejar
@@ -17,11 +17,6 @@ export interface Enlace {
   enlace: string;
 }
 
-export interface Insignia {
-  icono: string;
-  texto: string;
-}
-
 /** Descarta las entradas a medias: sin texto o sin destino no se pueden pintar. */
 function enlaces(lista: unknown): Enlace[] {
   if (!Array.isArray(lista)) return [];
@@ -29,11 +24,6 @@ function enlaces(lista: unknown): Enlace[] {
     (item): item is Enlace =>
       Boolean(item) && Boolean((item as Enlace).etiqueta) && Boolean((item as Enlace).enlace),
   );
-}
-
-function insignias(lista: unknown): Insignia[] {
-  if (!Array.isArray(lista)) return [];
-  return lista.filter((item): item is Insignia => Boolean(item) && Boolean((item as Insignia).texto));
 }
 
 /** Páginas fijas del menú principal, aparte del desplegable de trámites. */
@@ -44,6 +34,3 @@ export const pie = enlaces(navegacion?.pie);
 
 /** Columna «Legal» del pie. */
 export const legales = enlaces(navegacion?.legales);
-
-/** Franja «Seguridad y confianza» del pie. */
-export const confianza = insignias(navegacion?.confianza);

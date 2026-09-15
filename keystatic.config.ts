@@ -85,21 +85,6 @@ const ILUSTRACIONES_PASO = [
 ] as const;
 
 /**
- * Iconos para las insignias de «Seguridad y confianza» del pie.
- * Debe mantenerse en sintonía con `PATHS` en `src/components/ui/Icon.astro`.
- */
-const ICONOS_CONFIANZA = [
-  { label: 'Candado', value: 'candado' },
-  { label: 'Escudo', value: 'escudo' },
-  { label: 'Check en círculo', value: 'check-circle' },
-  { label: 'Reloj', value: 'reloj' },
-  { label: 'Documento', value: 'documento' },
-  { label: 'Firma', value: 'firma' },
-  { label: 'Euro', value: 'euro' },
-  { label: 'WhatsApp', value: 'whatsapp' },
-] as const;
-
-/**
  * Iconos para la franja de ventajas de la cabecera de la home.
  * Debe mantenerse en sintonía con `PATHS` en `src/components/ui/Icon.astro`.
  */
@@ -474,23 +459,6 @@ export default config({
           {
             label: 'Pie · columna «Legal»',
             itemLabel: (props) => props.fields.etiqueta.value || 'Enlace',
-          },
-        ),
-
-        confianza: fields.array(
-          fields.object({
-            icono: fields.select({
-              label: 'Icono',
-              options: ICONOS_CONFIANZA,
-              defaultValue: 'check-circle',
-            }),
-            texto: fields.text({ label: 'Texto' }),
-          }),
-          {
-            label: 'Pie · «Seguridad y confianza»',
-            description:
-              'Solo afirmaciones verificables. Nada de logos de medios de pago ni sellos que no se tengan: hoy no se cobra con tarjeta en la web.',
-            itemLabel: (props) => props.fields.texto.value || 'Insignia',
           },
         ),
       },

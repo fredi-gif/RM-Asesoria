@@ -1,10 +1,10 @@
 ---
 import Logo from './Logo.astro';
 import Container from '../ui/Container.astro';
-import Icon, { type IconName } from '../ui/Icon.astro';
+import Icon from '../ui/Icon.astro';
 import { empresa, whatsapp } from '../../lib/config';
 import { getTramites, tramiteHref } from '../../lib/tramites';
-import { pie, legales, confianza } from '../../lib/navegacion';
+import { pie, legales } from '../../lib/navegacion';
 
 const tramites = await getTramites();
 
@@ -23,15 +23,6 @@ const enlacesTramites = tramites.filter((tramite) => tramite.data.destacado);
 const destacados = (enlacesTramites.length > 0 ? enlacesTramites : tramites).slice(0, 4);
 
 const anio = new Date().getFullYear();
-
-/**
- * Las insignias de confianza se editan desde el panel, pero conviene recordar
- * el criterio con el que se eligieron: nada de logos de Visa/Mastercard/Bizum
- * ni sellos «PCI DSS Compliant». Hoy no se cobra con tarjeta en la web —todo el
- * flujo pasa por WhatsApp— y RM Gestión no tiene esa certificación, así que
- * ponerlos sería afirmar una infraestructura de pago que no existe, además de
- * usar marcas de terceros sin autorización. Solo señales verificables.
- */
 ---
 
 <footer class="bg-brand-950 text-white">
@@ -136,24 +127,8 @@ const anio = new Date().getFullYear();
       </div>
     </div>
 
-    <div class="mt-12 flex flex-col gap-3 border-t border-white/10 pt-8">
-      <h2 class="text-caption font-display font-bold tracking-[0.12em] text-white/40 uppercase">
-        Seguridad y confianza
-      </h2>
-      <ul class="flex flex-wrap gap-3">
-        {
-          confianza.map((item) => (
-            <li class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-small text-white/70">
-              <Icon name={item.icono as IconName} size={16} class="shrink-0 text-accent-400" />
-              {item.texto}
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-
     <div
-      class="mt-8 flex flex-col gap-2 border-t border-white/10 pt-6 text-caption text-white/40 sm:flex-row sm:items-center sm:justify-between"
+      class="mt-12 flex flex-col gap-2 border-t border-white/10 pt-6 text-caption text-white/40 sm:flex-row sm:items-center sm:justify-between"
     >
       <p>© {anio} {empresa.legal.razonSocial} · CIF {empresa.legal.cif}</p>
       <p>
