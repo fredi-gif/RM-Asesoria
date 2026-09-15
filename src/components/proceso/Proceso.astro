@@ -1,0 +1,139 @@
+---
+import PasoFicha from './PasoFicha.astro';
+
+interface Paso {
+  titulo: string;
+  descripcion?: string;
+  detalle?: string;
+  ilustracion?: string;
+}
+
+interface Props {
+  pasos: Paso[];
+}
+
+const { pasos } = Astro.props;
+
+/**
+ * Las fases del proceso como línea de tiempo.
+ *
+ * Antes cada paso era una franja con el texto a un lado y la ilustración al
+ * otro, alternando el lado para dar ritmo. El ritmo lo da ahora el raíl: los
+ * números cuelgan de una línea continua que se va rellenando al bajar, así
+ * que se ve de un vistazo que son fases de una secuencia y por dónde va la
+ * lectura.
+ *
+ * Con el raíl, la alternancia deja de tener sentido: en las filas invertidas
+ * el número quedaba pegado a la ilustración y a media pantalla de su propio
+ * título. El texto va siempre junto al raíl, que es lo que mantiene unido el
+ * número con lo que numera.
+ *
+ * El `<li>` no lleva `gap`, lleva `padding-bottom`: el tramo de línea de cada
+ * paso llega hasta el borde inferior de su `<li>`, y con `gap` quedaría un
+ * hueco sin línea entre un paso y el siguiente.
+ *
+ * El `id` es el que ya referenciaba el JSON-LD de la página (`#paso-1`,
+ * `#paso-2`…), que hasta ahora apuntaba a un ancla que no existía en el
+ * documento.
+ */
+---
+
+<ol class="relative" data-proceso>
+  {
+    pasos.map((paso, i) => (
+      <li
+        id={`paso-${i + 1}`}
+        class="relative grid scroll-mt-28 grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-14 last:pb-0 lg:grid-cols-[3rem_minmax(0,1fr)] lg:gap-x-8 lg:pb-24"
+      >
+        {/*
+          El tramo que une este paso con el siguiente. El último no lo lleva:
+          apuntaría al vacío. El relleno naranja va dentro y arranca a
+          `scaleY(1)` —o sea, dibujado— para que sin JavaScript la línea se vea
+          entera en lugar de quedarse en gris a medias.
+        */}
+        {i < pasos.length - 1 && (
+          <span
+            aria-hidden="true"
+            class="absolute top-10 bottom-0 left-5 w-0.5 -translate-x-1/2 bg-line lg:top-12 lg:left-6"
+          >
+            <span data-relleno class="block h-full w-full origin-top bg-accent-500" />
+          </span>
+        )}
+
+        {/*
+          Sin el atributo `data-activo` manda el estado encendido: es lo que se
+          ve si no hay JavaScript o si el visitante ha pedido menos movimiento.
+          El script lo pone a `false` en los pasos a los que todavía no se ha
+          llegado.
+        */}
+        <span
+          data-numero
+          class="flex size-10 items-center justify-center rounded-full bg-accent-50 font-display text-[1.0625rem] font-bold text-accent-600 ring-1 ring-accent-400/25 ring-inset transition-[background-color,color,box-shadow,transform] duration-500 data-[activo=false]:scale-90 data-[activo=false]:bg-surface data-[activo=false]:text-ink-subtle data-[activo=false]:ring-line lg:size-12 lg:text-[1.125rem]"
+        >
+          {i + 1}
+        </span>
+
+        <PasoFicha
+          titulo={paso.titulo}
+          descripcion={paso.descripcion}
+          detalle={paso.detalle}
+          ilustracion={paso.ilustracion}
+        />
+      </li>
+    ))
+  }
+</ol>
+
+<script>
+  const proceso = document.querySelector<HTMLElement>('[data-proceso]');
+
+  /**
+   * Con movimiento reducido no se engancha nada: el marcado ya se sirve con la
+   * línea dibujada y todos los números encendidos, que es el estado final.
+   */
+  if (proceso && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const numeros = [...proceso.querySelectorAll<HTMLElement>('[data-numero]')];
+    const rellenos = [...proceso.querySelectorAll<HTMLElement>('[data-relleno]')];
+
+    /**
+     * Altura de la ventana que hace de línea de meta, en tanto por uno desde
+     * arriba. Por encima del centro a propósito: el paso se enciende cuando ya
+     * se está leyendo, no cuando asoma por el borde inferior.
+     */
+    const CORTE = 0.62;
+
+    let pendiente = false;
+
+    const pintar = () => {
+      pendiente = false;
+      const corte = innerHeight * CORTE;
+
+      for (const numero of numeros) {
+        const caja = numero.getBoundingClientRect();
+        numero.dataset.activo = String(caja.top + caja.height / 2 <= corte);
+      }
+
+      for (const relleno of rellenos) {
+        // El padre es el tramo gris: su caja es la que mide el recorrido.
+        const caja = relleno.parentElement!.getBoundingClientRect();
+        const avance = caja.height > 0 ? (corte - caja.top) / caja.height : 0;
+        relleno.style.transform = `scaleY(${Math.min(Math.max(avance, 0), 1)})`;
+      }
+    };
+
+    /**
+     * El relleno sigue al scroll sin transición —una transición aquí se
+     * arrastraría por detrás del dedo—, así que se recalcula por fotograma y
+     * nunca más de una vez por fotograma.
+     */
+    const encolar = () => {
+      if (pendiente) return;
+      pendiente = true;
+      requestAnimationFrame(pintar);
+    };
+
+    pintar();
+    addEventListener('scroll', encolar, { passive: true });
+    addEventListener('resize', encolar);
+  }
+</script>

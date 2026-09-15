@@ -7,7 +7,7 @@ import SectionHeading from '../components/ui/SectionHeading.astro';
 import Button from '../components/ui/Button.astro';
 import WhatsAppCTA from '../components/tramite/WhatsAppCTA.astro';
 import TramiteCard from '../components/tramite/TramiteCard.astro';
-import PasoFicha from '../components/proceso/PasoFicha.astro';
+import Proceso from '../components/proceso/Proceso.astro';
 
 import home from '../content/home/index.json';
 import pagina from '../content/como-funciona/index.json';
@@ -77,24 +77,19 @@ const schema: Record<string, unknown>[] = [
   <!-- 1 · Cabecera -->
   <CabeceraPagina titulo={titulo} entradilla={pagina.hero.entradilla} />
 
-  <!-- 2 · Los pasos, uno por ficha. El fondo gris es lo que recorta el panel
-       blanco de cada ilustración. -->
+  <!-- 2 · Los pasos, como línea de tiempo: los números cuelgan de un raíl que
+       se rellena al bajar. El fondo gris es lo que recorta el panel blanco de
+       cada ilustración. -->
   <Section tone="alt">
     <Container>
-      <ol class="flex flex-col gap-16 lg:gap-24">
-        {
-          pasos.map((paso, i) => (
-            <PasoFicha
-              numero={i + 1}
-              titulo={paso.titulo.trim()}
-              descripcion={paso.descripcion}
-              detalle={paso.detalle}
-              ilustracion={paso.ilustracion}
-              invertida={i % 2 === 1}
-            />
-          ))
-        }
-      </ol>
+      <Proceso
+        pasos={pasos.map((paso) => ({
+          titulo: paso.titulo.trim(),
+          descripcion: paso.descripcion,
+          detalle: paso.detalle,
+          ilustracion: paso.ilustracion,
+        }))}
+      />
     </Container>
   </Section>
 

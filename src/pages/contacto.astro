@@ -5,11 +5,26 @@ import Container from '../components/ui/Container.astro';
 import Section from '../components/ui/Section.astro';
 import Card from '../components/ui/Card.astro';
 import Icon, { type IconName } from '../components/ui/Icon.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
 import Button from '../components/ui/Button.astro';
 import WhatsAppCTA from '../components/tramite/WhatsAppCTA.astro';
+import TramiteCard from '../components/tramite/TramiteCard.astro';
 
 import pagina from '../content/contacto/index.json';
 import { empresa, whatsapp } from '../lib/config';
+import { getTramites } from '../lib/tramites';
+
+/**
+ * Los destacados, los mismos que abren la home y componen el pie. Aquí actúan
+ * de respuesta a «puede que tu duda ya esté resuelta»: enseñar cuatro trámites
+ * con su precio resuelve más que un botón que promete un listado.
+ *
+ * Sin ninguno marcado se cae a los cuatro primeros del orden ya establecido,
+ * igual que en el pie y en «Cómo funciona».
+ */
+const tramites = await getTramites();
+const marcados = tramites.filter((tramite) => tramite.data.destacado);
+const habituales = (marcados.length > 0 ? marcados : tramites).slice(0, 4);
 
 const url = `${empresa.url}/contacto`;
 const titulo = pagina.hero.titulo || 'Contacto';
@@ -80,9 +95,10 @@ const schema: Record<string, unknown>[] = [
   <!-- 1 · Cabecera -->
   <CabeceraPagina titulo={titulo} entradilla={pagina.hero.entradilla} />
 
-  <!-- 2 · Canales -->
+  <!-- 2 · Canales · el horario no está aquí a propósito: aplica a los tres y
+       no es un canal, así que vive en la franja de datos de la empresa. -->
   <Section spacing="tight">
-    <Container class="flex flex-col gap-8">
+    <Container>
       <ul class="grid gap-4 md:grid-cols-3">
         {
           canales.map((canal) => (
@@ -113,17 +129,13 @@ const schema: Record<string, unknown>[] = [
           ))
         }
       </ul>
-
-      <!-- El horario no es un canal, es la condición que aplica a los tres. -->
-      <div class="flex items-center gap-2.5 text-small text-ink-muted">
-        <Icon name="reloj" size={18} class="shrink-0 text-brand-600" />
-        {empresa.horario}
-      </div>
     </Container>
   </Section>
 
   <!-- 3 · Datos de la empresa · lo que el aviso legal exige tener visible y
-       localizable, sin obligar a abrir la página legal entera. -->
+       localizable, sin obligar a abrir la página legal entera, más el horario:
+       es el dato que acompaña a los tres canales de arriba y aquí se lee junto
+       al resto en lugar de suelto bajo las tarjetas. -->
   <Section tone="alt" spacing="tight">
     <Container class="grid gap-8 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-14">
       <div class="flex flex-col gap-3">
@@ -158,18 +170,37 @@ const schema: Record<string, unknown>[] = [
           </dt>
           <dd class="text-brand-900">{empresa.legal.registro}</dd>
         </div>
+        <div class="flex flex-col gap-1">
+          <dt class="text-caption font-display font-bold tracking-[0.12em] text-ink-subtle uppercase">
+            Horario
+          </dt>
+          <dd class="flex items-center gap-2 text-brand-900">
+            <Icon name="reloj" size={18} class="shrink-0 text-brand-600" />
+            {empresa.horario}
+          </dd>
+        </div>
       </dl>
     </Container>
   </Section>
 
   <!-- 4 · Salidas para quien todavía no sabe qué preguntar -->
-  <Section spacing="tight">
-    <Container class="flex flex-col items-start gap-5">
-      <h2 class="text-h2">¿Prefieres mirar primero?</h2>
-      <p class="max-w-[58ch] text-ink-muted">
-        Puede que tu duda ya esté resuelta. En cada trámite tienes la documentación exacta y el
-        precio, y en las preguntas frecuentes están las dudas que más nos llegan.
-      </p>
+  <Section>
+    <Container class="flex flex-col gap-8">
+      <SectionHeading
+        title="Los trámites más solicitados"
+        subtitle="Puede que tu duda ya esté resuelta. En cada trámite tienes la documentación exacta y el precio, y en las preguntas frecuentes están las dudas que más nos llegan."
+      />
+
+      {
+        habituales.length > 0 && (
+          <ul class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {habituales.map((tramite) => (
+              <TramiteCard tramite={tramite} />
+            ))}
+          </ul>
+        )
+      }
+
       <div class="flex flex-wrap gap-3">
         <Button href="/#tramites" variant="secondary">Ver todos los trámites</Button>
         <Button href="/faqs" variant="outline">Preguntas frecuentes</Button>
