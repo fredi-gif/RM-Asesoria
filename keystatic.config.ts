@@ -1,5 +1,7 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
 
+import { BrandMark } from './src/components/keystatic/BrandMark';
+
 /**
  * Iconos disponibles para los trámites.
  * Debe mantenerse en sintonía con `PATHS` en `src/components/ui/Icon.astro`.
@@ -123,7 +125,7 @@ export default config({
     : { kind: 'local' },
 
   ui: {
-    brand: { name: 'RM Gestión' },
+    brand: { mark: BrandMark, name: 'RM Gestión' },
     navigation: {
       Contenido: ['tramites', 'paginas'],
       'Páginas fijas': ['home', 'comoFunciona', 'contacto', 'faqs'],

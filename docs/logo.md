@@ -11,6 +11,7 @@ por eso el favicon puede prescindir del nombre.
 | Sitio | Qué es |
 | --- | --- |
 | `src/components/layout/Logo.astro` | El componente que usan la cabecera y el pie. |
+| `src/components/keystatic/BrandMark.tsx` | El símbolo solo, en la cabecera del panel de Keystatic. |
 | `public/favicon.svg` | El mismo símbolo, sin nombre. |
 | `public/marca/` | El kit para el cliente: ocho SVG listos para usar. |
 
