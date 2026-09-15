@@ -1,4 +1,5 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
+import { block } from '@keystatic/core/content-components';
 
 import { BrandMark } from './src/components/keystatic/BrandMark';
 
@@ -366,7 +367,25 @@ export default config({
           },
         }),
         descripcion: fields.text({ label: 'Descripción breve', multiline: true }),
-        contenido: fields.markdoc({ label: 'Contenido' }),
+        contenido: fields.markdoc({
+          label: 'Contenido',
+          components: {
+            /**
+             * Inserta la ficha del titular —razón social, CIF, domicilio,
+             * email y datos registrales— leyéndola de «Datos de la empresa».
+             *
+             * Es un bloque y no texto escrito a mano para que el aviso legal
+             * no se quede desfasado cuando cambien los datos de la empresa: se
+             * rellenan una vez en su pantalla y esta página los recoge.
+             */
+            DatosTitular: block({
+              label: 'Datos del titular',
+              description:
+                'Ficha con los datos de la empresa, tal como estén en «Datos de la empresa».',
+              schema: {},
+            }),
+          },
+        }),
 
         seo: fields.object(
           {
@@ -601,9 +620,9 @@ export default config({
             }),
           }),
           {
-            label: 'Logos de la cabecera',
+            label: 'Logos institucionales',
             description:
-              'Se reparten en dos columnas por orden: la primera mitad arriba y el resto desplazado. Solo se ven en pantallas anchas.',
+              'Se muestran en una rejilla al final de la home, justo antes del pie. Cinco entradas es lo que cuadra con la fila; con más, se parten en varias.',
             itemLabel: (props) => props.fields.alt.value || 'Logo',
           },
         ),
@@ -619,7 +638,7 @@ export default config({
     }),
 
     comoFunciona: singleton({
-      label: 'Página «Cómo funciona»',
+      label: 'Cómo funciona',
       previewUrl: '/como-funciona',
       path: 'src/content/como-funciona/',
       format: { data: 'json' },
@@ -655,7 +674,7 @@ export default config({
     }),
 
     contacto: singleton({
-      label: 'Página «Contacto»',
+      label: 'Contacto',
       previewUrl: '/contacto',
       path: 'src/content/contacto/',
       format: { data: 'json' },
@@ -683,7 +702,7 @@ export default config({
     }),
 
     faqs: singleton({
-      label: 'Página «Preguntas frecuentes»',
+      label: 'Preguntas frecuentes',
       previewUrl: '/faqs',
       path: 'src/content/faqs/',
       format: { data: 'json' },

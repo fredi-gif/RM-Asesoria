@@ -3,13 +3,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import CabeceraPagina from '../components/layout/CabeceraPagina.astro';
 import Container from '../components/ui/Container.astro';
 import Section from '../components/ui/Section.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
 import Button from '../components/ui/Button.astro';
 import WhatsAppCTA from '../components/tramite/WhatsAppCTA.astro';
+import TramiteCard from '../components/tramite/TramiteCard.astro';
 import PasoFicha from '../components/proceso/PasoFicha.astro';
 
 import home from '../content/home/index.json';
 import pagina from '../content/como-funciona/index.json';
 import { empresa } from '../lib/config';
+import { getTramites } from '../lib/tramites';
 
 /**
  * Los pasos son los mismos que se resumen en la home: se leen del singleton
@@ -18,6 +21,20 @@ import { empresa } from '../lib/config';
  * resumen no cambian entre las dos vistas, que es justo lo que se quiere.
  */
 const pasos = home.comoFunciona.pasos;
+
+/**
+ * Los trámites de la rejilla de salida son los destacados, los mismos que
+ * abren la home y componen el pie. No va el catálogo entero a propósito:
+ * veinte tarjetas al final de esta página taparían los pasos, que son el
+ * motivo por el que alguien entra aquí. Para el resto está el botón.
+ *
+ * Si nadie ha marcado ninguno como destacado se cae a los cuatro primeros del
+ * orden ya establecido, en lugar de dejar la rejilla vacía — el mismo criterio
+ * que sigue el pie.
+ */
+const tramites = await getTramites();
+const marcados = tramites.filter((tramite) => tramite.data.destacado);
+const habituales = (marcados.length > 0 ? marcados : tramites).slice(0, 4);
 
 const url = `${empresa.url}/como-funciona`;
 const titulo = pagina.hero.titulo || 'Cómo funciona';
@@ -82,14 +99,26 @@ const schema: Record<string, unknown>[] = [
   </Section>
 
   <!-- 3 · Salida hacia el catálogo: quien llega aquí buscando su trámite
-       concreto no debería tener que volver por el menú. -->
-  <Section spacing="tight">
-    <Container class="flex flex-col items-start gap-5">
-      <h2 class="text-h2">¿Cuál es tu trámite?</h2>
-      <p class="max-w-[58ch] text-ink-muted">
-        En la página de cada trámite tienes los pasos concretos, la documentación exacta que pide y
-        el precio antes de contratar nada.
-      </p>
+       concreto no debería tener que volver por el menú. Las tarjetas son las
+       mismas de la home, con su precio, así que el siguiente paso se da desde
+       aquí en lugar de obligar a recorrer la portada otra vez. -->
+  <Section tone="white">
+    <Container class="flex flex-col gap-8">
+      <SectionHeading
+        title={home.tramites?.tituloDestacados || 'Los trámites más solicitados'}
+        subtitle="En la página de cada trámite tienes los pasos concretos, la documentación exacta que pide y el precio antes de contratar nada."
+      />
+
+      {
+        habituales.length > 0 && (
+          <ul class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {habituales.map((tramite) => (
+              <TramiteCard tramite={tramite} />
+            ))}
+          </ul>
+        )
+      }
+
       <div class="flex flex-wrap gap-3">
         <Button href="/#tramites" variant="secondary">Ver todos los trámites</Button>
         <Button href="/faqs" variant="outline">Preguntas frecuentes</Button>

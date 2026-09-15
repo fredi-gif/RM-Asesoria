@@ -1,0 +1,34 @@
+---
+import { empresa } from '../../lib/config';
+
+/**
+ * Ficha de datos identificativos del titular para el aviso legal.
+ *
+ * Se inserta en el contenido desde el panel —es el bloque «Datos del titular»
+ * del editor— en lugar de escribirse a mano en el texto. Así el artículo 10 de
+ * la LSSI se cumple con los datos que haya en «Datos de la empresa» y no con
+ * una copia que se queda vieja en cuanto cambie el domicilio o el CIF.
+ *
+ * Las filas vacías no se pintan: un campo sin rellenar en el panel debe
+ * desaparecer, no publicar una etiqueta con un hueco detrás. `lib/config` ya
+ * cae a los valores de `src/config/site.ts` antes de llegar aquí, así que un
+ * hueco real solo aparece si también está vacío el respaldo.
+ */
+const filas = [
+  { etiqueta: 'Titular', valor: empresa.legal.razonSocial },
+  { etiqueta: 'CIF', valor: empresa.legal.cif },
+  { etiqueta: 'Domicilio social', valor: empresa.legal.direccion },
+  { etiqueta: 'Correo electrónico', valor: empresa.email },
+  { etiqueta: 'Datos registrales', valor: empresa.legal.registro },
+].filter((fila) => Boolean(fila.valor));
+---
+
+<ul>
+  {
+    filas.map((fila) => (
+      <li>
+        <strong>{fila.etiqueta}:</strong> {fila.valor}
+      </li>
+    ))
+  }
+</ul>

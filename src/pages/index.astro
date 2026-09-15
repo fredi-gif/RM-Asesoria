@@ -7,7 +7,7 @@ import Button from '../components/ui/Button.astro';
 import TramiteCard from '../components/tramite/TramiteCard.astro';
 import PerfilSwitch from '../components/tramite/PerfilSwitch.astro';
 import StepsRow from '../components/tramite/StepsRow.astro';
-import LogoCloud from '../components/home/LogoCloud.astro';
+import LogoGrid from '../components/home/LogoGrid.astro';
 import Ventajas from '../components/home/Ventajas.astro';
 import HeroFondo from '../components/layout/HeroFondo.astro';
 
@@ -49,26 +49,19 @@ const titulos = home.tramites ?? { tituloDestacados: '', tituloTodos: '' };
     <HeroFondo />
 
     <Container class="relative pt-30 pb-10 lg:pt-38 lg:pb-14">
-      <!-- La nube de logos se ancla a este bloque, no al contenedor entero: se
-           centra con `inset-y-0` y, si abarcara también la franja de abajo,
-           bajaría hasta cruzarse con ella. -->
-      <div class="relative">
-        <LogoCloud oscuro={temaOscuro} />
-
-        <div class="relative flex max-w-[42rem] flex-col gap-6">
-          <h1
-            class:list={['text-display', temaOscuro && 'text-white']}
-            set:html={resaltar(home.hero.claim)}
-          />
-          <p
-            class:list={[
-              'max-w-[54ch] text-[1.125rem]',
-              temaOscuro ? 'text-white/70' : 'text-ink-muted',
-            ]}
-          >
-            {home.hero.subclaim}
-          </p>
-        </div>
+      <div class="relative flex max-w-[42rem] flex-col gap-6">
+        <h1
+          class:list={['text-display', temaOscuro && 'text-white']}
+          set:html={resaltar(home.hero.claim)}
+        />
+        <p
+          class:list={[
+            'max-w-[54ch] text-[1.125rem]',
+            temaOscuro ? 'text-white/70' : 'text-ink-muted',
+          ]}
+        >
+          {home.hero.subclaim}
+        </p>
       </div>
 
       <!-- Donde antes estaba el botón de WhatsApp. Lo que hay debajo es la
@@ -76,9 +69,8 @@ const titulos = home.tramites ?? { tituloDestacados: '', tituloTodos: '' };
            resuelve las cuatro dudas comunes a todos ellos sin desviar a nadie a
            una conversación antes de tiempo.
 
-           El margen es mayor que el que separa el claim del subclaim: tiene
-           que despegarse tanto del texto como de las burbujas de logos, que
-           al flotar pueden acabar más abajo que el propio párrafo. -->
+           El margen es mayor que el que separa el claim del subclaim: la
+           franja es un bloque aparte, no una tercera línea del titular. -->
       <Ventajas
         ventajas={home.hero.ventajas ?? []}
         oscuro={temaOscuro}
@@ -140,6 +132,15 @@ const titulos = home.tramites ?? { tituloDestacados: '', tituloTodos: '' };
       <div>
         <Button href="/como-funciona" variant="outline">Ver el proceso en detalle</Button>
       </div>
+    </Container>
+  </Section>
+
+  <!-- 4 · Sellos institucionales. Cierra la página, ya sin nada que pedirle a
+       quien lee: son los organismos y plataformas con los que se trabaja, y
+       aquí respaldan todo lo de arriba en lugar de interrumpirlo. -->
+  <Section tone="white" spacing="tight">
+    <Container>
+      <LogoGrid />
     </Container>
   </Section>
 </BaseLayout>

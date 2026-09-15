@@ -1,0 +1,89 @@
+---
+import { Image } from 'astro:assets';
+
+import home from '../../content/home/index.json';
+
+/**
+ * Rejilla de logos institucionales, lo último antes del pie.
+ *
+ * Sustituye a la nube de burbujas flotantes que había en el hero. Aquella solo
+ * se pintaba a partir de `xl` —por debajo no quedaba hueco sin pisar el
+ * claim—, así que en móvil y tablet los logos no se veían nunca. Y al final de
+ * la página un sello de confianza cierra, en lugar de competir con el titular
+ * por la atención de quien acaba de entrar.
+ *
+ * Las líneas son solo interiores, sin marco exterior: cada celda lleva borde
+ * arriba y a la izquierda, y la rejilla se desplaza un píxel hacia arriba y
+ * hacia la izquierda para que los de la primera fila y la primera columna
+ * caigan fuera del `overflow-hidden`. Hecho así, las líneas siguen cuadrando
+ * cuando la última fila queda incompleta, sea cual sea el número de columnas.
+ */
+
+/**
+ * Los ficheros viven en `src/assets` para que pasen por el optimizador de
+ * Astro: el logo del colegio son 118 kB en PNG y 7 kB en webp. Como `<Image>`
+ * necesita el módulo importado y no una ruta suelta, se resuelven todos con
+ * `import.meta.glob` y se cruzan con lo que guarda Keystatic.
+ */
+const modulos = import.meta.glob<{ default: ImageMetadata }>(
+  '../../assets/logos/**/*.{svg,png,jpg,jpeg,webp,avif}',
+  { eager: true },
+);
+
+const RAIZ = 'assets/logos/';
+
+/**
+ * Keystatic guarda `/src/assets/logos/logos/0/imagen.svg` y el glob devuelve
+ * `../../assets/logos/logos/0/imagen.svg`: dos prefijos distintos para el
+ * mismo fichero. Se recortan ambos por `assets/logos/` y se comparan por lo
+ * que queda.
+ *
+ * El glob tiene que ser `**`, no `*`: dentro de un array, Keystatic cuelga cada
+ * imagen de una carpeta con el índice del elemento, así que los ficheros no
+ * están sueltos en `assets/logos` sino un par de niveles más abajo. Con un solo
+ * asterisco no se encontraba ninguno y la lista se quedaba vacía.
+ *
+ * Y tampoco vale cruzarlos por nombre de fichero: Keystatic llama a todas las
+ * imágenes de un array `imagen.<ext>`, con lo que los cinco logos compartirían
+ * clave y se pisarían entre ellos.
+ */
+const relativa = (ruta: string) => {
+  const corte = ruta.indexOf(RAIZ);
+  return corte === -1 ? '' : ruta.slice(corte + RAIZ.length);
+};
+
+const porRuta = new Map(
+  Object.entries(modulos).map(([ruta, modulo]) => [relativa(ruta), modulo.default]),
+);
+
+// Se descartan las entradas sin imagen o cuyo fichero ya no está: el panel
+// permite borrar un logo del repositorio sin quitar su fila de la lista.
+const logos = (home.logos ?? [])
+  .map((logo) => ({
+    src: porRuta.get(relativa(logo?.imagen ?? '')),
+    alt: logo?.alt ?? '',
+    ancho: logo?.ancho ?? undefined,
+  }))
+  .filter((logo) => Boolean(logo.src));
+---
+
+{
+  logos.length > 0 && (
+    <div class="overflow-hidden">
+      <ul class="-mt-px -ml-px grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+        {logos.map((logo) => (
+          <li class="flex items-center justify-center border-t border-l border-line px-6 py-10">
+            <Image
+              src={logo.src!}
+              alt={logo.alt}
+              width={logo.ancho}
+              densities={logo.ancho ? [1, 2] : undefined}
+              class="h-12 w-full max-w-[9rem] object-contain"
+              loading="lazy"
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}

@@ -13,7 +13,7 @@ pnpm build      # build de producción
 
 | Ruta | Qué es |
 | --- | --- |
-| `/` | Home: cabecera, rejilla de trámites y «Tramitar con RM Gestión». Ancla: `#tramites`, `#tramitar` |
+| `/` | Home: cabecera, rejilla de trámites, «Cómo funciona» y los logos institucionales. Ancla: `#tramites`, `#tramitar` |
 | `/tramites` | Índice completo |
 | `/tramites/[slug]` | Página de trámite. Anclas: `#pasos`, `#documentacion`, `#precio`, `#faq` |
 | `/aviso-legal`, `/privacidad`, `/cookies` | Legales |
