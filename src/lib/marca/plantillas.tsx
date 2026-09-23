@@ -127,24 +127,22 @@ function Titular({ texto, fs, piel, alinear = 'flex-start' }: { texto: string; f
         color: piel.titular,
       }}
     >
-      {palabras.map(({ t, marcada }, i) => {
-        // Dentro de un tramo resaltado el espacio va dentro de la palabra
-        // (duro, para que no se parta ahí) y así el subrayado es continuo.
-        const ligada = marcada && palabras[i + 1]?.marcada;
-        return (
-          <span
-            key={i}
-            style={{
-              marginRight: ligada || i === palabras.length - 1 ? 0 : r(fs * 0.26),
-              ...(marcada
-                ? { textDecorationLine: 'underline', textDecorationColor: COLOR.acento500, textDecorationStyle: 'solid' }
-                : {}),
-            }}
-          >
-            {ligada ? `${t}\u00a0` : t}
-          </span>
-        );
-      })}
+      {palabras.map(({ t, marcada }, i) => (
+        // El subrayado va palabra a palabra. Si el espacio entrara en el
+        // subrayado, al partirse la línea dentro de un tramo resaltado el trazo
+        // se quedaría colgando al final del renglón.
+        <span
+          key={i}
+          style={{
+            marginRight: i === palabras.length - 1 ? 0 : r(fs * 0.26),
+            ...(marcada
+              ? { textDecorationLine: 'underline', textDecorationColor: COLOR.acento500, textDecorationStyle: 'solid' }
+              : {}),
+          }}
+        >
+          {t}
+        </span>
+      ))}
     </div>
   );
 }
@@ -330,7 +328,13 @@ function decoracionSilueta(modo: Modo, z: ReturnType<typeof zona>): string {
   return svg.replace('<svg ', `<svg x="${r(x)}" y="${r(y)}" `);
 }
 
-export function lienzoPieza(f: Formato, d: DatosPieza, empresa: DatosEmpresa): Lienzo {
+/**
+ * `escala` reduce todo el texto a la vez. La pone `ajustar` (en `render.ts`)
+ * cuando la maqueta a tamaño normal no cabe en su caja: los cuerpos de letra
+ * se estiman antes de maquetar y con textos largos la estimación se queda
+ * corta.
+ */
+export function lienzoPieza(f: Formato, d: DatosPieza, empresa: DatosEmpresa, escala = 1): Lienzo {
   const piel = PIELES[d.tema] ?? PIELES.atardecer;
   if (f.tipo === 'perfil') return lienzoPerfil(f, piel);
 
@@ -340,7 +344,7 @@ export function lienzoPieza(f: Formato, d: DatosPieza, empresa: DatosEmpresa): L
   const caja = { w: z.w - pad * 2, h: z.h - pad * 2 };
 
   // Unidad base: el cuerpo de texto. Todo lo demás cuelga de ella.
-  const u = lado * (modo === 'banda' ? 0.1 : modo === 'horizontal' ? 0.042 : 0.034);
+  const u = lado * (modo === 'banda' ? 0.1 : modo === 'horizontal' ? 0.042 : 0.034) * escala;
   const tesela = u * (modo === 'banda' ? 2.2 : 2.1);
   const esMarca = d.plantilla === 'marca';
   const hayCuerpo = !!d.texto || (d.plantilla === 'lista' && d.puntos.length > 0);
@@ -370,7 +374,7 @@ export function lienzoPieza(f: Formato, d: DatosPieza, empresa: DatosEmpresa): L
   if (modo === 'banda') {
     const titular = d.titular.trim();
     const anchoTexto = caja.w * 0.62;
-    const fs = cuerpoTitular(titular, anchoTexto - lado * 0.35, caja.h * 0.5, caja.h * 0.3, u * 0.8);
+    const fs = cuerpoTitular(titular, anchoTexto - lado * 0.35, caja.h * 0.5, caja.h * 0.3, u * 0.8) * escala;
     return {
       ...base,
       contenido: contenedor(
@@ -397,7 +401,7 @@ export function lienzoPieza(f: Formato, d: DatosPieza, empresa: DatosEmpresa): L
   if (modo === 'horizontal') {
     const dosColumnas = hayCuerpo && !esMarca;
     const anchoTitular = dosColumnas ? caja.w * 0.55 : caja.w * 0.8;
-    const fs = cuerpoTitular(titular, anchoTitular, caja.h * (d.boton ? 0.46 : 0.56), lado * 0.13, u * 1.2);
+    const fs = cuerpoTitular(titular, anchoTitular, caja.h * (d.boton ? 0.46 : 0.56), lado * 0.13, u * 1.2) * escala;
     const columnaDerecha = dosColumnas && (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: r(u * 0.8), width: r(caja.w * 0.38) }}>
         {d.plantilla === 'lista' ? <Puntos puntos={d.puntos.slice(0, 5)} fs={fsTexto} piel={piel} /> : <Parrafo texto={d.texto} fs={fsTexto} piel={piel} />}
@@ -422,7 +426,9 @@ export function lienzoPieza(f: Formato, d: DatosPieza, empresa: DatosEmpresa): L
             <Pie pie={d.pie} fs={fsPie} piel={piel} empresa={empresa} />
           </div>
         </>,
-        { flexDirection: 'column', justifyContent: 'space-between', gap: r(u * 0.8) },
+        // El hueco entre bloques es un mínimo de verdad: si no cabe, `ajustar`
+        // reduce el texto. Deja sitio al subrayado, que cuelga bajo la línea.
+        { flexDirection: 'column', justifyContent: 'space-between', gap: r(u * 1.5) },
       ),
     };
   }
@@ -430,7 +436,7 @@ export function lienzoPieza(f: Formato, d: DatosPieza, empresa: DatosEmpresa): L
   // --- Vertical y cuadrado: todo en columna, de arriba abajo.
   const vertical = modo === 'vertical';
   const presupuesto = hayCuerpo ? (vertical ? 0.34 : 0.3) : vertical ? 0.46 : 0.42;
-  const fs = cuerpoTitular(titular, caja.w, caja.h * presupuesto, lado * (esMarca ? 0.12 : 0.105), u * 1.3);
+  const fs = cuerpoTitular(titular, caja.w, caja.h * presupuesto, lado * (esMarca ? 0.12 : 0.105), u * 1.3) * escala;
   const centrado = esMarca;
   const alinear = centrado ? 'center' : 'flex-start';
 
@@ -453,7 +459,7 @@ export function lienzoPieza(f: Formato, d: DatosPieza, empresa: DatosEmpresa): L
           <Pie pie={d.pie} fs={fsPie} piel={piel} empresa={empresa} alinear={alinear} />
         </div>
       </>,
-      { flexDirection: 'column', justifyContent: 'space-between', gap: r(u) },
+      { flexDirection: 'column', justifyContent: 'space-between', gap: r(u * 1.5) },
     ),
   };
 }
@@ -526,13 +532,15 @@ export function lienzoAnverso(t: DatosTarjeta, empresa: DatosEmpresa): Lienzo {
   };
 }
 
-export async function lienzoReverso(t: DatosTarjeta, empresa: DatosEmpresa): Promise<Lienzo> {
+export async function lienzoReverso(t: DatosTarjeta, empresa: DatosEmpresa, escala = 1): Promise<Lienzo> {
   // El reverso va siempre claro: es la cara que se lee, y sobre crema los
   // datos pequeños aguantan mejor la impresión que en blanco sobre azul.
   const piel = PIELES.crema;
   const { ancho, alto, margen } = TARJETA_PX;
-  const fsNombre = Math.min(4.6 * MM, (ancho - margen * 2) / Math.max(10, t.nombre.length * 0.62) * (t.qr === 'ninguno' ? 1 : 0.7));
-  const fsDato = 2.55 * MM;
+  // El nombre manda sobre el cargo: con uno largo se parte en dos líneas en
+  // vez de encogerse, y si aun así no cabe, `ajustar` reduce todo a la vez.
+  const fsNombre = 4.2 * MM * escala;
+  const fsDato = 2.55 * MM * escala;
 
   const datos: { icono: string; texto: string }[] = [];
   if (t.telefono) datos.push({ icono: 'telefono', texto: t.telefono });
@@ -553,14 +561,17 @@ export async function lienzoReverso(t: DatosTarjeta, empresa: DatosEmpresa): Pro
     alto,
     fondo: { piel, paso: Math.round(4.5 * MM) },
     contenido: (
-      <div style={{ display: 'flex', width: ancho, height: alto, padding: r(margen), justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', width: ancho, height: alto, padding: r(margen), justifyContent: 'space-between', gap: r(3 * MM) }}>
+        {/* La columna de datos es la única que cede ancho: el nombre y el cargo
+            se parten; un email que no cabe asoma por fuera y lo detecta
+            `ajustar`. */}
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flexShrink: 1, flexGrow: 1, minWidth: 0, gap: r(2 * MM) }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: r(1 * MM) }}>
-            <div style={{ display: 'flex', fontFamily: DISPLAY, fontWeight: 700, fontSize: r(fsNombre), letterSpacing: r(-fsNombre * 0.02), color: COLOR.marca900 }}>
+            <div style={{ display: 'flex', fontFamily: DISPLAY, fontWeight: 700, fontSize: r(fsNombre), lineHeight: 1.15, letterSpacing: r(-fsNombre * 0.02), color: COLOR.marca900 }}>
               {t.nombre}
             </div>
             {t.cargo && (
-              <div style={{ display: 'flex', fontFamily: TEXTO, fontWeight: 400, fontSize: r(2.9 * MM), color: COLOR.tintaSuave }}>{t.cargo}</div>
+              <div style={{ display: 'flex', fontFamily: TEXTO, fontWeight: 400, fontSize: r(2.9 * MM * escala), color: COLOR.tintaSuave }}>{t.cargo}</div>
             )}
             <div style={{ display: 'flex', width: r(7 * MM), height: r(0.6 * MM), marginTop: r(1.2 * MM), backgroundColor: COLOR.acento500, borderRadius: 99 }} />
           </div>

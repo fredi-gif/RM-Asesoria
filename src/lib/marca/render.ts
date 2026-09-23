@@ -11,7 +11,7 @@
  *   - **PDF**: ese SVG dibujado como vectores con PDFKit, sin grano (es un
  *     filtro y el PDF no lo admite). Varias caras = varias páginas.
  */
-import type { ReactNode } from 'react';
+import { Children, cloneElement, isValidElement, type CSSProperties, type ReactElement, type ReactNode } from 'react';
 import satori from 'satori';
 import sharp from 'sharp';
 import PDFDocument from 'pdfkit';
@@ -29,6 +29,8 @@ export interface Lienzo {
   fondo?: Omit<OpcionesFondo, 'ancho' | 'alto' | 'grano'>;
   /** SVG suelto que se pinta entre el fondo y el contenido. */
   decoracion?: string;
+  /** La salida de Satori, si ya se maquetó (ver `ajustar`). */
+  maqueta?: string;
 }
 
 /**
@@ -60,9 +62,85 @@ function desplegarImagenes(svg: string): string {
   });
 }
 
+/**
+ * Ninguna caja puede encogerse por debajo de su contenido.
+ *
+ * Satori aplica el `flex-shrink: 1` de CSS: cuando el contenido no cabe,
+ * aplasta las cajas y el texto se desborda por encima del bloque siguiente
+ * (el botón acaba montado sobre el último punto de una lista). Con todo a 0,
+ * lo que sobra asoma por el borde del contenedor, y eso `desborda` lo ve.
+ */
+function sinEncoger(nodo: ReactNode): ReactNode {
+  if (Array.isArray(nodo)) return nodo.map(sinEncoger);
+  if (!isValidElement(nodo) || typeof nodo.type !== 'string') return nodo;
+  const el = nodo as ReactElement<{ style?: CSSProperties; children?: ReactNode }>;
+  const hijos = el.props.children;
+  return cloneElement(
+    el,
+    { style: { flexShrink: 0, ...el.props.style } },
+    ...(hijos === undefined ? [] : Children.toArray(hijos).map(sinEncoger)),
+  );
+}
+
+async function maquetar(lienzo: Lienzo): Promise<string> {
+  return satori(sinEncoger(lienzo.contenido) as never, {
+    width: lienzo.ancho,
+    height: lienzo.alto,
+    fonts: fuentes(),
+  });
+}
+
+/**
+ * ¿Algún elemento se sale de la caja que lo contiene?
+ *
+ * Satori deja en el SVG, para cada elemento, una máscara con su caja
+ * (`satori_om-id-1-3-0` es el primer hijo del cuarto hijo del segundo hijo de
+ * la raíz). Basta comparar cada caja con la de su padre.
+ */
+export function desborda(maqueta: string): boolean {
+  const cajas = new Map<string, number[]>();
+  for (const m of maqueta.matchAll(
+    /<mask id="satori_om-(id[-\d]*)"><rect x="([-\d.]+)" y="([-\d.]+)" width="([-\d.]+)" height="([-\d.]+)"/g,
+  )) {
+    cajas.set(m[1], m.slice(2, 6).map(Number));
+  }
+  const tolerancia = 1;
+  for (const [id, [x, y, w, h]] of cajas) {
+    const padre = cajas.get(id.replace(/-\d+$/, ''));
+    if (!padre || id === 'id') continue;
+    const [px, py, pw, ph] = padre;
+    if (x < px - tolerancia || y < py - tolerancia || x + w > px + pw + tolerancia || y + h > py + ph + tolerancia) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Maqueta a la mayor escala (hasta 1) en la que todo cabe.
+ *
+ * Los cuerpos de letra se estiman antes de maquetar; con textos largos la
+ * estimación se queda corta. Aquí se comprueba de verdad y, si algo se sale,
+ * se reduce todo el texto un 8 % y se vuelve a probar. Un titular corto no
+ * se toca; uno largo baja lo justo para caber.
+ */
+export async function ajustar(crear: (escala: number) => Lienzo | Promise<Lienzo>): Promise<Lienzo> {
+  let escala = 1;
+  for (let intento = 0; ; intento++) {
+    const lienzo = await crear(escala);
+    const maqueta = await maquetar(lienzo);
+    const cabe = !desborda(maqueta);
+    if (cabe || intento >= 12) {
+      if (!cabe) console.warn(`[marca] La maqueta de ${lienzo.ancho}×${lienzo.alto} no cabe ni al ${Math.round(escala * 100)} %`);
+      return { ...lienzo, maqueta };
+    }
+    escala *= 0.92;
+  }
+}
+
 export async function aSvg(lienzo: Lienzo, { grano = true } = {}): Promise<string> {
   const { ancho, alto } = lienzo;
-  const maqueta = await satori(lienzo.contenido as never, { width: ancho, height: alto, fonts: fuentes() });
+  const maqueta = lienzo.maqueta ?? (await maquetar(lienzo));
   const interior = maqueta.slice(maqueta.indexOf('>') + 1, maqueta.lastIndexOf('</svg>'));
 
   return (
