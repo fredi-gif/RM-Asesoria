@@ -19,20 +19,28 @@
     "@astrojs/vercel": "^11.0.5",
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
     "@fontsource-variable/source-sans-3": "^5.3.0",
+    "@fontsource/plus-jakarta-sans": "^5.3.0",
+    "@fontsource/source-sans-3": "^5.3.0",
     "@keystatic/astro": "^5.2.0",
     "@keystatic/core": "^0.6.4",
     "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "astro": "^7.2.0",
+    "pdfkit": "^0.20.2",
+    "qrcode": "^1.5.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "satori": "^0.33.5",
     "sharp": "^0.35.3",
+    "svg-to-pdfkit": "^0.1.8",
     "tailwindcss": "^4.3.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@types/pdfkit": "^0.17.6",
+    "@types/qrcode": "^1.5.6",
     "typescript": "~6.0.3"
   }
 }

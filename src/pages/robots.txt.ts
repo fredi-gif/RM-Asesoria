@@ -9,6 +9,8 @@ export const GET: APIRoute = () =>
       // El panel de contenidos y la guía de estilo no deben indexarse.
       'Disallow: /keystatic',
       'Disallow: /styleguide',
+      // Las galerías de imagen de marca son una herramienta del panel.
+      'Disallow: /marca/',
       '',
       `Sitemap: ${SITE.url}/sitemap-index.xml`,
       '',

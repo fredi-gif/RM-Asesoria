@@ -8,7 +8,23 @@ import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
 import keystatic from '@keystatic/astro';
 
+import { createRequire } from 'node:module';
+import { dirname } from 'node:path';
+
 import { SITE } from './src/config/site';
+
+/**
+ * Satori (el motor de las imágenes de marca, `src/lib/marca`) carga harfbuzz
+ * como WebAssembly leyendo `hb.wasm` de disco. El trazado de dependencias del
+ * adaptador de Vercel no ve esa lectura y no copia el fichero a la función,
+ * y sin él la función entera se cae al arrancar —panel incluido—. Se añade a
+ * mano, resolviendo la ruta desde Satori para que siga valiendo aunque cambie
+ * la versión.
+ */
+const requerir = createRequire(import.meta.url);
+const harfbuzzWasm = createRequire(`${dirname(requerir.resolve('satori/package.json'))}/`).resolve(
+  'harfbuzzjs/hb.wasm',
+);
 
 // https://astro.build/config
 export default defineConfig({
@@ -35,5 +51,5 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 
-  adapter: vercel(),
+  adapter: vercel({ includeFiles: [harfbuzzWasm] }),
 });
