@@ -1,0 +1,14 @@
+{
+  "nombre": "Presentación",
+  "plantilla": {
+    "discriminant": "marca",
+    "value": {
+      "titular": "",
+      "texto": "Gestoría online de trámites de vehículos."
+    }
+  },
+  "tema": "atardecer",
+  "boton": "Escríbenos por WhatsApp",
+  "pie": "ambos",
+  "silueta": true
+}

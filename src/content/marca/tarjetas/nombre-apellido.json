@@ -1,0 +1,10 @@
+{
+  "nombre": "Nombre Apellido",
+  "cargo": "Gestor administrativo",
+  "telefono": "",
+  "email": "",
+  "whatsapp": true,
+  "web": true,
+  "qr": "whatsapp",
+  "tema": "atardecer"
+}

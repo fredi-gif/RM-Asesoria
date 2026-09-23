@@ -2,6 +2,7 @@ import { config, fields, collection, singleton } from '@keystatic/core';
 import { block } from '@keystatic/core/content-components';
 
 import { BrandMark } from './src/components/keystatic/BrandMark';
+import { PIES, PLANTILLAS, QRS, TEMAS_MARCA } from './src/lib/marca/opciones';
 
 /**
  * Iconos disponibles para los trámites.
@@ -116,6 +117,7 @@ export default config({
       Contenido: ['tramites', 'paginas'],
       'Páginas fijas': ['home', 'comoFunciona', 'contacto', 'faqs'],
       Sitio: ['navegacion', 'configuracion', 'error404'],
+      'Imagen de marca': ['piezas', 'tarjetas'],
     },
   },
 
@@ -382,6 +384,147 @@ export default config({
             description: 'Si lo dejas vacío se usan el título y la descripción de arriba.',
           },
         ),
+      },
+    }),
+    /**
+     * Piezas para redes sociales. No se publican en la web: el botón «Vista
+     * previa» abre `/marca/piezas/<slug>`, que las genera en todos los formatos
+     * de Instagram, WhatsApp, LinkedIn, Facebook y YouTube con descarga en PNG,
+     * JPG, SVG y PDF. Las plantillas viven en `src/lib/marca/plantillas.tsx`.
+     */
+    piezas: collection({
+      label: 'Imágenes para redes',
+      path: 'src/content/marca/piezas/*',
+      slugField: 'nombre',
+      format: { data: 'json' },
+      previewUrl: '/marca/piezas/{slug}?rama={branch}',
+      schema: {
+        nombre: fields.slug({
+          name: {
+            label: 'Nombre de la pieza',
+            description:
+              'Solo para encontrarla en el panel y nombrar los ficheros. No aparece en la imagen.',
+          },
+        }),
+        plantilla: fields.conditional(
+          fields.select({
+            label: 'Plantilla',
+            description:
+              'Titular: un mensaje con botón. Lista: titular y puntos con check. Trámite: la ficha de un trámite con su precio. Marca: logo y claim, pensada para portadas y banners. Guarda y pulsa «Vista previa» (arriba a la derecha) para verla en todos los formatos y descargarla.',
+            options: PLANTILLAS as unknown as { label: string; value: string }[],
+            defaultValue: 'titular',
+          }),
+          {
+            titular: fields.object({
+              antetitulo: fields.text({
+                label: 'Antetítulo',
+                description: 'Opcional. Una etiqueta corta encima del titular. Ej.: «Novedad», «Consejo».',
+              }),
+              titular: fields.text({
+                label: 'Titular',
+                multiline: true,
+                description:
+                  'Envuelve una o dos palabras entre **dobles asteriscos** para subrayarlas en naranja, como en la home.',
+              }),
+              texto: fields.text({ label: 'Texto', multiline: true, description: 'Opcional. Una o dos frases.' }),
+            }),
+            lista: fields.object({
+              antetitulo: fields.text({ label: 'Antetítulo' }),
+              titular: fields.text({
+                label: 'Titular',
+                multiline: true,
+                description: 'Admite **dobles asteriscos** para el subrayado naranja.',
+              }),
+              puntos: fields.array(fields.text({ label: 'Punto' }), {
+                label: 'Puntos',
+                description: 'Hasta cinco en los formatos cuadrados y horizontales; siete en las historias.',
+                itemLabel: (props) => props.value || 'Punto',
+              }),
+            }),
+            tramite: fields.object({
+              tramite: fields.relationship({ label: 'Trámite', collection: 'tramites' }),
+              titular: fields.text({
+                label: 'Titular',
+                multiline: true,
+                description: 'Vacío = el claim del trámite. Admite **dobles asteriscos**.',
+              }),
+              texto: fields.text({ label: 'Texto', multiline: true, description: 'Vacío = el resumen del trámite.' }),
+              antetitulo: fields.text({ label: 'Antetítulo', description: 'Vacío = «Trámite online».' }),
+              mostrarPrecio: fields.checkbox({
+                label: 'Mostrar el precio',
+                description: 'Honorarios de particular más la tasa de la DGT, igual que en la ficha de la web.',
+                defaultValue: true,
+              }),
+              mostrarPlazo: fields.checkbox({ label: 'Mostrar el plazo', defaultValue: true }),
+            }),
+            marca: fields.object({
+              titular: fields.text({
+                label: 'Claim',
+                multiline: true,
+                description: 'Vacío = el claim de la home.',
+              }),
+              texto: fields.text({ label: 'Texto', multiline: true }),
+            }),
+          },
+        ),
+        tema: fields.select({
+          label: 'Fondo',
+          description: 'Los mismos dos temas que la cabecera de la home.',
+          options: TEMAS_MARCA as unknown as { label: string; value: string }[],
+          defaultValue: 'atardecer',
+        }),
+        boton: fields.text({
+          label: 'Texto del botón',
+          description:
+            'Vacío = sin botón. Si menciona WhatsApp, lleva el icono de WhatsApp. No se pinta en portadas ni banners.',
+          defaultValue: 'Escríbenos por WhatsApp',
+        }),
+        pie: fields.select({
+          label: 'Datos de contacto al pie',
+          description: 'Salen de «Datos de la empresa».',
+          options: PIES as unknown as { label: string; value: string }[],
+          defaultValue: 'ambos',
+        }),
+        silueta: fields.checkbox({
+          label: 'Silueta de la marca',
+          description: 'La esquina en arco del logo, a gran tamaño, asomando por abajo a la derecha.',
+          defaultValue: true,
+        }),
+      },
+    }),
+
+    /**
+     * Tarjetas de visita, una por persona. Igual que las piezas, no se
+     * publican: «Vista previa» abre `/marca/tarjetas/<slug>` con el PDF para
+     * imprenta (85 × 55 mm, con 3 mm de sangrado) y las caras sueltas.
+     */
+    tarjetas: collection({
+      label: 'Tarjetas de visita',
+      path: 'src/content/marca/tarjetas/*',
+      slugField: 'nombre',
+      format: { data: 'json' },
+      previewUrl: '/marca/tarjetas/{slug}?rama={branch}',
+      schema: {
+        nombre: fields.slug({ name: { label: 'Nombre y apellidos' } }),
+        cargo: fields.text({ label: 'Cargo', description: 'Ej.: «Gestora administrativa».' }),
+        telefono: fields.text({
+          label: 'Teléfono',
+          description: 'Vacío = el teléfono de «Datos de la empresa».',
+        }),
+        email: fields.text({ label: 'Email', description: 'Vacío = el email de «Datos de la empresa».' }),
+        whatsapp: fields.checkbox({ label: 'Mostrar el WhatsApp de la empresa', defaultValue: true }),
+        web: fields.checkbox({ label: 'Mostrar la web', defaultValue: true }),
+        qr: fields.select({
+          label: 'Código QR',
+          options: QRS as unknown as { label: string; value: string }[],
+          defaultValue: 'whatsapp',
+        }),
+        tema: fields.select({
+          label: 'Fondo del anverso',
+          description: 'El reverso, con los datos, va siempre en crema para que se lea bien impreso.',
+          options: TEMAS_MARCA as unknown as { label: string; value: string }[],
+          defaultValue: 'atardecer',
+        }),
       },
     }),
   },

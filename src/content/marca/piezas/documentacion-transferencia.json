@@ -1,0 +1,20 @@
+{
+  "nombre": "Documentación de una transferencia",
+  "plantilla": {
+    "discriminant": "lista",
+    "value": {
+      "antetitulo": "Checklist",
+      "titular": "Lo que necesitas para **una transferencia**",
+      "puntos": [
+        "Contrato de compraventa firmado",
+        "Permiso de circulación",
+        "Ficha técnica con la ITV en vigor",
+        "DNI o NIE de comprador y vendedor"
+      ]
+    }
+  },
+  "tema": "crema",
+  "boton": "Te lo revisamos gratis",
+  "pie": "ambos",
+  "silueta": true
+}

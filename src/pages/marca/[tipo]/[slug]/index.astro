@@ -1,0 +1,195 @@
+---
+/**
+ * Galería de descargas de una pieza para redes o de una tarjeta de visita.
+ *
+ * Es la página que abre el botón «Vista previa» del panel. No forma parte de
+ * la web pública: se genera en cada visita con lo último guardado, sólo se ve
+ * con sesión abierta en Keystatic (en producción) y no se indexa.
+ */
+import '../../../../styles/global.css';
+
+import Logo from '../../../../components/layout/Logo.astro';
+import { CARAS, EXTENSIONES, FORMATOS, REDES, TARJETA } from '../../../../lib/marca/formatos';
+import { leerPieza, leerTarjeta, SinSesion } from '../../../../lib/marca/datos';
+
+export const prerender = false;
+
+const { tipo, slug = '' } = Astro.params;
+const rama = Astro.url.searchParams.get('rama');
+// Keystatic sustituye `{branch}` por la rama activa; en local puede llegar
+// vacío o como texto literal, y entonces no hay rama que arrastrar.
+const ramaValida = rama && rama !== '{branch}' && rama !== 'undefined' ? rama : null;
+
+let entrada: { nombre: string } | null = null;
+try {
+  if (tipo === 'piezas') entrada = await leerPieza(Astro.cookies, ramaValida, slug);
+  else if (tipo === 'tarjetas') entrada = await leerTarjeta(Astro.cookies, ramaValida, slug);
+} catch (error) {
+  if (error instanceof SinSesion) return Astro.redirect('/keystatic');
+  throw error;
+}
+if (!entrada) return new Response('No encontrado', { status: 404 });
+
+Astro.response.headers.set('X-Robots-Tag', 'noindex');
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+
+const consulta = ramaValida ? `rama=${encodeURIComponent(ramaValida)}` : '';
+const enlace = (id: string, ext: string, descargar = false) => {
+  const q = [consulta, descargar ? 'descargar' : ''].filter(Boolean).join('&');
+  return `/marca/${tipo}/${slug}/${id}.${ext}${q ? `?${q}` : ''}`;
+};
+const volver = ramaValida
+  ? `/keystatic/branch/${encodeURIComponent(ramaValida)}/collection/${tipo}/item/${slug}`
+  : `/keystatic/collection/${tipo}/item/${slug}`;
+
+const grupos = REDES.map((red) => ({ ...red, formatos: FORMATOS.filter((f) => f.red === red.id) }));
+const etiqueta: Record<string, string> = { png: 'PNG', jpg: 'JPG', svg: 'SVG', pdf: 'PDF' };
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{entrada.nombre} · Imagen de marca</title>
+  </head>
+  <body class="bg-surface-alt">
+    <header class="border-b border-line bg-white">
+      <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
+        <div class="flex items-center gap-4">
+          <Logo />
+          <span class="hidden h-6 w-px bg-line sm:block"></span>
+          <span class="font-display text-sm font-semibold text-ink-muted">Imagen de marca</span>
+        </div>
+        <a
+          href={volver}
+          class="inline-flex items-center gap-2 rounded-md border border-line bg-white px-4 py-2 font-display text-sm font-semibold text-brand-900 hover:border-brand-100 hover:bg-brand-50"
+        >
+          ← Volver al panel
+        </a>
+      </div>
+    </header>
+
+    <main class="mx-auto flex max-w-7xl flex-col gap-12 px-4 py-10 sm:px-6">
+      <div class="flex flex-col gap-2">
+        <p class="font-display text-sm font-bold tracking-wider text-accent-600 uppercase">
+          {tipo === 'piezas' ? 'Imagen para redes' : 'Tarjeta de visita'}
+        </p>
+        <h1 class="text-h1">{entrada.nombre}</h1>
+        <p class="max-w-[70ch] text-ink-muted">
+          {
+            tipo === 'piezas'
+              ? 'Todos los formatos de cada red, generados con lo último que has guardado en el panel. Si cambias algo, guarda y recarga esta página.'
+              : `Tamaño estándar de ${TARJETA.corteMm.ancho} × ${TARJETA.corteMm.alto} mm con ${TARJETA.sangradoMm} mm de sangrado por cada lado. Para la imprenta, descarga el PDF: lleva las dos caras en vectorial y marcada la caja de corte.`
+          }
+        </p>
+      </div>
+
+      {
+        tipo === 'piezas' &&
+          grupos.map((grupo) => (
+            <section class="flex flex-col gap-5">
+              <h2 class="text-h3">{grupo.nombre}</h2>
+              <ul class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {grupo.formatos.map((f) => (
+                  <li class="flex flex-col overflow-hidden rounded-lg border border-line bg-white">
+                    <a
+                      href={enlace(f.id, 'png')}
+                      target="_blank"
+                      class="flex h-64 items-center justify-center bg-surface-muted p-4"
+                    >
+                      <img
+                        src={enlace(f.id, 'svg')}
+                        alt={`${grupo.nombre} · ${f.nombre}`}
+                        loading="lazy"
+                        class:list={[
+                          'max-h-full max-w-full shadow-sm',
+                          f.tipo === 'perfil' && 'rounded-full',
+                        ]}
+                        style={`aspect-ratio:${f.ancho}/${f.alto}`}
+                      />
+                    </a>
+                    <div class="flex flex-1 flex-col gap-3 p-4">
+                      <div class="flex flex-col gap-0.5">
+                        <h3 class="font-display text-base font-semibold text-brand-900">{f.nombre}</h3>
+                        <p class="text-sm text-ink-muted">
+                          {f.ancho} × {f.alto} px
+                          {f.nota && <span class="block text-ink-subtle">{f.nota}</span>}
+                        </p>
+                      </div>
+                      <div class="mt-auto flex flex-wrap gap-2">
+                        {EXTENSIONES.map((ext) => (
+                          <a
+                            href={enlace(f.id, ext, true)}
+                            download
+                            class:list={[
+                              'rounded-md px-3 py-1.5 font-display text-sm font-semibold',
+                              ext === 'png'
+                                ? 'bg-accent-500 text-white hover:bg-accent-600'
+                                : 'border border-line text-brand-900 hover:border-brand-100 hover:bg-brand-50',
+                            ]}
+                          >
+                            {etiqueta[ext]}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+      }
+
+      {
+        tipo === 'tarjetas' && (
+          <>
+            <div>
+              <a
+                href={enlace('tarjeta', 'pdf', true)}
+                download
+                class="inline-flex items-center gap-2 rounded-md bg-accent-500 px-5 py-3 font-display font-semibold text-white hover:bg-accent-600"
+              >
+                Descargar PDF para imprenta (dos caras)
+              </a>
+            </div>
+            <ul class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {CARAS.map((cara) => (
+                <li class="flex flex-col overflow-hidden rounded-lg border border-line bg-white">
+                  <div class="flex items-center justify-center bg-surface-muted p-6 sm:p-10">
+                    <img
+                      src={enlace(cara.id, 'svg')}
+                      alt={cara.nombre}
+                      class="w-full rounded-sm shadow-md"
+                      style="aspect-ratio:91/61"
+                    />
+                  </div>
+                  <div class="flex flex-col gap-3 p-4">
+                    <h2 class="font-display text-base font-semibold text-brand-900">{cara.nombre}</h2>
+                    <div class="flex flex-wrap gap-2">
+                      {EXTENSIONES.map((ext) => (
+                        <a
+                          href={enlace(cara.id, ext, true)}
+                          download
+                          class="rounded-md border border-line px-3 py-1.5 font-display text-sm font-semibold text-brand-900 hover:border-brand-100 hover:bg-brand-50"
+                        >
+                          {etiqueta[ext]}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <p class="text-sm text-ink-muted">
+              La vista previa incluye el sangrado: lo que queda fuera de los {TARJETA.sangradoMm} mm
+              del borde se corta. PNG y JPG salen a 300 ppp.
+            </p>
+          </>
+        )
+      }
+    </main>
+  </body>
+</html>
