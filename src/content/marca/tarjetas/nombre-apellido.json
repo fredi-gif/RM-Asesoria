@@ -1,6 +1,8 @@
 {
   "nombre": "Nombre Apellido",
   "cargo": "Gestor administrativo",
+  "telefono": "666666666",
+  "email": "test@gmail.com",
   "whatsapp": true,
   "web": true,
   "qr": "whatsapp",
