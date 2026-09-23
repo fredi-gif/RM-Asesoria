@@ -5,13 +5,11 @@
     "value": {
       "tramite": "transferencia",
       "titular": "Pon el coche a tu nombre **sin pedir cita**",
-      "texto": "",
-      "antetitulo": "",
       "mostrarPrecio": true,
       "mostrarPlazo": true
     }
   },
-  "tema": "atardecer",
+  "tema": "crema",
   "boton": "Escríbenos por WhatsApp",
   "pie": "ambos",
   "silueta": true
