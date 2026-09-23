@@ -2,7 +2,7 @@
  * Genera un fichero descargable a partir de una pieza o una tarjeta.
  */
 import { CARAS, TARJETA, TARJETA_PX, formato, type Cara, type Extension } from './formatos';
-import { aJpg, aPdf, aPng, aSvg, type Lienzo } from './render';
+import { aJpg, aPdf, aPng, aSvg, ajustar, type Lienzo } from './render';
 import { lienzoAnverso, lienzoPieza, lienzoReverso } from './plantillas';
 import { EMPRESA, type Pieza, type Tarjeta } from './datos';
 
@@ -49,7 +49,8 @@ async function exportar(lienzos: Lienzo[], ext: Extension, titulo: string, impre
 export async function ficheroPieza(pieza: Pieza, idFormato: string, ext: Extension): Promise<Fichero | null> {
   const f = formato(idFormato);
   if (!f) return null;
-  return exportar([lienzoPieza(f, pieza.datos, EMPRESA)], ext, `${pieza.nombre} · ${f.nombre}`);
+  const lienzo = await ajustar((escala) => lienzoPieza(f, pieza.datos, EMPRESA, escala));
+  return exportar([lienzo], ext, `${pieza.nombre} · ${f.nombre}`);
 }
 
 /**
@@ -59,8 +60,8 @@ export async function ficheroPieza(pieza: Pieza, idFormato: string, ext: Extensi
  */
 export async function ficheroTarjeta(tarjeta: Tarjeta, cara: Cara | 'tarjeta', ext: Extension): Promise<Fichero | null> {
   const lienzos: Record<Cara, () => Promise<Lienzo>> = {
-    anverso: async () => lienzoAnverso(tarjeta.datos, EMPRESA),
-    reverso: () => lienzoReverso(tarjeta.datos, EMPRESA),
+    anverso: () => ajustar(() => lienzoAnverso(tarjeta.datos, EMPRESA)),
+    reverso: () => ajustar((escala) => lienzoReverso(tarjeta.datos, EMPRESA, escala)),
   };
   if (cara === 'tarjeta') {
     if (ext !== 'pdf') return null;
