@@ -1,0 +1,17 @@
+{
+  "nombre": "Ejemplo",
+  "plantilla": {
+    "discriminant": "tramite",
+    "value": {
+      "titular": "Titulo H1",
+      "texto": "",
+      "antetitulo": "",
+      "mostrarPrecio": true,
+      "mostrarPlazo": true
+    }
+  },
+  "tema": "atardecer",
+  "boton": "Escríbenos por WhatsApp",
+  "pie": "ambos",
+  "silueta": true
+}
