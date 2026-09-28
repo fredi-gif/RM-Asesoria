@@ -25,6 +25,7 @@ import {
   type Tipo,
   type ValoresPlantilla,
 } from '../../lib/marca/entradas';
+import { peticionMarca, refrescarSesion } from '../../lib/marca/cliente';
 
 interface Props {
   tipo: Tipo;
@@ -66,19 +67,6 @@ const consulta = (pares: Record<string, string | null | false | undefined>) => {
   return q ? `?${q}` : '';
 };
 
-/**
- * El token del panel caduca a las pocas horas. Keystatic lo renueva con su
- * endpoint de refresco; aquí se usa el mismo, una sola vez a la vez.
- */
-let refresco: Promise<boolean> | null = null;
-function refrescarSesion(): Promise<boolean> {
-  refresco ??= fetch('/api/keystatic/github/refresh-token', { method: 'POST' })
-    .then((r) => r.ok)
-    .catch(() => false)
-    .finally(() => setTimeout(() => (refresco = null), 10_000));
-  return refresco;
-}
-
 function useRetrasado<T>(valor: T, ms: number): T {
   const [retrasado, setRetrasado] = useState(valor);
   useEffect(() => {
@@ -119,18 +107,7 @@ export default function Estudio(props: Props) {
   }, [sucio]);
 
   const peticion = useCallback(
-    async (metodo: 'POST' | 'DELETE', cuerpo: unknown, reintentar = true): Promise<Record<string, unknown>> => {
-      const r = await fetch(`/api/marca/${tipo}`, {
-        method: metodo,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cuerpo),
-      });
-      if (r.status === 401 && reintentar && (await refrescarSesion())) return peticion(metodo, cuerpo, false);
-      const datos = (await r.json().catch(() => ({}))) as Record<string, unknown>;
-      if (r.status === 401) throw new Error('sin-sesion');
-      if (!r.ok) throw new Error(typeof datos.error === 'string' ? datos.error : `Error ${r.status}`);
-      return datos;
-    },
+    (metodo: 'POST' | 'DELETE', cuerpo: unknown) => peticionMarca(tipo, metodo, cuerpo),
     [tipo],
   );
 
@@ -189,7 +166,7 @@ export default function Estudio(props: Props) {
 
   const eliminar = async () => {
     if (!slug) return;
-    if (!window.confirm(`¿Borrar «${entrada.nombre || slug}»? No se puede deshacer desde aquí.`)) return;
+    if (!window.confirm(`¿Borrar «${entrada.nombre || slug}»? Desaparecerá de la lista y del panel.`)) return;
     setOcupado('eliminando');
     try {
       await peticion('DELETE', { rama, slug });
@@ -224,9 +201,26 @@ export default function Estudio(props: Props) {
       {/* Formulario */}
       <aside className="border-line bg-white lg:sticky lg:top-[61px] lg:h-[calc(100vh-61px)] lg:overflow-y-auto lg:border-r">
         <div className="sticky top-0 z-10 flex flex-col gap-3 border-b border-line bg-white px-5 py-4">
-          <a href={urlLista} className="font-display text-sm font-semibold text-ink-muted hover:text-brand-900">
-            ← {nombres.lista}
-          </a>
+          <div className="flex items-center justify-between gap-3">
+            <a href={urlLista} className="font-display text-sm font-semibold text-ink-muted hover:text-brand-900">
+              ← {nombres.lista}
+            </a>
+            {slug && (
+              <div className="flex gap-2">
+                <button type="button" onClick={duplicar} disabled={!!ocupado} className={BOTON_SECUNDARIO}>
+                  Duplicar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void eliminar()}
+                  disabled={!!ocupado}
+                  className={BOTON_BORRAR}
+                >
+                  {ocupado === 'eliminando' ? 'Borrando…' : 'Borrar'}
+                </button>
+              </div>
+            )}
+          </div>
           <div className="flex items-center justify-between gap-3">
             <div className="flex min-w-0 flex-col">
               <h1 className="truncate font-display text-xl font-bold text-brand-900">
@@ -289,21 +283,6 @@ export default function Estudio(props: Props) {
             />
           )}
 
-          {slug && (
-            <div className="flex flex-wrap gap-2 border-t border-line pt-6">
-              <button type="button" onClick={duplicar} disabled={!!ocupado} className={BOTON_SECUNDARIO}>
-                Duplicar
-              </button>
-              <button
-                type="button"
-                onClick={() => void eliminar()}
-                disabled={!!ocupado}
-                className="rounded-md border border-line px-3 py-1.5 font-display text-sm font-semibold text-danger hover:border-red-200 hover:bg-red-50"
-              >
-                {ocupado === 'eliminando' ? 'Borrando…' : 'Borrar'}
-              </button>
-            </div>
-          )}
         </div>
       </aside>
 
@@ -331,6 +310,9 @@ export default function Estudio(props: Props) {
     </div>
   );
 }
+
+const BOTON_BORRAR =
+  'rounded-md border border-line px-3 py-1.5 font-display text-sm font-semibold text-danger hover:border-red-200 hover:bg-red-50 disabled:opacity-50';
 
 const BOTON_SECUNDARIO =
   'rounded-md border border-line px-3 py-1.5 font-display text-sm font-semibold text-brand-900 hover:border-brand-100 hover:bg-brand-50 disabled:opacity-50';
