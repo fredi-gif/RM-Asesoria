@@ -1,0 +1,42 @@
+---
+/**
+ * A dónde manda el estudio cuando falta la sesión del panel o ha caducado.
+ *
+ * El token de GitHub del panel dura unas horas; el panel lo renueva solo con
+ * el token de refresco, pero el estudio no es el panel. Esta página intenta esa
+ * misma renovación (el endpoint de Keystatic) y, si sale bien, vuelve a donde
+ * estaba. Si no, manda a entrar en el panel.
+ */
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Entrando… · Imagen de marca</title>
+  </head>
+  <body style="font-family: system-ui, sans-serif; padding: 2rem; color: #475569">
+    <p>Comprobando la sesión del panel…</p>
+    <script>
+      const volver = new URLSearchParams(location.search).get('volver');
+      // Sólo rutas del propio estudio: nada de redirecciones abiertas.
+      const destino = volver && /^\/marca(\/|\?|$)/.test(volver) ? volver : '/marca';
+      // Si se acaba de renovar y aun así se ha vuelto aquí, la renovación no
+      // sirve: a entrar en el panel, en vez de dar vueltas.
+      const ultimo = Number(sessionStorage.getItem('marca-refresco') || 0);
+      if (Date.now() - ultimo < 30_000) {
+        sessionStorage.removeItem('marca-refresco');
+        location.replace('/keystatic');
+      } else {
+        fetch('/api/keystatic/github/refresh-token', { method: 'POST' })
+          .then((r) => {
+            if (!r.ok) throw new Error();
+            sessionStorage.setItem('marca-refresco', String(Date.now()));
+            location.replace(destino);
+          })
+          .catch(() => location.replace('/keystatic'));
+      }
+    </script>
+  </body>
+</html>
