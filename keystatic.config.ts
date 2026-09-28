@@ -1,6 +1,7 @@
 import { config, fields, collection, singleton } from '@keystatic/core';
 import { block } from '@keystatic/core/content-components';
 
+import { accesoEstudio } from './src/components/keystatic/AccesoEstudio';
 import { BrandMark } from './src/components/keystatic/BrandMark';
 import { PIES, PLANTILLAS, QRS, TEMAS_MARCA } from './src/lib/marca/opciones';
 
@@ -117,7 +118,9 @@ export default config({
       Contenido: ['tramites', 'paginas'],
       'Páginas fijas': ['home', 'comoFunciona', 'contacto', 'faqs'],
       Sitio: ['navegacion', 'configuracion', 'error404'],
-      'Imagen de marca': ['piezas', 'tarjetas'],
+      // Las colecciones `piezas` y `tarjetas` no salen en el menú: se editan en
+      // el estudio de `/marca`, y estos dos singletons sólo redirigen allí.
+      'Imagen de marca': ['estudioPiezas', 'estudioTarjetas'],
     },
   },
 
@@ -387,10 +390,13 @@ export default config({
       },
     }),
     /**
-     * Piezas para redes sociales. No se publican en la web: el botón «Vista
-     * previa» abre `/marca/piezas/<slug>`, que las genera en todos los formatos
-     * de Instagram, WhatsApp, LinkedIn, Facebook y YouTube con descarga en PNG,
-     * JPG, SVG y PDF. Las plantillas viven en `src/lib/marca/plantillas.tsx`.
+     * Piezas para redes sociales. No se publican en la web y no salen en el
+     * menú: se crean, editan y descargan en el estudio de `/marca/piezas`
+     * (ver `docs/imagen-de-marca.md`), que lee y escribe estos mismos ficheros.
+     * La colección se queda aquí porque es el esquema del que leen el estudio y
+     * el lector de Keystatic; si cambias un campo, cámbialo también en
+     * `src/lib/marca/entradas.ts` y en el formulario de
+     * `src/components/marca/Estudio.tsx`.
      */
     piezas: collection({
       label: 'Imágenes para redes',
@@ -494,9 +500,9 @@ export default config({
     }),
 
     /**
-     * Tarjetas de visita, una por persona. Igual que las piezas, no se
-     * publican: «Vista previa» abre `/marca/tarjetas/<slug>` con el PDF para
-     * imprenta (85 × 55 mm, con 3 mm de sangrado) y las caras sueltas.
+     * Tarjetas de visita, una por persona. Igual que las piezas, se editan en
+     * el estudio (`/marca/tarjetas`), con el PDF para imprenta (85 × 55 mm, con
+     * 3 mm de sangrado) y las caras sueltas.
      */
     tarjetas: collection({
       label: 'Tarjetas de visita',
@@ -530,6 +536,22 @@ export default config({
   },
 
   singletons: {
+    /**
+     * Entradas del menú «Imagen de marca». No guardan nada: al abrirlas
+     * redirigen al estudio de `/marca`, en la misma rama. Ver
+     * `src/components/keystatic/AccesoEstudio.tsx`.
+     */
+    estudioPiezas: singleton({
+      label: 'Imágenes para redes',
+      path: 'src/content/marca/_estudio/piezas',
+      schema: { acceso: accesoEstudio('piezas') },
+    }),
+    estudioTarjetas: singleton({
+      label: 'Tarjetas de visita',
+      path: 'src/content/marca/_estudio/tarjetas',
+      schema: { acceso: accesoEstudio('tarjetas') },
+    }),
+
     configuracion: singleton({
       label: 'Datos de la empresa',
       path: 'src/content/configuracion/',

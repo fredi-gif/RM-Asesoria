@@ -1,0 +1,85 @@
+---
+/**
+ * Marco del estudio de imagen de marca (`/marca`).
+ *
+ * No forma parte de la web pública: se genera en cada visita, sólo se ve con
+ * sesión abierta en el panel (en producción) y no se indexa. La cabecera lleva
+ * las dos secciones —piezas y tarjetas— y la vuelta al panel, para que el
+ * estudio sea un sitio completo y no una vista previa suelta.
+ */
+import '../styles/global.css';
+
+import Logo from '../components/layout/Logo.astro';
+import type { Tipo } from '../lib/marca/entradas';
+import { consultaRama, urlPanel } from '../lib/marca/rama';
+
+interface Props {
+  titulo: string;
+  tipo: Tipo;
+  rama: string | null;
+}
+
+const { titulo, tipo, rama } = Astro.props;
+
+Astro.response.headers.set('X-Robots-Tag', 'noindex');
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+
+const secciones: { id: Tipo; nombre: string }[] = [
+  { id: 'piezas', nombre: 'Imágenes para redes' },
+  { id: 'tarjetas', nombre: 'Tarjetas de visita' },
+];
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{titulo} · Imagen de marca</title>
+  </head>
+  <body class="min-h-screen bg-surface-alt">
+    <header class="sticky top-0 z-30 border-b border-line bg-white">
+      <div class="mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6">
+        <a href={`/marca/piezas${consultaRama(rama)}`} class="flex items-center gap-4">
+          <Logo />
+          <span class="hidden h-6 w-px bg-line sm:block"></span>
+          <span class="hidden font-display text-sm font-semibold text-ink-muted sm:block">Imagen de marca</span>
+        </a>
+        <nav class="order-last flex w-full gap-1 md:order-none md:w-auto" aria-label="Secciones">
+          {
+            secciones.map((s) => (
+              <a
+                href={`/marca/${s.id}${consultaRama(rama)}`}
+                aria-current={s.id === tipo ? 'page' : undefined}
+                class:list={[
+                  'rounded-md px-3 py-2 font-display text-sm font-semibold',
+                  s.id === tipo ? 'bg-brand-50 text-brand-900' : 'text-ink-muted hover:bg-surface-muted hover:text-brand-900',
+                ]}
+              >
+                {s.nombre}
+              </a>
+            ))
+          }
+        </nav>
+        <div class="ml-auto flex items-center gap-3">
+          {
+            rama && (
+              <span class="hidden rounded-full bg-surface-muted px-3 py-1 font-mono text-xs text-ink-muted lg:inline" title="Rama de GitHub en la que se guarda">
+                {rama}
+              </span>
+            )
+          }
+          <a
+            href={urlPanel(rama)}
+            class="inline-flex items-center gap-2 rounded-md border border-line bg-white px-3 py-2 font-display text-sm font-semibold text-brand-900 hover:border-brand-100 hover:bg-brand-50"
+          >
+            ← Volver al panel
+          </a>
+        </div>
+      </div>
+    </header>
+    <slot />
+  </body>
+</html>
