@@ -42,8 +42,9 @@ export default defineConfig({
     markdoc(),
     keystatic(),
     sitemap({
-      // /styleguide es una página interna de trabajo, no debe indexarse.
-      filter: (page) => !page.includes('/styleguide'),
+      // /styleguide y /marca son herramientas internas: no deben indexarse (y
+      // robots.txt ya las bloquea, así que listarlas en el sitemap es contradictorio).
+      filter: (page) => !page.includes('/styleguide') && !page.includes('/marca'),
     }),
   ],
 
