@@ -14,8 +14,12 @@ export const SITE = {
   /** Descripción por defecto para meta description y Open Graph. */
   description:
     'Gestoría online especializada en trámites de vehículos: transferencias, matriculaciones, bajas y mucho más. Sin colas y sin desplazamientos.',
-  /** Sin barra final. */
-  url: 'https://rmgestion.es',
+  /**
+   * Sin barra final. Debe ser el dominio que sirve la web, no uno que redirija:
+   * en Vercel rmgestion.es redirige (308) a www, así que el canónico, el sitemap
+   * y el robots.txt tienen que apuntar a www o Google no indexa ninguna versión.
+   */
+  url: 'https://www.rmgestion.es',
   /** Formato internacional sin «+» ni espacios — es lo que espera wa.me. */
   whatsapp: '34681879306',
   email: 'hola@rmgestion.es',
