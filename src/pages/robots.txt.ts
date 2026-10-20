@@ -10,7 +10,7 @@ export const GET: APIRoute = () =>
       'Disallow: /keystatic',
       'Disallow: /styleguide',
       // Las galerías de imagen de marca son una herramienta del panel.
-      'Disallow: /marca/',
+      'Disallow: /marca',
       '',
       `Sitemap: ${SITE.url}/sitemap-index.xml`,
       '',
