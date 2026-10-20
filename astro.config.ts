@@ -30,6 +30,12 @@ const harfbuzzWasm = createRequire(`${dirname(requerir.resolve('satori/package.j
 export default defineConfig({
   site: SITE.url,
 
+  // Una sola URL por página, sin barra final, que es como enlaza la web por
+  // dentro. Con 'ignore' cada página respondía 200 en /x y en /x/, y el
+  // canónico y el sitemap usaban /x/ mientras los enlaces internos iban a /x:
+  // dos URLs por página con señales cruzadas para Google.
+  trailingSlash: 'never',
+
   // /tramites era un duplicado de la rejilla de la home. Se retira, pero la URL
   // llegó a publicarse y a enlazarse, así que se redirige en vez de devolver un
   // 404: 301 para que el buscador traslade la autoridad al destino.
