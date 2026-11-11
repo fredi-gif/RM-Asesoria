@@ -36,6 +36,9 @@ export const PATHS = {
   hoja: '<path d="M5 19c0-7 4.5-12 14-12 0 8-4.5 12.5-11 12.5H5Z"/><path d="M9 15.5c1.5-2.5 3.5-4.2 6.5-5.5"/>',
   placas:
     '<rect x="2.5" y="6.5" width="19" height="11" rx="1.8"/><path d="M2.5 12h19"/><path d="M6 9.5h4M6 14.5h7"/>',
+  /** Placas verdes: mismo trazo que las rojas; el color lo pone la ilustración. */
+  'placas-verdes':
+    '<rect x="2.5" y="6.5" width="19" height="11" rx="1.8"/><path d="M2.5 12h19"/><path d="M6 9.5h4M6 14.5h7"/>',
   /** Entrega a compraventa: el vehículo entra en el stock del profesional. */
   entrega:
     '<path d="M4 13.5V18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4.5"/><path d="M4 13.5h4l1.4 2h5.2l1.4-2h4"/><path d="M12 3.5v7"/><path d="m8.8 7.4 3.2 3.2 3.2-3.2"/>',
